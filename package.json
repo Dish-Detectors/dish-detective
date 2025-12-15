@@ -21,7 +21,7 @@
     "@mui/material": "^7.3.4",
     "@vercel/blob": "^2.0.0",
     "mongoose": "^8.19.3",
-    "next": "^16.0.7",
+    "next": "16.0.10",
     "prettier": "^3.6.2",
     "react": "^19.2.1",
     "react-dom": "^19.2.1"
