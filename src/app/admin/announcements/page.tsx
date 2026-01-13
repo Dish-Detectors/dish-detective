@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, KeyboardEvent } from "react";
 import {
   Box,
   Typography,
@@ -8,19 +8,36 @@ import {
   Divider,
   IconButton,
   InputBase,
-  Stack,
   useMediaQuery,
   useTheme,
-  Button,
 } from "@mui/material";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import SendIcon from "@mui/icons-material/Send";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DownloadIcon from "@mui/icons-material/Download";
-import AdminNavbar, { navWidth, headerHeight } from "@/components/AdminNavbar";
+import AdminNavbar, { navWidth } from "@/components/AdminNavbar";
+
+interface IFile {
+  name: string;
+  date: string;
+  size: string;
+}
+
+interface IMessage {
+  id: number;
+  text: string;
+  time: string;
+  isAdmin: boolean;
+  file?: IFile;
+}
+
+interface IAudienceMessages {
+  workers: IMessage[];
+  students: IMessage[];
+}
 
 // Mock data based on the screenshot
-const initialMessages = {
+const initialMessages: IAudienceMessages = {
   workers: [
     {
       id: 1,
@@ -56,64 +73,71 @@ const initialMessages = {
   ],
 };
 
+interface AudienceCardProps {
+  type: "workers" | "students";
+  title: string;
+  subtitle: string;
+  selected: boolean;
+  onClick: (type: "workers" | "students") => void;
+}
+
+const AudienceCard = ({ type, title, subtitle, selected, onClick }: AudienceCardProps) => (
+  <Paper
+    onClick={() => onClick(type)}
+    elevation={selected ? 1 : 0}
+    sx={{
+      p: 2,
+      mb: 2,
+      cursor: "pointer",
+      borderRadius: 3,
+      border: "1px solid",
+      borderColor: selected ? "primary.main" : "rgba(0,0,0,0.12)",
+      bgcolor: selected ? "white" : "transparent",
+      transition: "all 0.2s",
+      "&:hover": {
+        borderColor: "primary.main",
+      },
+    }}
+  >
+    <Typography variant="subtitle1" fontWeight={700} color="text.primary">
+      {title}
+    </Typography>
+    <Typography variant="body2" color="text.secondary">
+      {subtitle}
+    </Typography>
+  </Paper>
+);
+
 export default function AnnouncementChatPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [selectedAudience, setSelectedAudience] = useState<"workers" | "students">("workers");
-  const [messages, setMessages] = useState(initialMessages);
+  const [messages, setMessages] = useState<IAudienceMessages>(initialMessages);
   const [messageInput, setMessageInput] = useState("");
 
   const handleSendMessage = () => {
     if (!messageInput.trim()) return;
 
-    const newMessage = {
+    const newMessage: IMessage = {
       id: Date.now(),
       text: messageInput,
       time: "Just now",
       isAdmin: true,
     };
 
-    setMessages((prev) => ({
+    setMessages((prev: IAudienceMessages) => ({
       ...prev,
       [selectedAudience]: [...prev[selectedAudience], newMessage],
     }));
     setMessageInput("");
   };
 
-  const AudienceCard = ({ 
-    type, 
-    title, 
-    subtitle 
-  }: { 
-    type: "workers" | "students", 
-    title: string, 
-    subtitle: string 
-  }) => (
-    <Paper
-      onClick={() => setSelectedAudience(type)}
-      elevation={selectedAudience === type ? 1 : 0}
-      sx={{
-        p: 2,
-        mb: 2,
-        cursor: "pointer",
-        borderRadius: 3,
-        border: "1px solid",
-        borderColor: selectedAudience === type ? "primary.main" : "rgba(0,0,0,0.12)",
-        bgcolor: selectedAudience === type ? "white" : "transparent",
-        transition: "all 0.2s",
-        "&:hover": {
-          borderColor: "primary.main",
-        },
-      }}
-    >
-      <Typography variant="subtitle1" fontWeight={700} color="text.primary">
-        {title}
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        {subtitle}
-      </Typography>
-    </Paper>
-  );
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
 
   return (
     <>
@@ -155,11 +179,15 @@ export default function AnnouncementChatPage() {
               type="workers"
               title="Radnici"
               subtitle="Interna obavijest radnicima"
+              selected={selectedAudience === "workers"}
+              onClick={setSelectedAudience}
             />
             <AudienceCard
               type="students"
               title="Studenti"
               subtitle="Javna obavijest studentima"
+              selected={selectedAudience === "students"}
+              onClick={setSelectedAudience}
             />
           </Box>
 
@@ -242,7 +270,7 @@ export default function AnnouncementChatPage() {
                             {msg.file.date} • {msg.file.size}
                           </Typography>
                         </Box>
-                        <IconButton size="small">
+                        <IconButton size="small" aria-label="download file">
                           <DownloadIcon fontSize="small" />
                         </IconButton>
                       </Box>
@@ -267,7 +295,7 @@ export default function AnnouncementChatPage() {
                   },
                 }}
               >
-                <IconButton size="small" sx={{ color: "text.secondary", mr: 1 }}>
+                <IconButton size="small" sx={{ color: "text.secondary", mr: 1 }} aria-label="attach file">
                   <AttachFileIcon />
                 </IconButton>
                 <InputBase
@@ -275,12 +303,13 @@ export default function AnnouncementChatPage() {
                   placeholder="Enter your message"
                   value={messageInput}
                   onChange={(e) => setMessageInput(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                  onKeyDown={handleKeyDown}
                   sx={{ flexGrow: 1, fontSize: "0.95rem" }}
                 />
                 <IconButton
                   onClick={handleSendMessage}
                   disabled={!messageInput.trim()}
+                  aria-label="send message"
                   sx={{
                     bgcolor: messageInput.trim() ? "#5faef4" : "rgba(0,0,0,0.05)",
                     color: "white",
