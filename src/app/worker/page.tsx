@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Box,
   Divider,
@@ -8,12 +9,6 @@ import {
   Paper,
   useMediaQuery,
   useTheme,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DishCard from "@/components/DishCard";
@@ -30,86 +25,129 @@ interface Dish {
   updatedAt: string;
 }
 
+async function getWorkerMenzaId(): Promise<string> {
+  // TODO: derive menza from the authenticated worker
+  return "menza-placeholder";
+}
+
+async function fetchTodaysOfferForMenza(menzaId: string): Promise<Dish[]> {
+  // TODO: query DB for today's offer for this menza
+  void menzaId;
+  // Temporary, return hardcoded dish examples...
+  return [
+    {
+      _id: "placeholder-1",
+      name: "Primjer jela 1",
+      description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
+      category: "Kategorija",
+      imageUrl: "",
+      allergens: ["Gluten", "Jaja"],
+      createdAt: "",
+      updatedAt: "",
+    },
+    {
+      _id: "placeholder-2",
+      name: "Primjer jela 2",
+      description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
+      category: "Kategorija",
+      imageUrl: "",
+      allergens: ["Mlijeko"],
+      createdAt: "",
+      updatedAt: "",
+    },
+    {
+      _id: "placeholder-3",
+      name: "Primjer jela 3",
+      description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
+      category: "Kategorija",
+      imageUrl: "",
+      allergens: ["Gluten"],
+      createdAt: "",
+      updatedAt: "",
+    },
+    {
+      _id: "placeholder-4",
+      name: "Primjer jela 4",
+      description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
+      category: "Kategorija",
+      imageUrl: "",
+      allergens: ["Jaja"],
+      createdAt: "",
+      updatedAt: "",
+    },
+    {
+      _id: "placeholder-5",
+      name: "Primjer jela 5",
+      description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
+      category: "Kategorija",
+      imageUrl: "",
+      allergens: ["Mlijeko"],
+      createdAt: "",
+      updatedAt: "",
+    },
+    {
+      _id: "placeholder-6",
+      name: "Primjer jela 6",
+      description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
+      category: "Kategorija",
+      imageUrl: "",
+      allergens: ["Gluten", "Mlijeko"],
+      createdAt: "",
+      updatedAt: "",
+    },
+    {
+      _id: "placeholder-7",
+      name: "Primjer jela 7",
+      description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
+      category: "Kategorija",
+      imageUrl: "",
+      allergens: [],
+      createdAt: "",
+      updatedAt: "",
+    },
+  ];
+}
+
+async function removeDishFromTodaysOffer(params: {
+  menzaId: string;
+  dishId: string;
+  // TODO: accept date?
+}): Promise<void> {
+  // TODO: remove dish from today's offer in DB; ensure it only affects this menza's offer
+  void params;
+}
+
 export default function Page() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const router = useRouter();
 
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [menzaId, setMenzaId] = useState<string | null>(null);
+  const [dishes, setDishes] = useState<Dish[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const dishes = useMemo<Dish[]>(
-    () => [
-      {
-        _id: "placeholder-1",
-        name: "Primjer jela 1",
-        description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
-        category: "Kategorija",
-        imageUrl: "",
-        allergens: ["Gluten", "Jaja"],
-        createdAt: "",
-        updatedAt: "",
-      },
-      {
-        _id: "placeholder-2",
-        name: "Primjer jela 2",
-        description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
-        category: "Kategorija",
-        imageUrl: "",
-        allergens: ["Mlijeko"],
-        createdAt: "",
-        updatedAt: "",
-      },
-      {
-        _id: "placeholder-3",
-        name: "Primjer jela 3",
-        description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
-        category: "Kategorija",
-        imageUrl: "",
-        allergens: ["Gluten"],
-        createdAt: "",
-        updatedAt: "",
-      },
-      {
-        _id: "placeholder-4",
-        name: "Primjer jela 4",
-        description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
-        category: "Kategorija",
-        imageUrl: "",
-        allergens: ["Jaja"],
-        createdAt: "",
-        updatedAt: "",
-      },
-      {
-        _id: "placeholder-5",
-        name: "Primjer jela 5",
-        description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
-        category: "Kategorija",
-        imageUrl: "",
-        allergens: ["Mlijeko"],
-        createdAt: "",
-        updatedAt: "",
-      },
-      {
-        _id: "placeholder-6",
-        name: "Primjer jela 6",
-        description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
-        category: "Kategorija",
-        imageUrl: "",
-        allergens: ["Gluten", "Mlijeko"],
-        createdAt: "",
-        updatedAt: "",
-      },
-      {
-        _id: "placeholder-7",
-        name: "Primjer jela 7",
-        description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
-        category: "Kategorija",
-        imageUrl: "",
-        allergens: [],
-        createdAt: "",
-        updatedAt: "",
-      },
-    ],
-    [],
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      setLoading(true);
+      const id = await getWorkerMenzaId();
+      const result = await fetchTodaysOfferForMenza(id);
+      if (cancelled) return;
+      setMenzaId(id);
+      setDishes(result);
+      setLoading(false);
+    }
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const sortedDishes = useMemo(
+    () => [...dishes].sort((a, b) => a.name.localeCompare(b.name)),
+    [dishes],
   );
 
   return (
@@ -152,7 +190,13 @@ export default function Page() {
           pb: isMobile ? 5 : 4,
         }}
       >
-        {dishes.length === 0 ? (
+        {loading ? (
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 3 }}>
+            <Typography variant="body1" sx={{ fontWeight: 700 }}>
+              Učitavanje ponude...
+            </Typography>
+          </Paper>
+        ) : sortedDishes.length === 0 ? (
           <Box
             sx={{
               bgcolor: "white",
@@ -184,11 +228,11 @@ export default function Page() {
             <Paper
               role="button"
               tabIndex={0}
-              onClick={() => setAddDialogOpen(true)}
+              onClick={() => router.push("/worker/add")}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
-                  setAddDialogOpen(true);
+                  router.push("/worker/add");
                 }
               }}
               elevation={0}
@@ -246,7 +290,7 @@ export default function Page() {
               </Box>
             </Paper>
 
-            {dishes.map((dish, index) => (
+            {sortedDishes.map((dish, index) => (
               <Box
                 key={dish._id}
                 sx={{
@@ -265,7 +309,8 @@ export default function Page() {
                   imageUrl={dish.imageUrl}
                   allergens={dish.allergens}
                   onDelete={() => {
-                    
+                    if (!menzaId) return;
+                    void removeDishFromTodaysOffer({ menzaId, dishId: dish._id });
                   }}
                 />
               </Box>
@@ -273,26 +318,6 @@ export default function Page() {
           </Box>
         )}
       </Box>
-
-        <Dialog
-          open={addDialogOpen}
-          onClose={() => setAddDialogOpen(false)}
-          aria-labelledby="add-to-offer-dialog-title"
-        >
-          <DialogTitle id="add-to-offer-dialog-title">
-            Dodaj u ponudu
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Ovdje će ići odabir jela i dodavanje u dnevnu ponudu.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setAddDialogOpen(false)} autoFocus>
-              Zatvori
-            </Button>
-          </DialogActions>
-        </Dialog>
       </Box>
     </>
   );
