@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DishCard from "@/components/DishCard";
+import WorkerNavbar, { navWidth } from "@/components/WorkerNavbar";
 
 interface Dish {
   _id: string;
@@ -112,7 +113,9 @@ export default function Page() {
   );
 
   return (
-    <Box
+    <>
+      <WorkerNavbar isMobile={isMobile} />
+      <Box
         sx={{
           height: "100vh",
           bgcolor: "#f5f5f5",
@@ -122,6 +125,8 @@ export default function Page() {
           py: { xs: 3, sm: 5 },
           pt: 0,
           pb: { xs: "100px", sm: 6 },
+          ml: isMobile ? 0 : `${navWidth}px`,
+          width: isMobile ? "100%" : `calc(100% - ${navWidth}px)`,
           overflow: "hidden",
         }}
       >
@@ -289,5 +294,6 @@ export default function Page() {
           </DialogActions>
         </Dialog>
       </Box>
+    </>
   );
 }
