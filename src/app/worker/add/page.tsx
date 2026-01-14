@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+
 import {
   Box,
   Divider,
@@ -11,75 +12,14 @@ import {
 } from "@mui/material";
 import WorkerNavbar, { navWidth } from "@/components/WorkerNavbar";
 import DishCard from "@/components/DishCard";
-
-type MenzaDish = {
-  id: string;
-  name: string;
-  description?: string;
-  allergens?: string[];
-};
-
-async function getWorkerMenzaId(): Promise<string> {
-  // TODO: derive menza from the authenticated worker
-  return "menza-placeholder";
-}
-
-async function fetchAllDishesForMenza(
-  menzaId: string,
-): Promise<MenzaDish[]> {
-  // TODO: query DB by menzaId and return all dishes allowed for this menza
-  void menzaId;
-  // Temporary, return hardcoded dish examples...
-  return [
-    {
-      id: "dish-1",
-      name: "Primjer jela 1",
-      description: "Opis jela (placeholder)",
-      allergens: ["Gluten", "Jaja"],
-    },
-    {
-      id: "dish-2",
-      name: "Primjer jela 2",
-      description: "Opis jela (placeholder)",
-      allergens: ["Mlijeko"],
-    },
-    {
-      id: "dish-3",
-      name: "Primjer jela 3",
-      description: "Opis jela (placeholder)",
-      allergens: [],
-    },
-    {
-      id: "dish-4",
-      name: "Primjer jela 4",
-      description: "Opis jela (placeholder)",
-      allergens: ["Gluten"],
-    },
-  ];
-}
-
-async function fetchTodaysOfferDishIdsForMenza(menzaId: string): Promise<string[]> {
-  // TODO: query DB for today's offer for this menza and return dishIds already present
-  void menzaId;
-  // Temporary, pretend dish with id "dish-2" is already in today's offer
-  return ["dish-2"]; 
-}
-
-async function addDishToTodaysOffer(params: {
-  menzaId: string;
-  dishId: string;
-  // TODO: accept date?
-}): Promise<void> {
-  // TODO: write to Offer/DailyMenu collection; ensure no duplicates
-  void params;
-}
+import { MenuItem, getWorkerMenzaId, fetchAllDishesForMenza, fetchTodaysOfferDishIdsForMenza, addDishToTodaysOffer } from "../actions";
 
 export default function Page() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [menzaId, setMenzaId] = useState<string | null>(null);
-  const [dishes, setDishes] = useState<MenzaDish[]>([]);
+  const [dishes, setDishes] = useState<MenuItem[]>([]);
   const [todaysOfferDishIds, setTodaysOfferDishIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -216,7 +156,7 @@ export default function Page() {
                         onDelete={() => {
                           if (isAlreadyInOffer) return;
                           if (!menzaId) return;
-                          void addDishToTodaysOffer({ menzaId, dishId: dish.id });
+                          void addDishToTodaysOffer({ menuItemId: dish.id, updateDate: new Date() });
                         }}
                       />
                     </Box>

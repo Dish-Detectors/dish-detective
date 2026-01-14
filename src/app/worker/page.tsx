@@ -13,109 +13,10 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import DishCard from "@/components/DishCard";
 import WorkerNavbar, { navWidth } from "@/components/WorkerNavbar";
+import { MenuItem, getWorkerMenzaId, fetchTodaysOfferForMenza, removeDishFromTodaysOffer } from "./actions";
 
-interface Dish {
-  _id: string;
-  name: string;
-  description: string;
-  category: string;
-  imageUrl: string;
-  allergens: string[];
-  createdAt: string;
-  updatedAt: string;
-}
 
-async function getWorkerMenzaId(): Promise<string> {
-  // TODO: derive menza from the authenticated worker
-  return "menza-placeholder";
-}
 
-async function fetchTodaysOfferForMenza(menzaId: string): Promise<Dish[]> {
-  // TODO: query DB for today's offer for this menza
-  void menzaId;
-  // Temporary, return hardcoded dish examples...
-  return [
-    {
-      _id: "placeholder-1",
-      name: "Primjer jela 1",
-      description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
-      category: "Kategorija",
-      imageUrl: "",
-      allergens: ["Gluten", "Jaja"],
-      createdAt: "",
-      updatedAt: "",
-    },
-    {
-      _id: "placeholder-2",
-      name: "Primjer jela 2",
-      description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
-      category: "Kategorija",
-      imageUrl: "",
-      allergens: ["Mlijeko"],
-      createdAt: "",
-      updatedAt: "",
-    },
-    {
-      _id: "placeholder-3",
-      name: "Primjer jela 3",
-      description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
-      category: "Kategorija",
-      imageUrl: "",
-      allergens: ["Gluten"],
-      createdAt: "",
-      updatedAt: "",
-    },
-    {
-      _id: "placeholder-4",
-      name: "Primjer jela 4",
-      description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
-      category: "Kategorija",
-      imageUrl: "",
-      allergens: ["Jaja"],
-      createdAt: "",
-      updatedAt: "",
-    },
-    {
-      _id: "placeholder-5",
-      name: "Primjer jela 5",
-      description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
-      category: "Kategorija",
-      imageUrl: "",
-      allergens: ["Mlijeko"],
-      createdAt: "",
-      updatedAt: "",
-    },
-    {
-      _id: "placeholder-6",
-      name: "Primjer jela 6",
-      description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
-      category: "Kategorija",
-      imageUrl: "",
-      allergens: ["Gluten", "Mlijeko"],
-      createdAt: "",
-      updatedAt: "",
-    },
-    {
-      _id: "placeholder-7",
-      name: "Primjer jela 7",
-      description: "Opis jela (placeholder) - ovdje će doći stvarni podaci.",
-      category: "Kategorija",
-      imageUrl: "",
-      allergens: [],
-      createdAt: "",
-      updatedAt: "",
-    },
-  ];
-}
-
-async function removeDishFromTodaysOffer(params: {
-  menzaId: string;
-  dishId: string;
-  // TODO: accept date?
-}): Promise<void> {
-  // TODO: remove dish from today's offer in DB; ensure it only affects this menza's offer
-  void params;
-}
 
 export default function Page() {
   const theme = useTheme();
@@ -123,7 +24,7 @@ export default function Page() {
   const router = useRouter();
 
   const [menzaId, setMenzaId] = useState<string | null>(null);
-  const [dishes, setDishes] = useState<Dish[]>([]);
+  const [dishes, setDishes] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -292,7 +193,7 @@ export default function Page() {
 
             {sortedDishes.map((dish, index) => (
               <Box
-                key={dish._id}
+                key={dish.id}
                 sx={{
                   opacity: 0,
                   animation: `fadeInUp 0.6s ease-out ${(index + 1) * 0.06}s forwards`,
@@ -310,7 +211,7 @@ export default function Page() {
                   allergens={dish.allergens}
                   onDelete={() => {
                     if (!menzaId) return;
-                    void removeDishFromTodaysOffer({ menzaId, dishId: dish._id });
+                    void removeDishFromTodaysOffer({ menuItemId: dish.id, updateDate: new Date()});
                   }}
                 />
               </Box>
