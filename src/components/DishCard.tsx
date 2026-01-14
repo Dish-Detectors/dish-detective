@@ -22,6 +22,7 @@ interface DishCardProps {
   onEdit?: () => void;
   onDelete: () => void;
   actionMode?: "delete" | "add";
+  actionDisabled?: boolean;
 }
 
 const DishCard = ({
@@ -33,6 +34,7 @@ const DishCard = ({
   onEdit,
   onDelete,
   actionMode = "delete",
+  actionDisabled = false,
 }: DishCardProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -194,6 +196,7 @@ const DishCard = ({
                 onDelete();
               }}
               size="small"
+              disabled={actionDisabled}
               sx={{
                 bgcolor: actionBg,
                 color: "white",
@@ -201,6 +204,12 @@ const DishCard = ({
                 height: 32,
                 "&:hover": {
                   bgcolor: actionHoverBg,
+                },
+                "&.Mui-disabled": {
+                  bgcolor: "grey.400",
+                  color: "white",
+                  opacity: 1,
+                  cursor: "not-allowed",
                 },
               }}
             >
@@ -387,6 +396,7 @@ const DishCard = ({
               e.stopPropagation();
               onDelete();
             }}
+            disabled={actionDisabled}
             sx={{
               flex: 1,
               bgcolor: actionBg,
@@ -394,6 +404,12 @@ const DishCard = ({
               borderRadius: 2,
               "&:hover": {
                 bgcolor: actionHoverBg,
+              },
+              "&.Mui-disabled": {
+                bgcolor: "grey.400",
+                color: "white",
+                opacity: 1,
+                cursor: "not-allowed",
               },
             }}
           >
