@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
 
 interface DishCardProps {
   name: string;
@@ -20,6 +21,7 @@ interface DishCardProps {
   allergens?: string[];
   onEdit?: () => void;
   onDelete: () => void;
+  actionMode?: "delete" | "add";
 }
 
 const DishCard = ({
@@ -30,9 +32,14 @@ const DishCard = ({
   allergens = [],
   onEdit,
   onDelete,
+  actionMode = "delete",
 }: DishCardProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const actionIcon = actionMode === "add" ? <AddIcon sx={{ fontSize: 18 }} /> : <DeleteIcon sx={{ fontSize: 18 }} />;
+  const actionBg = actionMode === "add" ? "success.main" : "error.main";
+  const actionHoverBg = actionMode === "add" ? "success.dark" : "error.dark";
 
   // Mobile Layout - Horizontal card with image on left
   if (isMobile) {
@@ -188,16 +195,16 @@ const DishCard = ({
               }}
               size="small"
               sx={{
-                bgcolor: "error.main",
+                bgcolor: actionBg,
                 color: "white",
                 width: 32,
                 height: 32,
                 "&:hover": {
-                  bgcolor: "error.dark",
+                  bgcolor: actionHoverBg,
                 },
               }}
             >
-              <DeleteIcon sx={{ fontSize: 18 }} />
+              {actionIcon}
             </IconButton>
           </Box>
         </Box>
@@ -382,15 +389,15 @@ const DishCard = ({
             }}
             sx={{
               flex: 1,
-              bgcolor: "error.main",
+              bgcolor: actionBg,
               color: "white",
               borderRadius: 2,
               "&:hover": {
-                bgcolor: "error.dark",
+                bgcolor: actionHoverBg,
               },
             }}
           >
-            <DeleteIcon />
+            {actionMode === "add" ? <AddIcon /> : <DeleteIcon />}
           </IconButton>
         </Box>
       </Box>
