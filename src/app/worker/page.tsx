@@ -149,7 +149,7 @@ export default function Page() {
           flex: 1,
           overflowY: "auto",
           pr: 1,
-          pb: isMobile ? 10 : 4,
+          pb: isMobile ? 5 : 4,
         }}
       >
         {dishes.length === 0 ? (
@@ -202,9 +202,9 @@ export default function Page() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                height: isMobile ? 120 : 380,
-                minHeight: isMobile ? 120 : 380,
-                maxHeight: isMobile ? 120 : 380,
+                height: isMobile ? 96 : 380,
+                minHeight: isMobile ? 96 : 380,
+                maxHeight: isMobile ? 96 : 380,
                 "&:hover": {
                   borderColor: theme.palette.primary.main,
                   boxShadow: 2,
