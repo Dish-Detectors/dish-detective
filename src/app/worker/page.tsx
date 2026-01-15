@@ -16,8 +16,6 @@ import WorkerNavbar, { navWidth } from "@/components/WorkerNavbar";
 import { MenuItem, getWorkerMenzaId, fetchTodaysOfferForMenza, removeDishFromTodaysOffer } from "./actions";
 
 
-
-
 export default function Page() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -97,20 +95,6 @@ export default function Page() {
               Učitavanje ponude...
             </Typography>
           </Paper>
-        ) : sortedDishes.length === 0 ? (
-          <Box
-            sx={{
-              bgcolor: "white",
-              p: 4,
-              borderRadius: 3,
-              textAlign: "center",
-              maxWidth: { xs: "100%", sm: 600 },
-            }}
-          >
-            <Typography variant="body1" color="text.secondary">
-              Nema jela
-            </Typography>
-          </Box>
         ) : (
           <Box
             sx={{
