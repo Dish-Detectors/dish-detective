@@ -1,3 +1,4 @@
+"use server";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { UserRole } from "@/types/globals";
 
