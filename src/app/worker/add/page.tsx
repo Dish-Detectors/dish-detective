@@ -147,9 +147,9 @@ export default function Page() {
                     >
                       <DishCard
                         name={dish.name}
-                        restaurantName="Kategorija"
+                        restaurantName={dish.category}
                         position={dish.description ?? "Opis jela (placeholder)"}
-                        imageUrl=""
+                        imageUrl={dish.imageUrl}
                         allergens={dish.allergens ?? []}
                         actionMode="add"
                         actionDisabled={isAlreadyInOffer}
