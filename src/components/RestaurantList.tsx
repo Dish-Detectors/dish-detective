@@ -10,7 +10,27 @@ interface RestaurantListProps {
 
 export default function RestaurantList({ restaurants }: RestaurantListProps) {
     return (
-        <Stack spacing={2} sx={{ p: 2, overflowY: "auto", height: "100%" }}>
+        <Stack
+            spacing={2}
+            sx={{
+                p: 2,
+                overflowY: "auto",
+                height: "100%",
+                "&::-webkit-scrollbar": {
+                    width: "8px",
+                },
+                "&::-webkit-scrollbar-track": {
+                    background: "transparent",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                    background: "#ccc",
+                    borderRadius: "4px",
+                },
+                "&::-webkit-scrollbar-thumb:hover": {
+                    background: "#bbb",
+                },
+            }}
+        >
             {restaurants.map((restaurant) => (
                 <Card
                     key={restaurant._id as string}
@@ -43,7 +63,7 @@ export default function RestaurantList({ restaurants }: RestaurantListProps) {
                                 component="div"
                                 sx={{ mb: 1 }}
                             >
-                                Lokacija restorana: {restaurant.address}
+                                {restaurant.address}
                             </Typography>
                             <Button
                                 size="small"
