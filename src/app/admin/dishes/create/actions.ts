@@ -77,6 +77,8 @@ export async function createDish(formData: FormData): Promise<ActionResponse> {
       category: category.trim(),
       imageUrl: imageUrl,
       allergens: allergens,
+      rating : 0,
+      numRatings : 0
     });
 
     return {
