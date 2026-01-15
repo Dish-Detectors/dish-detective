@@ -19,6 +19,7 @@ import {
   fetchTodaysOfferForMenza,
   removeDishFromTodaysOffer,
 } from "./actions";
+import PancakeStackLoader from "@/components/PancakeStackLoader";
 
 export default function Page() {
   const theme = useTheme();
@@ -94,11 +95,16 @@ export default function Page() {
           }}
         >
           {loading ? (
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 3 }}>
-              <Typography variant="body1" sx={{ fontWeight: 700 }}>
-                Učitavanje ponude...
-              </Typography>
-            </Paper>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "50vh",
+              }}
+            >
+              <PancakeStackLoader />
+            </Box>
           ) : (
             <Box
               sx={{
@@ -209,7 +215,7 @@ export default function Page() {
                       void removeDishFromTodaysOffer({
                         menuItemId: removedId,
                         updateDate: new Date(),
-                      }).catch(async (err) => {
+                      }).catch(async (err: any) => {
                         console.error(
                           "Failed to remove dish from today's offer",
                           err

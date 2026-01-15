@@ -1,21 +1,20 @@
 import { ReactNode } from "react";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import dbConnect from "@/utils/dbConnect";
-import User from "@/models/User";
+
 export default async function WorkerLayout({
   children,
 }: {
   children: ReactNode;
 }) {
-  const { userId } = await auth();
+  const { userId, sessionClaims } = await auth();
   if (!userId) {
     redirect("/");
   }
-  await dbConnect();
-  const user = await User.findOne({ clerkId: userId }).lean();
-  if (!user || user.role !== "worker") {
+
+  if (sessionClaims?.metadata?.role !== "worker") {
     redirect("/");
   }
+
   return <>{children}</>;
 }
