@@ -78,8 +78,8 @@ export default function StudentNavbar({ isMobile = false }: StudentNavbarProps) 
                     <HomeFilledIcon />
                 </IconButton>
                 <IconButton
-                    onClick={() => router.push("/student/dashboard")}
-                    sx={getIconButtonStyle("/student/dashboard")}
+                    onClick={() => router.push("/student/restaurants")}
+                    sx={getIconButtonStyle("/student/restaurants")}
                 >
                     <GridViewIcon />
                 </IconButton>
