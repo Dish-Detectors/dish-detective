@@ -195,7 +195,20 @@ export default function Page() {
                   allergens={dish.allergens}
                   onDelete={() => {
                     if (!menzaId) return;
-                    void removeDishFromTodaysOffer({ menuItemId: dish.id, updateDate: new Date()});
+                    const removedId = dish.id;
+
+                    // Optimistic UI update
+                    setDishes((prev) => prev.filter((d) => d.id !== removedId));
+
+                    void removeDishFromTodaysOffer({
+                      menuItemId: removedId,
+                      updateDate: new Date(),
+                    }).catch(async (err) => {
+                      console.error("Failed to remove dish from today's offer", err);
+                      // Fallback: refresh from server to keep UI consistent
+                      const refreshed = await fetchTodaysOfferForMenza(menzaId);
+                      setDishes(refreshed);
+                    });
                   }}
                 />
               </Box>

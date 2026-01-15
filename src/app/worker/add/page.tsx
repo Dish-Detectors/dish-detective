@@ -156,7 +156,23 @@ export default function Page() {
                         onDelete={() => {
                           if (isAlreadyInOffer) return;
                           if (!menzaId) return;
-                          void addDishToTodaysOffer({ menuItemId: dish.id, updateDate: new Date() });
+
+                          const addedId = dish.id;
+
+                          // Optimistic UI update: immediately grey out / disable the card
+                          setTodaysOfferDishIds((prev) =>
+                            prev.includes(addedId) ? prev : [...prev, addedId],
+                          );
+
+                          void addDishToTodaysOffer({
+                            menuItemId: addedId,
+                            updateDate: new Date(),
+                          }).catch(async (err) => {
+                            console.error("Failed to add dish to today's offer", err);
+                            // Fallback: refresh from server to keep UI consistent
+                            const refreshed = await fetchTodaysOfferDishIdsForMenza(menzaId);
+                            setTodaysOfferDishIds(refreshed);
+                          });
                         }}
                       />
                     </Box>
