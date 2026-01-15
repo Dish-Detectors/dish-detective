@@ -38,7 +38,7 @@ export default function WorkerManagerAccountsPage() {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [employees, setEmployees] = useState<EmployeeData[]>([]);
   const [filteredEmployees, setFilteredEmployees] = useState<EmployeeData[]>(
-    []
+    [],
   );
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -74,7 +74,7 @@ export default function WorkerManagerAccountsPage() {
           emp.firstName.toLowerCase().includes(query) ||
           emp.lastName.toLowerCase().includes(query) ||
           emp.restaurantName.toLowerCase().includes(query) ||
-          emp.role.toLowerCase().includes(query)
+          emp.role.toLowerCase().includes(query),
       );
       setFilteredEmployees(filtered);
     }
@@ -99,7 +99,7 @@ export default function WorkerManagerAccountsPage() {
         // Remove employee from local state
         setEmployees(employees.filter((emp) => emp.id !== employeeToDelete));
         setFilteredEmployees(
-          filteredEmployees.filter((emp) => emp.id !== employeeToDelete)
+          filteredEmployees.filter((emp) => emp.id !== employeeToDelete),
         );
       } else {
         alert(result.error || "Greška prilikom brisanja");
