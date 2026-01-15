@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { UserButton, useUser } from "@clerk/nextjs"; // Import useUser
 import {
   Menu,

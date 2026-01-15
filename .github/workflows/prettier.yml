@@ -24,4 +24,4 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Run prettier
-        run: npm run format:check
+        run: npm run format-check

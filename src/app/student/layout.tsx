@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import dbConnect from "@/utils/dbConnect";
 import User from "@/models/User";
+import StudentLayoutClient from "@/components/StudentLayoutClient";
 
 export default async function StudentLayout({
   children,
@@ -33,5 +34,5 @@ export default async function StudentLayout({
     redirect("/");
   }
 
-  return <>{children}</>;
+  return <StudentLayoutClient>{children}</StudentLayoutClient>;
 }
