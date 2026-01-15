@@ -39,7 +39,6 @@ export default async function RedirectAfterSignIn() {
     });
 
     user = foundOrCreatedUser;
-
   } catch (error) {
     console.error("Error in auth redirect:", error);
     // If there's an error, redirect to home page
@@ -47,14 +46,14 @@ export default async function RedirectAfterSignIn() {
   }
 
   switch (user.role) {
-      case "admin":
-        redirect("/admin");
-      case "manager":
-        redirect("/manager");
-      case "worker":
-        redirect("/worker");
-      case "student":
-      default:
-        redirect("/student");
+    case "admin":
+      redirect("/admin");
+    case "manager":
+      redirect("/manager");
+    case "worker":
+      redirect("/worker");
+    case "student":
+    default:
+      redirect("/student");
   }
 }

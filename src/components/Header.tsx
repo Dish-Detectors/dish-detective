@@ -25,7 +25,6 @@ export default function Header() {
   const isHomepage = pathname === "/";
   const isLoginRoute = pathname.startsWith("/login");
 
-
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
