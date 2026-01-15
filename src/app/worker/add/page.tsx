@@ -19,6 +19,7 @@ import {
   fetchTodaysOfferDishIdsForMenza,
   addDishToTodaysOffer,
 } from "../actions";
+import PancakeStackLoader from "@/components/PancakeStackLoader";
 
 export default function Page() {
   const theme = useTheme();
@@ -109,11 +110,16 @@ export default function Page() {
           }}
         >
           {loading ? (
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 3 }}>
-              <Typography variant="body1" sx={{ fontWeight: 700 }}>
-                Učitavanje jela...
-              </Typography>
-            </Paper>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "50vh",
+              }}
+            >
+              <PancakeStackLoader />
+            </Box>
           ) : sortedDishes.length === 0 ? (
             <Paper elevation={0} sx={{ p: 3, borderRadius: 3 }}>
               <Typography variant="body1" sx={{ fontWeight: 700, mb: 1 }}>
@@ -178,7 +184,7 @@ export default function Page() {
                           void addDishToTodaysOffer({
                             menuItemId: addedId,
                             updateDate: new Date(),
-                          }).catch(async (err) => {
+                          }).catch(async (err: any) => {
                             console.error(
                               "Failed to add dish to today's offer",
                               err
