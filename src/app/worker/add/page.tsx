@@ -32,7 +32,7 @@ export default function Page() {
 
   const todaysOfferDishIdSet = useMemo(
     () => new Set(todaysOfferDishIds),
-    [todaysOfferDishIds]
+    [todaysOfferDishIds],
   );
 
   const sortedDishes = useMemo(() => {
@@ -178,7 +178,7 @@ export default function Page() {
 
                           // Optimistic UI update: immediately grey out / disable the card
                           setTodaysOfferDishIds((prev) =>
-                            prev.includes(addedId) ? prev : [...prev, addedId]
+                            prev.includes(addedId) ? prev : [...prev, addedId],
                           );
 
                           void addDishToTodaysOffer({
@@ -187,7 +187,7 @@ export default function Page() {
                           }).catch(async (err: any) => {
                             console.error(
                               "Failed to add dish to today's offer",
-                              err
+                              err,
                             );
                             // Fallback: refresh from server to keep UI consistent
                             const refreshed =

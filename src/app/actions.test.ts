@@ -11,7 +11,7 @@ describe("App Root Server Actions", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+    consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -21,7 +21,10 @@ describe("App Root Server Actions", () => {
   describe("getUserRole", () => {
     it("should return error when user is not authenticated", async () => {
       // Mock unauthenticated user
-      (auth as unknown as jest.Mock).mockResolvedValue({ userId: null, sessionClaims: null });
+      (auth as unknown as jest.Mock).mockResolvedValue({
+        userId: null,
+        sessionClaims: null,
+      });
 
       const result = await getUserRole();
 
@@ -34,7 +37,7 @@ describe("App Root Server Actions", () => {
       const mockUserId = "clerk_test_user_123";
       (auth as unknown as jest.Mock).mockResolvedValue({
         userId: mockUserId,
-        sessionClaims: { metadata: {} }
+        sessionClaims: { metadata: {} },
       });
 
       const result = await getUserRole();
@@ -48,7 +51,7 @@ describe("App Root Server Actions", () => {
       const mockUserId = "clerk_existing_user_456";
       (auth as unknown as jest.Mock).mockResolvedValue({
         userId: mockUserId,
-        sessionClaims: { metadata: { role: "admin" } }
+        sessionClaims: { metadata: { role: "admin" } },
       });
 
       const result = await getUserRole();
@@ -62,7 +65,9 @@ describe("App Root Server Actions", () => {
       const mockUserId = "clerk_worker_789";
       (auth as unknown as jest.Mock).mockResolvedValue({
         userId: mockUserId,
-        sessionClaims: { metadata: { role: "worker", restaurantId: "restaurant_123" } }
+        sessionClaims: {
+          metadata: { role: "worker", restaurantId: "restaurant_123" },
+        },
       });
 
       const result = await getUserRole();
@@ -76,7 +81,9 @@ describe("App Root Server Actions", () => {
       const mockUserId = "clerk_manager_101";
       (auth as unknown as jest.Mock).mockResolvedValue({
         userId: mockUserId,
-        sessionClaims: { metadata: { role: "manager", restaurantId: "restaurant_456" } }
+        sessionClaims: {
+          metadata: { role: "manager", restaurantId: "restaurant_456" },
+        },
       });
 
       const result = await getUserRole();

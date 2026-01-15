@@ -45,7 +45,7 @@ export async function getAllEmployees(): Promise<ActionResponse> {
     const employees = clerkUsersResponse.data.filter(
       (user) =>
         user.publicMetadata.role === "manager" ||
-        user.publicMetadata.role === "worker"
+        user.publicMetadata.role === "worker",
     );
 
     if (employees.length === 0) {

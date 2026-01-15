@@ -272,8 +272,8 @@ export default function Page() {
         <DialogTitle id="delete-dialog-title">Potvrda brisanja</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Jeste li sigurni da želite obrisati ovo jelo? Ova radnja se ne
-            može poništiti.
+            Jeste li sigurni da želite obrisati ovo jelo? Ova radnja se ne može
+            poništiti.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

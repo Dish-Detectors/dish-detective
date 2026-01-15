@@ -30,7 +30,7 @@ export async function getWorkerMenzaId(): Promise<string> {
 }
 
 export async function fetchAllDishesForMenza(
-  menzaId: string
+  menzaId: string,
 ): Promise<MenuItem[]> {
   await dbConnect();
   const menu = await Menu.findOne({ restaurantId: menzaId }).lean();
@@ -45,9 +45,13 @@ export async function fetchAllDishesForMenza(
   return (
     menuItems.map((item) => ({
       id: item.id,
-      name: (dishesMap.get(item.dishId.toString()) as any)?.name || "Nepoznato jelo",
-      description: (dishesMap.get(item.dishId.toString()) as any)?.description || "",
-      allergens: (dishesMap.get(item.dishId.toString()) as any)?.allergens || [],
+      name:
+        (dishesMap.get(item.dishId.toString()) as any)?.name ||
+        "Nepoznato jelo",
+      description:
+        (dishesMap.get(item.dishId.toString()) as any)?.description || "",
+      allergens:
+        (dishesMap.get(item.dishId.toString()) as any)?.allergens || [],
       category: (dishesMap.get(item.dishId.toString()) as any)?.category || "",
       imageUrl: (dishesMap.get(item.dishId.toString()) as any)?.imageUrl || "",
     })) || []
@@ -55,7 +59,7 @@ export async function fetchAllDishesForMenza(
 }
 
 export async function fetchTodaysOfferDishIdsForMenza(
-  menzaId: string
+  menzaId: string,
 ): Promise<string[]> {
   await dbConnect();
   const menu = await Menu.findOne({ restaurantId: menzaId }).lean();
@@ -78,12 +82,12 @@ export async function addDishToTodaysOffer(params: {
   await MenuItem.findByIdAndUpdate(
     params.menuItemId,
     { $set: { available: true, lastServed: params.updateDate } },
-    { new: true }
+    { new: true },
   );
 }
 
 export async function fetchTodaysOfferForMenza(
-  menzaId: string
+  menzaId: string,
 ): Promise<MenuItem[]> {
   await dbConnect();
   const menu = await Menu.findOne({ restaurantId: menzaId }).lean();
@@ -100,11 +104,17 @@ export async function fetchTodaysOfferForMenza(
       .filter((item) => item.available)
       .map((item) => ({
         id: item.id,
-        name: (dishesMap.get(item.dishId.toString()) as any)?.name || "Nepoznato jelo",
-        description: (dishesMap.get(item.dishId.toString()) as any)?.description || "",
-        allergens: (dishesMap.get(item.dishId.toString()) as any)?.allergens || [],
-        category: (dishesMap.get(item.dishId.toString()) as any)?.category || "",
-        imageUrl: (dishesMap.get(item.dishId.toString()) as any)?.imageUrl || "",
+        name:
+          (dishesMap.get(item.dishId.toString()) as any)?.name ||
+          "Nepoznato jelo",
+        description:
+          (dishesMap.get(item.dishId.toString()) as any)?.description || "",
+        allergens:
+          (dishesMap.get(item.dishId.toString()) as any)?.allergens || [],
+        category:
+          (dishesMap.get(item.dishId.toString()) as any)?.category || "",
+        imageUrl:
+          (dishesMap.get(item.dishId.toString()) as any)?.imageUrl || "",
       })) || []
   );
 }
@@ -117,6 +127,6 @@ export async function removeDishFromTodaysOffer(params: {
   await MenuItem.findByIdAndUpdate(
     params.menuItemId,
     { $set: { available: false, lastServed: params.updateDate } },
-    { new: true }
+    { new: true },
   );
 }

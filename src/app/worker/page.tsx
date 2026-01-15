@@ -51,7 +51,7 @@ export default function Page() {
 
   const sortedDishes = useMemo(
     () => [...dishes].sort((a, b) => a.name.localeCompare(b.name)),
-    [dishes]
+    [dishes],
   );
 
   return (
@@ -209,7 +209,7 @@ export default function Page() {
 
                       // Optimistic UI update
                       setDishes((prev) =>
-                        prev.filter((d) => d.id !== removedId)
+                        prev.filter((d) => d.id !== removedId),
                       );
 
                       void removeDishFromTodaysOffer({
@@ -218,7 +218,7 @@ export default function Page() {
                       }).catch(async (err: any) => {
                         console.error(
                           "Failed to remove dish from today's offer",
-                          err
+                          err,
                         );
                         // Fallback: refresh from server to keep UI consistent
                         const refreshed =

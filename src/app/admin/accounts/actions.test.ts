@@ -36,11 +36,11 @@ describe("Accounts Server Actions", () => {
     // Mock admin authentication by default
     (auth as unknown as jest.Mock).mockResolvedValue({
       userId: adminClerkId,
-      sessionClaims: { metadata: { role: "admin" } }
+      sessionClaims: { metadata: { role: "admin" } },
     });
 
     jest.clearAllMocks();
-    consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+    consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
   }, 10000);
 
   afterEach(() => {
@@ -89,7 +89,9 @@ describe("Accounts Server Actions", () => {
       ];
 
       // Mock Clerk client
-      const mockGetUserList = jest.fn().mockResolvedValue({ data: mockEmployees });
+      const mockGetUserList = jest
+        .fn()
+        .mockResolvedValue({ data: mockEmployees });
 
       (clerkClient as unknown as jest.Mock).mockResolvedValue({
         users: {
@@ -128,12 +130,17 @@ describe("Accounts Server Actions", () => {
           id: "clerk_worker_orphan",
           firstName: "Orphan",
           lastName: "Worker",
-          publicMetadata: { role: "worker", restaurantId: "507f1f77bcf86cd799439011" },
+          publicMetadata: {
+            role: "worker",
+            restaurantId: "507f1f77bcf86cd799439011",
+          },
         },
       ];
 
       // Mock Clerk client
-      const mockGetUserList = jest.fn().mockResolvedValue({ data: mockEmployees });
+      const mockGetUserList = jest
+        .fn()
+        .mockResolvedValue({ data: mockEmployees });
 
       (clerkClient as unknown as jest.Mock).mockResolvedValue({
         users: {
@@ -160,7 +167,7 @@ describe("Accounts Server Actions", () => {
     it("should return error when user is not an admin", async () => {
       (auth as unknown as jest.Mock).mockResolvedValue({
         userId: "clerk_student_test",
-        sessionClaims: { metadata: { role: "student" } }
+        sessionClaims: { metadata: { role: "student" } },
       });
 
       const result = await getAllEmployees();
@@ -177,7 +184,7 @@ describe("Accounts Server Actions", () => {
       // Mock Clerk getUser to return a worker
       const mockGetUser = jest.fn().mockResolvedValue({
         id: clerkId,
-        publicMetadata: { role: "worker" }
+        publicMetadata: { role: "worker" },
       });
       const mockDeleteUser = jest.fn().mockResolvedValue({});
 
@@ -200,7 +207,7 @@ describe("Accounts Server Actions", () => {
       // Mock Clerk getUser to return an admin
       const mockGetUser = jest.fn().mockResolvedValue({
         id: clerkId,
-        publicMetadata: { role: "admin" }
+        publicMetadata: { role: "admin" },
       });
 
       (clerkClient as unknown as jest.Mock).mockResolvedValue({
@@ -221,9 +228,11 @@ describe("Accounts Server Actions", () => {
       // Mock Clerk getUser to return a worker
       const mockGetUser = jest.fn().mockResolvedValue({
         id: clerkId,
-        publicMetadata: { role: "worker" }
+        publicMetadata: { role: "worker" },
       });
-      const mockDeleteUser = jest.fn().mockRejectedValue(new Error("Clerk API error"));
+      const mockDeleteUser = jest
+        .fn()
+        .mockRejectedValue(new Error("Clerk API error"));
 
       (clerkClient as unknown as jest.Mock).mockResolvedValue({
         users: {
@@ -235,7 +244,9 @@ describe("Accounts Server Actions", () => {
       const result = await deleteEmployee(clerkId);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Failed to delete employee from authentication system");
+      expect(result.error).toBe(
+        "Failed to delete employee from authentication system",
+      );
     });
 
     it("should return error when user is not authenticated", async () => {
@@ -250,7 +261,7 @@ describe("Accounts Server Actions", () => {
     it("should return error when user is not an admin", async () => {
       (auth as unknown as jest.Mock).mockResolvedValue({
         userId: "clerk_student_test",
-        sessionClaims: { metadata: { role: "student" } }
+        sessionClaims: { metadata: { role: "student" } },
       });
 
       const result = await deleteEmployee("clerk_id");

@@ -17,24 +17,22 @@ export interface IMenu extends Document {
   updatedAt: Date;
 }
 
-const menuItemSchema = new Schema<IMenuItem>(
-  {
-    dishId: {
-      type: Schema.Types.ObjectId,
-      ref: "Dish",
-      required: [true, "Dish ID is required"],
-    },
-    available: {
-      type: Boolean,
-      required: [true, "Available status is required"],
-      default: true,
-    },
-    lastServed: {
-      type: Date,
-      required: [true, "Last served date is required"],
-    },
-  }
-);
+const menuItemSchema = new Schema<IMenuItem>({
+  dishId: {
+    type: Schema.Types.ObjectId,
+    ref: "Dish",
+    required: [true, "Dish ID is required"],
+  },
+  available: {
+    type: Boolean,
+    required: [true, "Available status is required"],
+    default: true,
+  },
+  lastServed: {
+    type: Date,
+    required: [true, "Last served date is required"],
+  },
+});
 
 const menuSchema = new Schema<IMenu>(
   {

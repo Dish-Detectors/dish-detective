@@ -19,11 +19,11 @@ describe("Edit Account Server Actions", () => {
     // Mock admin authentication by default
     (auth as unknown as jest.Mock).mockResolvedValue({
       userId: adminClerkId,
-      sessionClaims: { metadata: { role: "admin" } }
+      sessionClaims: { metadata: { role: "admin" } },
     });
 
     jest.clearAllMocks();
-    consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+    consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
   }, 10000);
 
   afterEach(() => {
@@ -37,7 +37,10 @@ describe("Edit Account Server Actions", () => {
         firstName: "John",
         lastName: "Doe",
         username: "johndoe",
-        publicMetadata: { role: "worker", restaurantId: "507f1f77bcf86cd799439011" },
+        publicMetadata: {
+          role: "worker",
+          restaurantId: "507f1f77bcf86cd799439011",
+        },
       };
 
       const mockGetUser = jest.fn().mockResolvedValue(mockUser);
@@ -93,10 +96,13 @@ describe("Edit Account Server Actions", () => {
       const result = await updateEmployeeAccount(updateData);
 
       expect(result.success).toBe(true);
-      expect(mockUpdateUser).toHaveBeenCalledWith(testEmployeeId, expect.objectContaining({
-        firstName: updateData.name,
-        lastName: updateData.lastName,
-      }));
+      expect(mockUpdateUser).toHaveBeenCalledWith(
+        testEmployeeId,
+        expect.objectContaining({
+          firstName: updateData.name,
+          lastName: updateData.lastName,
+        }),
+      );
       expect(mockUpdateMetadata).toHaveBeenCalledWith(testEmployeeId, {
         publicMetadata: {
           role: updateData.role,
@@ -108,7 +114,7 @@ describe("Edit Account Server Actions", () => {
     it("should return error when user is not an admin", async () => {
       (auth as unknown as jest.Mock).mockResolvedValue({
         userId: "clerk_student_test",
-        sessionClaims: { metadata: { role: "student" } }
+        sessionClaims: { metadata: { role: "student" } },
       });
 
       const result = await updateEmployeeAccount(updateData);
@@ -118,7 +124,9 @@ describe("Edit Account Server Actions", () => {
     });
 
     it("should handle Clerk update errors", async () => {
-      const mockUpdateUser = jest.fn().mockRejectedValue(new Error("Clerk error"));
+      const mockUpdateUser = jest
+        .fn()
+        .mockRejectedValue(new Error("Clerk error"));
       (clerkClient as unknown as jest.Mock).mockResolvedValue({
         users: {
           updateUser: mockUpdateUser,
