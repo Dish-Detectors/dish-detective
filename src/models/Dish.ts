@@ -36,7 +36,7 @@ const dishSchema = new Schema<IDish>(
     allergens: {
       type: [String],
       default: [],
-    },
+    }
   },
   {
     timestamps: true,
