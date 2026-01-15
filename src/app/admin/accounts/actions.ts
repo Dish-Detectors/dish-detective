@@ -2,7 +2,6 @@
 
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import dbConnect from "@/utils/dbConnect";
-import User from "@/models/User";
 import Restaurant from "@/models/Restaurant";
 
 type EmployeeData = {
@@ -23,25 +22,31 @@ type ActionResponse = {
 export async function getAllEmployees(): Promise<ActionResponse> {
   try {
     // Verify the current user is an admin
-    const { userId } = await auth();
+    const { userId, sessionClaims } = await auth();
     if (!userId) {
       return { success: false, error: "Unauthorized" };
     }
 
-    await dbConnect();
-
-    const currentUser = await User.findOne({ clerkId: userId }).lean();
-    if (!currentUser || currentUser.role !== "admin") {
+    if (sessionClaims?.metadata?.role !== "admin") {
       return {
         success: false,
         error: "Only admins can view employee accounts",
       };
     }
 
-    // Get all users with role of manager or worker
-    const employees = await User.find({
-      role: { $in: ["manager", "worker"] },
-    }).lean();
+    const client = await clerkClient();
+
+    // Fetch all users from Clerk
+    // Note: In a large app, you'd use pagination or filter by metadata if Clerk supports it directly in listUsers
+    const clerkUsersResponse = await client.users.getUserList({
+      limit: 100, // Adjust as needed
+    });
+
+    const employees = clerkUsersResponse.data.filter(
+      (user) =>
+        user.publicMetadata.role === "manager" ||
+        user.publicMetadata.role === "worker"
+    );
 
     if (employees.length === 0) {
       return {
@@ -51,38 +56,37 @@ export async function getAllEmployees(): Promise<ActionResponse> {
       };
     }
 
-    const client = await clerkClient();
+    await dbConnect();
 
     // Fetch data for each employee
-    const employeeDataPromises = employees.map(async (employee) => {
+    const employeeDataPromises = employees.map(async (clerkUser) => {
       try {
-        // Get user details from Clerk
-        const clerkUser = await client.users.getUser(employee.clerkId);
+        const restaurantId = clerkUser.publicMetadata.restaurantId as string;
+        let restaurantName = "Unknown";
 
-        // Get restaurant name from MongoDB
-        const restaurant = await Restaurant.findById(
-          employee.restaurantId,
-        ).lean();
+        if (restaurantId) {
+          const restaurant = await Restaurant.findById(restaurantId).lean();
+          restaurantName = restaurant?.name || "Unknown";
+        }
 
         return {
-          id: String(employee._id),
+          id: clerkUser.id,
           firstName: clerkUser.firstName || "",
           lastName: clerkUser.lastName || "",
-          restaurantName: restaurant?.name || "Unknown",
-          role: employee.role as "manager" | "worker",
+          restaurantName,
+          role: clerkUser.publicMetadata.role as "manager" | "worker",
         };
       } catch (error) {
         console.error(
-          `Error fetching data for employee ${employee.clerkId}:`,
+          `Error fetching data for employee ${clerkUser.id}:`,
           error,
         );
-        // Return partial data if there's an error
         return {
-          id: String(employee._id),
-          firstName: "Unknown",
-          lastName: "Unknown",
+          id: clerkUser.id,
+          firstName: clerkUser.firstName || "Unknown",
+          lastName: clerkUser.lastName || "Unknown",
           restaurantName: "Unknown",
-          role: employee.role as "manager" | "worker",
+          role: clerkUser.publicMetadata.role as "manager" | "worker",
         };
       }
     });
@@ -103,62 +107,42 @@ export async function getAllEmployees(): Promise<ActionResponse> {
   }
 }
 
-export async function deleteEmployee(userId: string): Promise<ActionResponse> {
+export async function deleteEmployee(clerkId: string): Promise<ActionResponse> {
   try {
     // Verify the current user is an admin
-    const { userId: currentUserId } = await auth();
+    const { userId: currentUserId, sessionClaims } = await auth();
     if (!currentUserId) {
       return { success: false, error: "Unauthorized" };
     }
 
-    await dbConnect();
-
-    const currentUser = await User.findOne({ clerkId: currentUserId }).lean();
-    if (!currentUser || currentUser.role !== "admin") {
+    if (sessionClaims?.metadata?.role !== "admin") {
       return {
         success: false,
         error: "Only admins can delete employee accounts",
       };
     }
 
-    // Find the employee to get their clerkId
-    const employee = await User.findById(userId).lean();
+    const client = await clerkClient();
 
-    if (!employee) {
-      return { success: false, error: "Employee not found" };
-    }
+    // Fetch user to verify role before deletion
+    const userToDelete = await client.users.getUser(clerkId);
+    const role = userToDelete.publicMetadata.role;
 
-    if (employee.role !== "manager" && employee.role !== "worker") {
+    if (role !== "manager" && role !== "worker") {
       return {
         success: false,
         error: "Can only delete manager or worker accounts",
       };
     }
 
-    const clerkId = employee.clerkId;
-
-    // Delete from MongoDB first
-    try {
-      await User.findByIdAndDelete(userId);
-    } catch (dbError) {
-      console.error("Error deleting user from MongoDB:", dbError);
-      return {
-        success: false,
-        error: "Failed to delete employee from database",
-      };
-    }
-
-    // Then delete from Clerk
-    const client = await clerkClient();
+    // Delete from Clerk
     try {
       await client.users.deleteUser(clerkId);
     } catch (clerkError) {
       console.error("Error deleting user from Clerk:", clerkError);
-      // MongoDB entry is already deleted, so we'll consider this a partial success
       return {
-        success: true,
-        message:
-          "Employee deleted from database, but failed to delete from authentication system",
+        success: false,
+        error: "Failed to delete employee from authentication system",
       };
     }
 

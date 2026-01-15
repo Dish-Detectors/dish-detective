@@ -1,7 +1,6 @@
 "use server";
 import { auth, clerkClient } from "@clerk/nextjs/server";
-import dbConnect from "@/utils/dbConnect";
-import User, { UserRole } from "@/models/User";
+import { UserRole } from "@/types/globals";
 
 interface CreateEmployeeAccountParams {
   name: string;
@@ -22,14 +21,12 @@ export async function createEmployeeAccount({
 }: CreateEmployeeAccountParams) {
   try {
     // Verify the current user is an admin
-    const { userId } = await auth();
+    const { userId, sessionClaims } = await auth();
     if (!userId) {
       return { success: false, error: "Unauthorized" };
     }
 
-    await dbConnect();
-    const currentUser = await User.findOne({ clerkId: userId }).lean();
-    if (!currentUser || currentUser.role !== "admin") {
+    if (sessionClaims?.metadata?.role !== "admin") {
       return {
         success: false,
         error: "Only admins can create employee accounts",
@@ -49,20 +46,17 @@ export async function createEmployeeAccount({
       firstName: name,
       lastName: lastName,
       skipPasswordRequirement: false,
-    });
-
-    // Create user in MongoDB with the Clerk ID
-    const mongoUser = await User.create({
-      clerkId: clerkUser.id,
-      role,
-      restaurantId,
+      publicMetadata: {
+        role,
+        restaurantId,
+      },
     });
 
     return {
       success: true,
       message: "Employee account created successfully",
       user: {
-        id: String(mongoUser._id), // Convert ObjectId to string
+        id: clerkUser.id, // Use Clerk ID as the primary ID
         clerkId: clerkUser.id,
         username,
         name,
