@@ -22,14 +22,8 @@ export default function Header() {
   const router = useRouter();
   const { user } = useUser(); // Get the user data from Clerk
 
-  const [isHomepage, setisHomepage] = useState(false);
-  const [isLoginRoute, setisLoginRoute] = useState(false);
-
-  useEffect(() => {
-    // This code runs only on the client, after hydration
-    setisHomepage(pathname === "/");
-    setisLoginRoute(pathname.startsWith("/login"));
-  }, []); // The empty dependency array ensures this runs only once on mount
+  const isHomepage = pathname === "/";
+  const isLoginRoute = pathname.startsWith("/login");
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
