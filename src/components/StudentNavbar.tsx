@@ -4,7 +4,7 @@ import { Box, Stack, IconButton } from "@mui/material";
 import { useRouter, usePathname } from "next/navigation";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import GridViewIcon from "@mui/icons-material/GridView";
-import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 
 export const navWidth = 80;
 export const headerHeight = 64;
@@ -84,10 +84,12 @@ export default function StudentNavbar({ isMobile = false }: StudentNavbarProps) 
                     <GridViewIcon />
                 </IconButton>
                 <IconButton
-                    onClick={() => router.push("/student/messages")}
-                    sx={getIconButtonStyle("/student/messages")}
+                    sx={{
+                        color: "text.primary",
+                        "&:hover": { bgcolor: "grey.100" },
+                    }}
                 >
-                    <ChatBubbleIcon />
+                    <NotificationsIcon />
                 </IconButton>
             </Stack>
         </Box>
