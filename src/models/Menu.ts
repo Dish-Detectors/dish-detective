@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document, Model, Types } from "mongoose";
 
 // Menu item interface
-interface IMenuItem {
+export interface IMenuItem extends Document {
   dishId: Types.ObjectId;
   available: boolean;
   lastServed: Date;
@@ -17,25 +17,22 @@ export interface IMenu extends Document {
   updatedAt: Date;
 }
 
-const menuItemSchema = new Schema<IMenuItem>(
-  {
-    dishId: {
-      type: Schema.Types.ObjectId,
-      ref: "Dish",
-      required: [true, "Dish ID is required"],
-    },
-    available: {
-      type: Boolean,
-      required: [true, "Available status is required"],
-      default: true,
-    },
-    lastServed: {
-      type: Date,
-      required: [true, "Last served date is required"],
-    },
+const menuItemSchema = new Schema<IMenuItem>({
+  dishId: {
+    type: Schema.Types.ObjectId,
+    ref: "Dish",
+    required: [true, "Dish ID is required"],
   },
-  { _id: false }, // Prevent automatic _id creation
-);
+  available: {
+    type: Boolean,
+    required: [true, "Available status is required"],
+    default: true,
+  },
+  lastServed: {
+    type: Date,
+    required: [true, "Last served date is required"],
+  },
+});
 
 const menuSchema = new Schema<IMenu>(
   {
@@ -54,7 +51,7 @@ const menuSchema = new Schema<IMenu>(
       required: [true, "Last updated by user ID is required"],
     },
     items: {
-      type: [menuItemSchema],
+      type: [Schema.Types.ObjectId],
       default: [],
     },
   },
@@ -68,4 +65,10 @@ const Menu: Model<IMenu> =
   (mongoose.models.Menu as Model<IMenu>) ||
   mongoose.model<IMenu>("Menu", menuSchema);
 
+const MenuItem: Model<IMenuItem> =
+  (mongoose.models.MenuItem as Model<IMenuItem>) ||
+  mongoose.model<IMenuItem>("MenuItem", menuItemSchema);
+
 export default Menu;
+
+export { MenuItem };

@@ -21,7 +21,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import DishCard from "@/components/DishCard";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
-import AdminNavbar, { navWidth } from "@/components/AdminNavbar";
+import { navWidth } from "@/components/AdminNavbar";
 import { getAllDishes, deleteDish } from "./actions";
 
 interface Dish {
@@ -124,176 +124,172 @@ export default function Page() {
   }
 
   return (
-    <>
-      <AdminNavbar isMobile={isMobile} />
-      <Box
+    <Box
+      sx={{
+        height: "100vh",
+        bgcolor: "#f5f5f5",
+        display: "flex",
+        flexDirection: "column",
+        px: { xs: 3, sm: 5 },
+        py: { xs: 3, sm: 5 },
+        pt: 0,
+        pb: { xs: "100px", sm: 6 },
+        overflow: "hidden",
+      }}
+    >
+      <Typography
+        variant="h4"
         sx={{
-          height: "100vh",
-          bgcolor: "#f5f5f5",
-          display: "flex",
-          flexDirection: "column",
-          px: { xs: 3, sm: 5 },
-          py: { xs: 3, sm: 5 },
-          pt: 0,
-          pb: { xs: "100px", sm: 6 },
-          ml: isMobile ? 0 : `${navWidth}px`,
-          overflow: "hidden",
+          fontWeight: 780,
+          mb: 4,
+          color: "#212222",
+          flexShrink: 0,
         }}
       >
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: 780,
-            mb: 4,
-            color: "#212222",
-            flexShrink: 0,
-          }}
-        >
-          Upravljaj jelima
-        </Typography>
+        Upravljaj jelima
+      </Typography>
 
-        <Box
-          sx={{
-            display: "flex",
-            gap: 2,
-            mb: 4,
-            maxWidth: { xs: "100%", sm: 600 },
-            flexShrink: 0,
+      <Box
+        sx={{
+          display: "flex",
+          gap: 2,
+          mb: 4,
+          maxWidth: { xs: "100%", sm: 600 },
+          flexShrink: 0,
+        }}
+      >
+        <TextField
+          fullWidth
+          placeholder="Search"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: "#999" }} />
+                </InputAdornment>
+              ),
+            },
           }}
-        >
-          <TextField
-            fullWidth
-            placeholder="Search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ color: "#999" }} />
-                  </InputAdornment>
-                ),
-              },
-            }}
-            sx={{
-              bgcolor: "white",
+          sx={{
+            bgcolor: "white",
+            borderRadius: 10,
+            "& .MuiOutlinedInput-root": {
               borderRadius: 10,
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 10,
-                "& fieldset": {
-                  borderColor: "#e0e0e0",
-                },
+              "& fieldset": {
+                borderColor: "#e0e0e0",
               },
-            }}
-          />
+            },
+          }}
+        />
 
-          <IconButton
-            onClick={handleAddNew}
+        <IconButton
+          onClick={handleAddNew}
+          sx={{
+            bgcolor: "white",
+            border: "1px solid #e0e0e0",
+            width: 56,
+            height: 56,
+            borderRadius: "50%",
+            "&:hover": {
+              bgcolor: "#e0e0e0",
+            },
+          }}
+          aria-label="add dish"
+        >
+          <AddIcon />
+        </IconButton>
+      </Box>
+
+      <Box
+        sx={{
+          flex: 1,
+          overflowY: "auto",
+          pr: 1,
+        }}
+      >
+        {filteredDishes.length === 0 ? (
+          <Box
             sx={{
               bgcolor: "white",
-              border: "1px solid #e0e0e0",
-              width: 56,
-              height: 56,
-              borderRadius: "50%",
-              "&:hover": {
-                bgcolor: "#e0e0e0",
-              },
+              p: 4,
+              borderRadius: 3,
+              textAlign: "center",
+              maxWidth: { xs: "100%", sm: 600 },
             }}
-            aria-label="add dish"
           >
-            <AddIcon />
-          </IconButton>
-        </Box>
-
-        <Box
-          sx={{
-            flex: 1,
-            overflowY: "auto",
-            pr: 1,
-          }}
-        >
-          {filteredDishes.length === 0 ? (
-            <Box
-              sx={{
-                bgcolor: "white",
-                p: 4,
-                borderRadius: 3,
-                textAlign: "center",
-                maxWidth: { xs: "100%", sm: 600 },
-              }}
-            >
-              <Typography variant="body1" color="text.secondary">
-                {searchQuery ? "Nema rezultata pretrage" : "Nema jela"}
-              </Typography>
-            </Box>
-          ) : (
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: {
-                  xs: "1fr",
-                  sm: "repeat(2, 1fr)",
-                  md: "repeat(3, 1fr)",
-                  lg: "repeat(4, 1fr)",
-                },
-                gap: 3,
-                pb: 2,
-              }}
-            >
-              {filteredDishes.map((dish, index) => (
-                <Box
-                  key={dish._id}
-                  sx={{
-                    opacity: 0,
-                    animation: `fadeInUp 0.6s ease-out ${index * 0.1}s forwards`,
-                    "@keyframes fadeInUp": {
-                      from: { opacity: 0, transform: "translateY(20px)" },
-                      to: { opacity: 1, transform: "translateY(0)" },
-                    },
-                  }}
-                >
-                  <DishCard
-                    name={dish.name}
-                    restaurantName={dish.category}
-                    position={dish.description}
-                    imageUrl={dish.imageUrl}
-                    allergens={dish.allergens}
-                    onEdit={() => handleEdit(dish._id)}
-                    onDelete={() => handleDelete(dish._id)}
-                  />
-                </Box>
-              ))}
-            </Box>
-          )}
-        </Box>
-
-        <Dialog
-          open={deleteDialogOpen}
-          onClose={cancelDelete}
-          aria-labelledby="delete-dialog-title"
-        >
-          <DialogTitle id="delete-dialog-title">Potvrda brisanja</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Jeste li sigurni da želite obrisati ovo jelo? Ova radnja se ne
-              može poništiti.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={cancelDelete} disabled={deleting}>
-              Odustani
-            </Button>
-            <Button
-              onClick={confirmDelete}
-              color="error"
-              variant="contained"
-              disabled={deleting}
-            >
-              {deleting ? "Brisanje..." : "Obriši"}
-            </Button>
-          </DialogActions>
-        </Dialog>
+            <Typography variant="body1" color="text.secondary">
+              {searchQuery ? "Nema rezultata pretrage" : "Nema jela"}
+            </Typography>
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "repeat(2, 1fr)",
+                md: "repeat(3, 1fr)",
+                lg: "repeat(4, 1fr)",
+              },
+              gap: 3,
+              pb: 2,
+            }}
+          >
+            {filteredDishes.map((dish, index) => (
+              <Box
+                key={dish._id}
+                sx={{
+                  opacity: 0,
+                  animation: `fadeInUp 0.6s ease-out ${index * 0.1}s forwards`,
+                  "@keyframes fadeInUp": {
+                    from: { opacity: 0, transform: "translateY(20px)" },
+                    to: { opacity: 1, transform: "translateY(0)" },
+                  },
+                }}
+              >
+                <DishCard
+                  name={dish.name}
+                  restaurantName={dish.category}
+                  position={dish.description}
+                  imageUrl={dish.imageUrl}
+                  allergens={dish.allergens}
+                  onEdit={() => handleEdit(dish._id)}
+                  onDelete={() => handleDelete(dish._id)}
+                />
+              </Box>
+            ))}
+          </Box>
+        )}
       </Box>
-    </>
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={cancelDelete}
+        aria-labelledby="delete-dialog-title"
+      >
+        <DialogTitle id="delete-dialog-title">Potvrda brisanja</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Jeste li sigurni da želite obrisati ovo jelo? Ova radnja se ne može
+            poništiti.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={cancelDelete} disabled={deleting}>
+            Odustani
+          </Button>
+          <Button
+            onClick={confirmDelete}
+            color="error"
+            variant="contained"
+            disabled={deleting}
+          >
+            {deleting ? "Brisanje..." : "Obriši"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 }

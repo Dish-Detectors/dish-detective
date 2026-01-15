@@ -1,28 +1,24 @@
 "use client";
 
 import { Box, Stack, IconButton } from "@mui/material";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
-import RestaurantIcon from "@mui/icons-material/Restaurant";
-import MapIcon from "@mui/icons-material/Map";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+import SmsIcon from "@mui/icons-material/Sms";
 
 export const navWidth = 80;
 export const headerHeight = 64;
 
-interface StudentNavbarProps {
+interface WorkerNavbarProps {
   isMobile?: boolean;
 }
 
-export default function StudentNavbar({
-  isMobile = false,
-}: StudentNavbarProps) {
+export default function WorkerNavbar({ isMobile = false }: WorkerNavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
 
   const isActive = (path: string) => {
-    if (path === "/student") {
-      return pathname === "/student";
+    if (path === "/worker") {
+      return pathname === "/worker";
     }
     return pathname.startsWith(path);
   };
@@ -63,7 +59,7 @@ export default function StudentNavbar({
         justifyContent: isMobile ? "space-around" : "center",
         alignItems: "center",
         p: isMobile ? 1 : 2,
-        zIndex: (theme) => theme.zIndex.drawer + 1, // Ensure navbar is above content
+        zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
     >
       <Stack
@@ -75,30 +71,18 @@ export default function StudentNavbar({
         }}
       >
         <IconButton
-          onClick={() => router.push("/student")}
-          sx={getIconButtonStyle("/student")}
+          onClick={() => router.push("/worker")}
+          sx={getIconButtonStyle("/worker")}
+          aria-label="Home"
         >
           <HomeFilledIcon />
         </IconButton>
         <IconButton
-          onClick={() => router.push("/student/restaurants")}
-          sx={getIconButtonStyle("/student/restaurants")}
+          onClick={() => router.push("/worker/notifications")}
+          sx={getIconButtonStyle("/worker/notifications")}
+          aria-label="Notifications"
         >
-          <RestaurantIcon />
-        </IconButton>
-        <IconButton
-          onClick={() => router.push("/student/map")}
-          sx={getIconButtonStyle("/student/map")}
-        >
-          <MapIcon />
-        </IconButton>
-        <IconButton
-          sx={{
-            color: "text.primary",
-            "&:hover": { bgcolor: "grey.100" },
-          }}
-        >
-          <NotificationsIcon />
+          <SmsIcon />
         </IconButton>
       </Stack>
     </Box>
