@@ -266,9 +266,7 @@ export default function Page() {
         />
 
         <DesktopActionCard
-          icon={
-            <RestaurantIcon sx={{ fontSize: 40, color: "text.primary" }} />
-          }
+          icon={<RestaurantIcon sx={{ fontSize: 40, color: "text.primary" }} />}
           title="Upravljaj jelima"
           descriptions={[
             "• Dodavanje i brisanje jela",

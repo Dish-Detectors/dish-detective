@@ -1,6 +1,5 @@
 "use server";
 import { auth } from "@clerk/nextjs/server";
-import User from "@/models/User";
 import Menu, { MenuItem } from "@/models/Menu";
 import Dish from "@/models/Dish";
 import dbConnect from "@/utils/dbConnect";
@@ -15,18 +14,23 @@ export interface MenuItem {
 }
 
 export async function getWorkerMenzaId(): Promise<string> {
-  const { userId } = await auth();
-  await dbConnect();
-  const user = await User.findOne({ clerkId: userId }).lean();
-  if (user !== null && user.restaurantId !== undefined) {
-    return user.restaurantId;
+  const { userId, sessionClaims } = await auth();
+
+  if (!userId) {
+    return "";
   }
-  // TODO: some kind of error?
+
+  const restaurantId = (sessionClaims as any)?.metadata?.restaurantId;
+
+  if (restaurantId) {
+    return restaurantId;
+  }
+
   return "";
 }
 
 export async function fetchAllDishesForMenza(
-  menzaId: string
+  menzaId: string,
 ): Promise<MenuItem[]> {
   await dbConnect();
   const menu = await Menu.findOne({ restaurantId: menzaId }).lean();
@@ -41,17 +45,21 @@ export async function fetchAllDishesForMenza(
   return (
     menuItems.map((item) => ({
       id: item.id,
-      name: dishesMap.get(item.dishId.toString())?.name || "Nepoznato jelo",
-      description: dishesMap.get(item.dishId.toString())?.description || "",
-      allergens: dishesMap.get(item.dishId.toString())?.allergens || [],
-      category: dishesMap.get(item.dishId.toString())?.category || "",
-      imageUrl: dishesMap.get(item.dishId.toString())?.imageUrl || "",
+      name:
+        (dishesMap.get(item.dishId.toString()) as any)?.name ||
+        "Nepoznato jelo",
+      description:
+        (dishesMap.get(item.dishId.toString()) as any)?.description || "",
+      allergens:
+        (dishesMap.get(item.dishId.toString()) as any)?.allergens || [],
+      category: (dishesMap.get(item.dishId.toString()) as any)?.category || "",
+      imageUrl: (dishesMap.get(item.dishId.toString()) as any)?.imageUrl || "",
     })) || []
   );
 }
 
 export async function fetchTodaysOfferDishIdsForMenza(
-  menzaId: string
+  menzaId: string,
 ): Promise<string[]> {
   await dbConnect();
   const menu = await Menu.findOne({ restaurantId: menzaId }).lean();
@@ -74,12 +82,12 @@ export async function addDishToTodaysOffer(params: {
   await MenuItem.findByIdAndUpdate(
     params.menuItemId,
     { $set: { available: true, lastServed: params.updateDate } },
-    { new: true }
+    { new: true },
   );
 }
 
 export async function fetchTodaysOfferForMenza(
-  menzaId: string
+  menzaId: string,
 ): Promise<MenuItem[]> {
   await dbConnect();
   const menu = await Menu.findOne({ restaurantId: menzaId }).lean();
@@ -96,11 +104,17 @@ export async function fetchTodaysOfferForMenza(
       .filter((item) => item.available)
       .map((item) => ({
         id: item.id,
-        name: dishesMap.get(item.dishId.toString())?.name || "Nepoznato jelo",
-        description: dishesMap.get(item.dishId.toString())?.description || "",
-        allergens: dishesMap.get(item.dishId.toString())?.allergens || [],
-        category: dishesMap.get(item.dishId.toString())?.category || "",
-        imageUrl: dishesMap.get(item.dishId.toString())?.imageUrl || "",
+        name:
+          (dishesMap.get(item.dishId.toString()) as any)?.name ||
+          "Nepoznato jelo",
+        description:
+          (dishesMap.get(item.dishId.toString()) as any)?.description || "",
+        allergens:
+          (dishesMap.get(item.dishId.toString()) as any)?.allergens || [],
+        category:
+          (dishesMap.get(item.dishId.toString()) as any)?.category || "",
+        imageUrl:
+          (dishesMap.get(item.dishId.toString()) as any)?.imageUrl || "",
       })) || []
   );
 }
@@ -113,6 +127,6 @@ export async function removeDishFromTodaysOffer(params: {
   await MenuItem.findByIdAndUpdate(
     params.menuItemId,
     { $set: { available: false, lastServed: params.updateDate } },
-    { new: true }
+    { new: true },
   );
 }
