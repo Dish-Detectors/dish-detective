@@ -173,6 +173,7 @@ export default function Header() {
   const userRole = user?.publicMetadata?.role as string;
   // Create the dynamic link. Default to "/" if role isn't found.
   const homeHref = userRole ? `/${userRole}` : "/";
+  const isWorker = userRole === "worker" || pathname.startsWith("/worker");
 
   // Non-homepage header (blue header)
   return (
@@ -216,6 +217,23 @@ export default function Header() {
         </Box>
 
         <Box sx={{ display: "flex", gap: { xs: 2, md: 3 } }}>
+          {isWorker && (
+            <Typography
+              variant="body2"
+              sx={{
+                display: { xs: "none", sm: "flex" },
+                alignItems: "center",
+                color: "white",
+                fontWeight: 600,
+                whiteSpace: "nowrap",
+                textDecoration: "underline",
+                textUnderlineOffset: "4px",
+              }}
+            >
+              Ime menze u kojoj radi
+            </Typography>
+          )}
+
           <Button
             sx={{
               display: { xs: "none", sm: "flex" },

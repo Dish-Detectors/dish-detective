@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
 
 interface DishCardProps {
   name: string;
@@ -20,6 +21,8 @@ interface DishCardProps {
   allergens?: string[];
   onEdit?: () => void;
   onDelete: () => void;
+  actionMode?: "delete" | "add";
+  actionDisabled?: boolean;
 }
 
 const DishCard = ({
@@ -30,9 +33,20 @@ const DishCard = ({
   allergens = [],
   onEdit,
   onDelete,
+  actionMode = "delete",
+  actionDisabled = false,
 }: DishCardProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const actionIcon =
+    actionMode === "add" ? (
+      <AddIcon sx={{ fontSize: 18 }} />
+    ) : (
+      <DeleteIcon sx={{ fontSize: 18 }} />
+    );
+  const actionBg = actionMode === "add" ? "success.main" : "error.main";
+  const actionHoverBg = actionMode === "add" ? "success.dark" : "error.dark";
 
   // Mobile Layout - Horizontal card with image on left
   if (isMobile) {
@@ -187,17 +201,24 @@ const DishCard = ({
                 onDelete();
               }}
               size="small"
+              disabled={actionDisabled}
               sx={{
-                bgcolor: "error.main",
+                bgcolor: actionBg,
                 color: "white",
                 width: 32,
                 height: 32,
                 "&:hover": {
-                  bgcolor: "error.dark",
+                  bgcolor: actionHoverBg,
+                },
+                "&.Mui-disabled": {
+                  bgcolor: "grey.400",
+                  color: "white",
+                  opacity: 1,
+                  cursor: "not-allowed",
                 },
               }}
             >
-              <DeleteIcon sx={{ fontSize: 18 }} />
+              {actionIcon}
             </IconButton>
           </Box>
         </Box>
@@ -380,17 +401,24 @@ const DishCard = ({
               e.stopPropagation();
               onDelete();
             }}
+            disabled={actionDisabled}
             sx={{
               flex: 1,
-              bgcolor: "error.main",
+              bgcolor: actionBg,
               color: "white",
               borderRadius: 2,
               "&:hover": {
-                bgcolor: "error.dark",
+                bgcolor: actionHoverBg,
+              },
+              "&.Mui-disabled": {
+                bgcolor: "grey.400",
+                color: "white",
+                opacity: 1,
+                cursor: "not-allowed",
               },
             }}
           >
-            <DeleteIcon />
+            {actionMode === "add" ? <AddIcon /> : <DeleteIcon />}
           </IconButton>
         </Box>
       </Box>
