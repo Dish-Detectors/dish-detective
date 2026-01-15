@@ -39,7 +39,12 @@ const DishCard = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const actionIcon = actionMode === "add" ? <AddIcon sx={{ fontSize: 18 }} /> : <DeleteIcon sx={{ fontSize: 18 }} />;
+  const actionIcon =
+    actionMode === "add" ? (
+      <AddIcon sx={{ fontSize: 18 }} />
+    ) : (
+      <DeleteIcon sx={{ fontSize: 18 }} />
+    );
   const actionBg = actionMode === "add" ? "success.main" : "error.main";
   const actionHoverBg = actionMode === "add" ? "success.dark" : "error.dark";
 

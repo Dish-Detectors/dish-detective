@@ -3,7 +3,7 @@
 import { Box, Stack, IconButton } from "@mui/material";
 import { usePathname, useRouter } from "next/navigation";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
-import SmsIcon from '@mui/icons-material/Sms';
+import SmsIcon from "@mui/icons-material/Sms";
 
 export const navWidth = 80;
 export const headerHeight = 64;

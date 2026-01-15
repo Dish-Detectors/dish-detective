@@ -12,7 +12,13 @@ import {
 } from "@mui/material";
 import WorkerNavbar, { navWidth } from "@/components/WorkerNavbar";
 import DishCard from "@/components/DishCard";
-import { MenuItem, getWorkerMenzaId, fetchAllDishesForMenza, fetchTodaysOfferDishIdsForMenza, addDishToTodaysOffer } from "../actions";
+import {
+  MenuItem,
+  getWorkerMenzaId,
+  fetchAllDishesForMenza,
+  fetchTodaysOfferDishIdsForMenza,
+  addDishToTodaysOffer,
+} from "../actions";
 
 export default function Page() {
   const theme = useTheme();
@@ -23,15 +29,20 @@ export default function Page() {
   const [todaysOfferDishIds, setTodaysOfferDishIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const sortedDishes = useMemo(
-    () => [...dishes].sort((a, b) => a.name.localeCompare(b.name)),
-    [dishes],
-  );
-
   const todaysOfferDishIdSet = useMemo(
     () => new Set(todaysOfferDishIds),
-    [todaysOfferDishIds],
+    [todaysOfferDishIds]
   );
+
+  const sortedDishes = useMemo(() => {
+    return [...dishes].sort((a, b) => {
+      const aInOffer = todaysOfferDishIdSet.has(a.id) ? 1 : 0;
+      const bInOffer = todaysOfferDishIdSet.has(b.id) ? 1 : 0;
+
+      if (aInOffer !== bInOffer) return aInOffer - bInOffer;
+      return a.name.localeCompare(b.name);
+    });
+  }, [dishes, todaysOfferDishIdSet]);
 
   useEffect(() => {
     let cancelled = false;
@@ -161,16 +172,20 @@ export default function Page() {
 
                           // Optimistic UI update: immediately grey out / disable the card
                           setTodaysOfferDishIds((prev) =>
-                            prev.includes(addedId) ? prev : [...prev, addedId],
+                            prev.includes(addedId) ? prev : [...prev, addedId]
                           );
 
                           void addDishToTodaysOffer({
                             menuItemId: addedId,
                             updateDate: new Date(),
                           }).catch(async (err) => {
-                            console.error("Failed to add dish to today's offer", err);
+                            console.error(
+                              "Failed to add dish to today's offer",
+                              err
+                            );
                             // Fallback: refresh from server to keep UI consistent
-                            const refreshed = await fetchTodaysOfferDishIdsForMenza(menzaId);
+                            const refreshed =
+                              await fetchTodaysOfferDishIdsForMenza(menzaId);
                             setTodaysOfferDishIds(refreshed);
                           });
                         }}

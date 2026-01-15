@@ -31,7 +31,6 @@ export default function Header() {
     setisLoginRoute(pathname.startsWith("/login"));
   }, []); // The empty dependency array ensures this runs only once on mount
 
-
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
