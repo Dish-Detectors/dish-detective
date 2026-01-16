@@ -37,9 +37,9 @@ export async function createDish(formData: FormData): Promise<ActionResponse> {
     // Parse allergens
     const allergens = allergensString
       ? allergensString
-          .split(",")
-          .map((a) => a.trim())
-          .filter(Boolean)
+        .split(",")
+        .map((a) => a.trim())
+        .filter(Boolean)
       : [];
 
     let imageUrl = "";
@@ -68,10 +68,9 @@ export async function createDish(formData: FormData): Promise<ActionResponse> {
     }
 
     // Create dish in database
-    const conn = await dbConnect();
-    const DishModel = conn.model("Dish", Dish.schema);
+    await dbConnect();
 
-    const dish = await DishModel.create({
+    const dish = await Dish.create({
       name: name.trim(),
       description: description.trim(),
       category: category.trim(),

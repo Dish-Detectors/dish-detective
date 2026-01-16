@@ -63,6 +63,12 @@ const restaurantSchema = new Schema<IRestaurant>(
     workingHours: {
       type: [workingDaySchema],
       required: [true, "Working hours are required"],
+      validate: {
+        validator: function (val: any[]) {
+          return val.length > 0;
+        },
+        message: "Working hours cannot be empty",
+      },
     },
     location: {
       type: {

@@ -24,12 +24,10 @@ export async function updateDish(
   input: Partial<DishInput>,
 ): Promise<ActionResponse> {
   try {
-    const conn = await dbConnect();
-    // Needed because we use a custom connection
-    const DishModel = conn.model("Dish", Dish.schema);
+    await dbConnect();
 
     // Validate id
-    if (!conn.Types.ObjectId.isValid(dishId)) {
+    if (!Types.ObjectId.isValid(dishId)) {
       return {
         success: false,
         message: "Invalid dish ID format",
@@ -48,7 +46,7 @@ export async function updateDish(
       updateData.imageUrl = input.imageUrl.trim();
     if (input.allergens !== undefined) updateData.allergens = input.allergens;
 
-    const updatedDish = await DishModel.findByIdAndUpdate(dishId, updateData, {
+    const updatedDish = await Dish.findByIdAndUpdate(dishId, updateData, {
       new: true,
       runValidators: true,
     });

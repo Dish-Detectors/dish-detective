@@ -1,6 +1,6 @@
 "use server";
 
-import Restaurant, { Location } from "../../../models/Restaurant";
+import Restaurant, { Location, IWorkingDay } from "../../../models/Restaurant";
 import dbConnect from "../../../utils/dbConnect";
 import { Types } from "mongoose";
 
@@ -8,7 +8,7 @@ type RestaurantInput = {
   name: string;
   address: string;
   imageUrl: string;
-  workingHours: string[];
+  workingHours: IWorkingDay[];
   location: Location;
 };
 
@@ -97,6 +97,13 @@ export async function deleteRestaurant(
     };
   } catch (error: any) {
     console.error("Error deleting restaurant:", error);
+
+    if (error.name === "CastError") {
+      return {
+        success: false,
+        message: "Invalid restaurant ID format",
+      };
+    }
 
     return {
       success: false,
@@ -190,6 +197,13 @@ export async function updateRestaurant(
         success: false,
         message: "Validation failed",
         errors,
+      };
+    }
+
+    if (error.name === "CastError") {
+      return {
+        success: false,
+        message: "Invalid restaurant ID format",
       };
     }
 
