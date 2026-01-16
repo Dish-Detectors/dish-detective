@@ -11,9 +11,9 @@ export default async function StudentRestaurantsPage() {
     <Box
       sx={{
         p: 3,
-        height: "calc(100vh - 64px)", // Adjust for header height
         display: "flex",
         flexDirection: "column",
+        minHeight: "100%",
         boxSizing: "border-box",
       }}
     >
@@ -22,8 +22,6 @@ export default async function StudentRestaurantsPage() {
       </Typography>
       <Box
         sx={{
-          flexGrow: 1,
-          overflow: "hidden",
           maxWidth: 800,
           mx: "auto",
           width: "100%",
