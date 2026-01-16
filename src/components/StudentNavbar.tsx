@@ -21,7 +21,9 @@ export default function StudentNavbar({
 }: StudentNavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [notifAnchor, setNotifAnchor] = React.useState<null | HTMLElement>(null);
+  const [notifAnchor, setNotifAnchor] = React.useState<null | HTMLElement>(
+    null,
+  );
 
   const handleToggleNotif = (event: React.MouseEvent<HTMLElement>) => {
     setNotifAnchor(notifAnchor ? null : event.currentTarget);
@@ -49,21 +51,21 @@ export default function StudentNavbar({
         position: "fixed",
         ...(isMobile
           ? {
-            top: "auto",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            width: "100%",
-            height: "64px",
-            boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
-          }
+              top: "auto",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              width: "100%",
+              height: "64px",
+              boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
+            }
           : {
-            top: `${headerHeight}px`,
-            left: 0,
-            bottom: 0,
-            width: `${navWidth}px`,
-            boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
-          }),
+              top: `${headerHeight}px`,
+              left: 0,
+              bottom: 0,
+              width: `${navWidth}px`,
+              boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
+            }),
         bgcolor: "common.white",
         display: "flex",
         flexDirection: isMobile ? "row" : "column",

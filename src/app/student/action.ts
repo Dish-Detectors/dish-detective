@@ -24,14 +24,16 @@ export async function addDishToTodaysOffer(params: {
   );
 }
 
-
 export async function rateDish(params: {
   dishId: string;
   rating: number;
 }): Promise<ActionResponse> {
   const conn = await dbConnect();
   const { userId } = await auth();
-  const dishRating = await DishRating.findOne({ dishId: params.dishId, userId: userId });
+  const dishRating = await DishRating.findOne({
+    dishId: params.dishId,
+    userId: userId,
+  });
 
   if (!dishRating) {
     const DishRatingModel = conn.model("DishRating", Dish.schema);
@@ -39,7 +41,7 @@ export async function rateDish(params: {
     const dishRating = await DishRatingModel.create({
       dishId: params.dishId,
       ratings: params.rating,
-      userId: userId
+      userId: userId,
     });
     if (!dishRating) {
       return {
@@ -52,12 +54,12 @@ export async function rateDish(params: {
       message: "Dish rated successfully",
     };
   }
-  dishRating.rating = params.rating
+  dishRating.rating = params.rating;
   await dishRating.save();
   return {
     success: true,
     message: "Dish rating updated successfully",
-  }
+  };
 }
 
 export async function getRestaurantOffer(restaurantId: string) {
@@ -71,18 +73,25 @@ export async function getRestaurantOffer(restaurantId: string) {
     _id: { $in: menu.items },
   }).lean();
 
-  const dishIds = menuItems.map(item => item.dishId);
+  const dishIds = menuItems.map((item) => item.dishId);
   const dishes = await Dish.find({ _id: { $in: dishIds } }).lean();
-  const dishesMap = new Map(dishes.map(dish => [dish._id.toString(), dish]));
+  const dishesMap = new Map(dishes.map((dish) => [dish._id.toString(), dish]));
 
-  return menuItems.map(item => ({
+  return menuItems.map((item) => ({
     id: item._id.toString(),
     dishId: item.dishId.toString(),
-    name: (dishesMap.get(item.dishId.toString()) as any)?.name || "Nepoznato jelo",
-    description: (dishesMap.get(item.dishId.toString()) as any)?.description || "",
+    name:
+      (dishesMap.get(item.dishId.toString()) as any)?.name || "Nepoznato jelo",
+    description:
+      (dishesMap.get(item.dishId.toString()) as any)?.description || "",
     imageUrl: (dishesMap.get(item.dishId.toString()) as any)?.imageUrl || "",
     allergens: (dishesMap.get(item.dishId.toString()) as any)?.allergens || [],
-    lastServed: item.lastServed ? new Date(item.lastServed).toLocaleTimeString("hr-HR", { hour: "2-digit", minute: "2-digit" }) : "--:--",
-    available: item.available
+    lastServed: item.lastServed
+      ? new Date(item.lastServed).toLocaleTimeString("hr-HR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "--:--",
+    available: item.available,
   }));
 }

@@ -11,27 +11,31 @@ import Restaurant from "@/models/Restaurant";
 export async function getAllWorkerNotifications(): Promise<any[]> {
   await dbConnect();
 
-  const notifications = await Notification.find({ type: "worker" }).sort({ createdAt: -1 }).lean();
+  const notifications = await Notification.find({ type: "worker" })
+    .sort({ createdAt: -1 })
+    .lean();
   if (!notifications) {
     return [];
   }
   const client = await clerkClient();
 
-  const populatedNotifications = await Promise.all(notifications.map(async (notif) => {
-    try {
-      const user = await client.users.getUser(notif.postedBy);
-      return {
-        ...notif,
-        _id: notif._id.toString(),
-        postedBy: `${user.firstName || "Nepoznato ime"} ${user.lastName || "Nepoznato prezime"}`
-      };
-    } catch (e) {
-      return {
-        ...notif,
-        _id: notif._id.toString(),
-      };
-    }
-  }));
+  const populatedNotifications = await Promise.all(
+    notifications.map(async (notif) => {
+      try {
+        const user = await client.users.getUser(notif.postedBy);
+        return {
+          ...notif,
+          _id: notif._id.toString(),
+          postedBy: `${user.firstName || "Nepoznato ime"} ${user.lastName || "Nepoznato prezime"}`,
+        };
+      } catch (e) {
+        return {
+          ...notif,
+          _id: notif._id.toString(),
+        };
+      }
+    }),
+  );
 
   return populatedNotifications;
 }
@@ -44,36 +48,39 @@ export async function getAllStudentNotifications(): Promise<any[]> {
 
   const notifications = await Notification.find({
     type: "student",
-    targetUserId: userId
-  }).sort({ createdAt: -1 }).lean();
+    targetUserId: userId,
+  })
+    .sort({ createdAt: -1 })
+    .lean();
   if (!notifications) {
     return [];
   }
   const client = await clerkClient();
 
-  const populatedNotifications = await Promise.all(notifications.map(async (notif) => {
-    try {
-      const user = await client.users.getUser(notif.postedBy);
-      return {
-        ...notif,
-        _id: notif._id.toString(),
-        postedBy: `${user.firstName || "Nepoznato ime"} ${user.lastName || "Nepoznato prezime"}`
-      };
-    } catch (e) {
-      return {
-        ...notif,
-        _id: notif._id.toString(),
-      };
-    }
-  }));
+  const populatedNotifications = await Promise.all(
+    notifications.map(async (notif) => {
+      try {
+        const user = await client.users.getUser(notif.postedBy);
+        return {
+          ...notif,
+          _id: notif._id.toString(),
+          postedBy: `${user.firstName || "Nepoznato ime"} ${user.lastName || "Nepoznato prezime"}`,
+        };
+      } catch (e) {
+        return {
+          ...notif,
+          _id: notif._id.toString(),
+        };
+      }
+    }),
+  );
 
   return populatedNotifications;
 }
 
-
 export async function sendDishNotification(
   menuItemId: string,
-  availableFrom: string
+  availableFrom: string,
 ) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
@@ -134,7 +141,7 @@ export async function sendDishNotification(
     const subscribers = await Subscription.find({ menuItemId });
 
     // Save to database for each subscribed student
-    const notificationPromises = subscribers.map(sub =>
+    const notificationPromises = subscribers.map((sub) =>
       Notification.create({
         title: title,
         description: body,
@@ -142,7 +149,7 @@ export async function sendDishNotification(
         type: "student",
         postedBy: userId,
         targetUserId: sub.userId,
-      })
+      }),
     );
     await Promise.all(notificationPromises);
 
@@ -205,7 +212,7 @@ export async function getUserSubscriptions() {
 
   await dbConnect();
   const subs = await Subscription.find({ userId });
-  return subs.map(sub => sub.menuItemId.toString());
+  return subs.map((sub) => sub.menuItemId.toString());
 }
 
 export async function syncDeviceSubscriptions(token: string) {
@@ -218,8 +225,8 @@ export async function syncDeviceSubscriptions(token: string) {
     const subs = await Subscription.find({ userId });
 
     // Subscribe token to all topics the user has in DB
-    const syncPromises = subs.map(sub =>
-      messaging.subscribeToTopic(token, `dish_notify_${sub.menuItemId}`)
+    const syncPromises = subs.map((sub) =>
+      messaging.subscribeToTopic(token, `dish_notify_${sub.menuItemId}`),
     );
 
     await Promise.all(syncPromises);

@@ -1,18 +1,15 @@
 "use server";
 import { auth } from "@clerk/nextjs/server";
 import Notification from "@/models/Notification";
-import DishRating, { IDishRating} from "@/models/DishRating";
+import DishRating, { IDishRating } from "@/models/DishRating";
 import dbConnect from "@/utils/dbConnect";
 
-
 type ActionResponse = {
-    success: boolean;
-    message: string;
-    data?: any;
-    errors?: Record<string, string>;
-  };
-  
-
+  success: boolean;
+  message: string;
+  data?: any;
+  errors?: Record<string, string>;
+};
 
 export async function addNotification(
   description: string,
@@ -23,26 +20,26 @@ export async function addNotification(
 
   if (!userId) {
     return {
-        success: false,
-        message: "User not authenticated",
-        errors: { image: "User not authenticated" },
+      success: false,
+      message: "User not authenticated",
+      errors: { image: "User not authenticated" },
     };
   }
 
   const NotificationModel = conn.model("Notification", Notification.schema);
 
-    const newNotification = new NotificationModel({
-        description,
-        type,
-        postedBy: userId,
-        createdAt: new Date(),
-    });
+  const newNotification = new NotificationModel({
+    description,
+    type,
+    postedBy: userId,
+    createdAt: new Date(),
+  });
 
-    await newNotification.save();
-    return {
-        success: true,
-        message: "Success",
-    };
+  await newNotification.save();
+  return {
+    success: true,
+    message: "Success",
+  };
 }
 
 export async function deleteNotification(
@@ -53,24 +50,23 @@ export async function deleteNotification(
 
   if (!userId) {
     return {
-        success: false,
-        message: "User not authenticated",
-        errors: { image: "User not authenticated" },
+      success: false,
+      message: "User not authenticated",
+      errors: { image: "User not authenticated" },
     };
   }
-  const deletedNotif =await Notification.findByIdAndDelete(notificationId);
+  const deletedNotif = await Notification.findByIdAndDelete(notificationId);
   if (!deletedNotif) {
     return {
-        success: false,
-        message: "Notification not found",
+      success: false,
+      message: "Notification not found",
     };
+  }
+  return {
+    success: true,
+    message: "Success",
+  };
 }
-    return {
-        success: true,
-        message: "Success",
-    };
-}
-
 
 export async function getAllRatingsForDish(
   dishId: string,
@@ -89,4 +85,3 @@ export async function getAllRatingsForDish(
     return [];
   }
 }
-
