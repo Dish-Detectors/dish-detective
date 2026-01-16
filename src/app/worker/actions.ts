@@ -74,6 +74,8 @@ export async function fetchTodaysOfferDishIdsForMenza(
   );
 }
 
+import { sendDishNotification } from "@/actions/notification";
+
 export async function addDishToTodaysOffer(params: {
   menuItemId: string;
   updateDate: Date;
@@ -84,6 +86,13 @@ export async function addDishToTodaysOffer(params: {
     { $set: { available: true, lastServed: params.updateDate } },
     { new: true },
   );
+
+  // Send notification to subscribed students
+  const timeString = params.updateDate.toLocaleTimeString("hr-HR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  await sendDishNotification(params.menuItemId, timeString);
 }
 
 export async function fetchTodaysOfferForMenza(
