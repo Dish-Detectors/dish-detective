@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import {
   Paper,
   Box,
@@ -20,9 +21,11 @@ interface DishCardProps {
   imageUrl?: string;
   allergens?: string[];
   onEdit?: () => void;
-  onDelete: () => void;
+  onDelete?: () => void;
   actionMode?: "delete" | "add";
   actionDisabled?: boolean;
+  showActions?: boolean;
+  extraInfo?: ReactNode;
 }
 
 const DishCard = ({
@@ -35,6 +38,8 @@ const DishCard = ({
   onDelete,
   actionMode = "delete",
   actionDisabled = false,
+  showActions = true,
+  extraInfo,
 }: DishCardProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -164,63 +169,74 @@ const DishCard = ({
                 )}
               </Box>
             )}
+
+            {!showActions && extraInfo && (
+              <Typography
+                variant="body2"
+                sx={{ mt: 1, fontWeight: 700, color: "text.secondary" }}
+              >
+                {extraInfo}
+              </Typography>
+            )}
           </Box>
 
           {/* Action Buttons */}
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 0.5,
-              flexShrink: 0,
-            }}
-          >
-            {onEdit && (
+          {showActions && onDelete && (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 0.5,
+                flexShrink: 0,
+              }}
+            >
+              {onEdit && (
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit();
+                  }}
+                  size="small"
+                  sx={{
+                    bgcolor: "primary.main",
+                    color: "white",
+                    width: 32,
+                    height: 32,
+                    "&:hover": {
+                      bgcolor: "primary.dark",
+                    },
+                  }}
+                >
+                  <EditIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              )}
               <IconButton
                 onClick={(e) => {
                   e.stopPropagation();
-                  onEdit();
+                  onDelete();
                 }}
                 size="small"
+                disabled={actionDisabled}
                 sx={{
-                  bgcolor: "primary.main",
+                  bgcolor: actionBg,
                   color: "white",
                   width: 32,
                   height: 32,
                   "&:hover": {
-                    bgcolor: "primary.dark",
+                    bgcolor: actionHoverBg,
+                  },
+                  "&.Mui-disabled": {
+                    bgcolor: "grey.400",
+                    color: "white",
+                    opacity: 1,
+                    cursor: "not-allowed",
                   },
                 }}
               >
-                <EditIcon sx={{ fontSize: 18 }} />
+                {actionIcon}
               </IconButton>
-            )}
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete();
-              }}
-              size="small"
-              disabled={actionDisabled}
-              sx={{
-                bgcolor: actionBg,
-                color: "white",
-                width: 32,
-                height: 32,
-                "&:hover": {
-                  bgcolor: actionHoverBg,
-                },
-                "&.Mui-disabled": {
-                  bgcolor: "grey.400",
-                  color: "white",
-                  opacity: 1,
-                  cursor: "not-allowed",
-                },
-              }}
-            >
-              {actionIcon}
-            </IconButton>
-          </Box>
+            </Box>
+          )}
         </Box>
       </Paper>
     );
@@ -369,58 +385,80 @@ const DishCard = ({
           </Box>
         )}
 
+        {!showActions && extraInfo && (
+          <Typography
+            variant="body2"
+            sx={{
+              mt: 1,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              maxWidth: "100%",
+              wordBreak: "break-word",
+              fontWeight: 700,
+              color: "text.secondary",
+            }}
+          >
+            {extraInfo}
+          </Typography>
+        )}
+
         {/* Action Buttons */}
-        <Box
-          sx={{
-            display: "flex",
-            gap: 1,
-            mt: "auto",
-          }}
-        >
-          {onEdit && (
+        {showActions && onDelete && (
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              mt: "auto",
+            }}
+          >
+            {onEdit && (
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit();
+                }}
+                sx={{
+                  flex: 1,
+                  bgcolor: "primary.main",
+                  color: "white",
+                  borderRadius: 2,
+                  "&:hover": {
+                    bgcolor: "primary.dark",
+                  },
+                }}
+              >
+                <EditIcon />
+              </IconButton>
+            )}
             <IconButton
               onClick={(e) => {
                 e.stopPropagation();
-                onEdit();
+                onDelete();
               }}
+              disabled={actionDisabled}
               sx={{
                 flex: 1,
-                bgcolor: "primary.main",
+                bgcolor: actionBg,
                 color: "white",
                 borderRadius: 2,
                 "&:hover": {
-                  bgcolor: "primary.dark",
+                  bgcolor: actionHoverBg,
+                },
+                "&.Mui-disabled": {
+                  bgcolor: "grey.400",
+                  color: "white",
+                  opacity: 1,
+                  cursor: "not-allowed",
                 },
               }}
             >
-              <EditIcon />
+              {actionMode === "add" ? <AddIcon /> : <DeleteIcon />}
             </IconButton>
-          )}
-          <IconButton
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete();
-            }}
-            disabled={actionDisabled}
-            sx={{
-              flex: 1,
-              bgcolor: actionBg,
-              color: "white",
-              borderRadius: 2,
-              "&:hover": {
-                bgcolor: actionHoverBg,
-              },
-              "&.Mui-disabled": {
-                bgcolor: "grey.400",
-                color: "white",
-                opacity: 1,
-                cursor: "not-allowed",
-              },
-            }}
-          >
-            {actionMode === "add" ? <AddIcon /> : <DeleteIcon />}
-          </IconButton>
-        </Box>
+          </Box>
+        )}
       </Box>
     </Paper>
   );
