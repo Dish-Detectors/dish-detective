@@ -13,6 +13,8 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import RestaurantIcon from '@mui/icons-material/Restaurant';
+import SchoolIcon from '@mui/icons-material/School';
 import PancakeStackLoader from "@/components/PancakeStackLoader";
 import HomeRevealAnimation from "@/components/HomeRevealAnimation";
 import HomeRevealGate from "@/components/HomeRevealGate";
@@ -247,14 +249,14 @@ export default function Home() {
                 onClick={() => router.push("/login/employee")}
                 sx={{ fontSize: "1.2rem", py: 1.2 }}
               >
-                Radnik u menzi
+                <RestaurantIcon fontSize="small" sx={{ mr: 1 }} /> Radnik u menzi
               </MenuItem>
               <Box sx={{ borderBottom: "1px solid black", my: 0 }} />
               <MenuItem
                 onClick={() => router.push("/login/student")}
                 sx={{ fontSize: "1.2rem", py: 1.2 }}
               >
-                Student
+                <SchoolIcon fontSize="small" sx={{ mr: 1 }} /> Student
               </MenuItem>
             </Menu>
           </Box>
@@ -359,16 +361,16 @@ export default function Home() {
             >
               <MenuItem
                 onClick={() => router.push("/login/employee")}
-                sx={{ fontSize: "1rem", py: 1.2 }}
+                sx={{ fontSize: "1rem", py: 1.2, display: 'flex', alignItems: 'center' }}
               >
-                Radnik u menzi
+                <RestaurantIcon fontSize="small" sx={{ mr: 1 }} /> Radnik u menzi
               </MenuItem>
               <Box sx={{ borderBottom: "1px solid black", my: 0 }} />
               <MenuItem
                 onClick={() => router.push("/login/student")}
-                sx={{ fontSize: "1rem", py: 1.2 }}
+                sx={{ fontSize: "1rem", py: 1.2, display: 'flex', alignItems: 'center' }}
               >
-                Student
+                <SchoolIcon fontSize="small" sx={{ mr: 1 }} /> Student
               </MenuItem>
             </Menu>
           </Stack>
