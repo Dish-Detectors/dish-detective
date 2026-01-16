@@ -6,6 +6,8 @@ import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import MapIcon from "@mui/icons-material/Map";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import NotificationCenter from "./NotificationCenter";
+import React from "react";
 
 export const navWidth = 80;
 export const headerHeight = 64;
@@ -19,6 +21,13 @@ export default function StudentNavbar({
 }: StudentNavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const [notifAnchor, setNotifAnchor] = React.useState<null | HTMLElement>(
+    null,
+  );
+
+  const handleToggleNotif = (event: React.MouseEvent<HTMLElement>) => {
+    setNotifAnchor(notifAnchor ? null : event.currentTarget);
+  };
 
   const isActive = (path: string) => {
     if (path === "/student") {
@@ -93,14 +102,22 @@ export default function StudentNavbar({
           <MapIcon />
         </IconButton>
         <IconButton
+          onClick={handleToggleNotif}
           sx={{
-            color: "text.primary",
+            color: notifAnchor ? "primary.main" : "text.primary",
+            bgcolor: notifAnchor ? "grey.100" : "transparent",
             "&:hover": { bgcolor: "grey.100" },
           }}
         >
           <NotificationsIcon />
         </IconButton>
       </Stack>
+
+      <NotificationCenter
+        open={Boolean(notifAnchor)}
+        anchorEl={notifAnchor}
+        onClose={() => setNotifAnchor(null)}
+      />
     </Box>
   );
 }

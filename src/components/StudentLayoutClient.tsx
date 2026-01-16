@@ -2,6 +2,7 @@
 
 import { ReactNode, useState, useEffect } from "react";
 import StudentNavbar, { navWidth } from "@/components/StudentNavbar";
+import NotificationSync from "@/components/NotificationSync";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
 
@@ -47,10 +48,11 @@ export default function StudentLayoutClient({
           flexGrow: 1,
           pl: isMobile ? 0 : `${navWidth}px`,
           width: isMobile ? "100%" : `calc(100% - ${navWidth}px)`,
-          pb: isMobile ? "64px" : 0,
+          pb: isMobile ? "96px" : 0,
         }}
       >
         {children}
+        <NotificationSync />
       </Box>
     </Box>
   );

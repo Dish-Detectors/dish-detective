@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { IRestaurant } from "@/models/Restaurant";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import Link from "next/link";
 
 interface RestaurantListProps {
   restaurants: IRestaurant[];
@@ -21,22 +22,7 @@ export default function RestaurantList({ restaurants }: RestaurantListProps) {
     <Stack
       spacing={2}
       sx={{
-        p: 2,
-        overflowY: "auto",
-        height: "100%",
-        "&::-webkit-scrollbar": {
-          width: "8px",
-        },
-        "&::-webkit-scrollbar-track": {
-          background: "transparent",
-        },
-        "&::-webkit-scrollbar-thumb": {
-          background: "#ccc",
-          borderRadius: "4px",
-        },
-        "&::-webkit-scrollbar-thumb:hover": {
-          background: "#bbb",
-        },
+        py: 2,
       }}
     >
       {restaurants.map((restaurant) => (
@@ -86,6 +72,8 @@ export default function RestaurantList({ restaurants }: RestaurantListProps) {
                 {restaurant.address}
               </Typography>
               <Button
+                component={Link}
+                href={`/student/restaurants/${restaurant._id}`}
                 size="small"
                 endIcon={
                   <ArrowForwardIcon sx={{ fontSize: "1rem !important" }} />

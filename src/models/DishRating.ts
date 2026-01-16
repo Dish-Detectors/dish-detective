@@ -3,8 +3,8 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 // Dish document interface
 export interface IDishRating extends Document {
   dishId: string;
-    userId: string;
-    rating: number // e.g., 1 to 5
+  userId: string;
+  rating: number; // e.g., 1 to 5
 }
 
 const dishRatingSchema = new Schema<IDishRating>(
@@ -21,7 +21,7 @@ const dishRatingSchema = new Schema<IDishRating>(
     rating: {
       type: Number,
       required: [true, "Rating is required"],
-    }
+    },
   },
   {
     timestamps: true,
