@@ -9,7 +9,9 @@ import {
 
 describe("Restaurant Server Actions", () => {
   let mongoServer: MongoMemoryServer;
-  const STANDARD_HOURS = [{ day: 1, shifts: [{ start: "08:00", end: "20:00" }] }];
+  const STANDARD_HOURS = [
+    { day: 1, shifts: [{ start: "08:00", end: "20:00" }] },
+  ];
 
   // Setup: Start in-memory MongoDB before all tests
   beforeAll(async () => {
