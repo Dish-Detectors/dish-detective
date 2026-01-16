@@ -42,6 +42,8 @@ export default function Home() {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isShortScreen = useMediaQuery("(max-height: 740px)");
 
+  const typingFinished = subtitleText.length >= fullSubtitle.length;
+
   // Typewriter effect
   useEffect(() => {
     const startDelay = isMobile ? 0 : 1850; // Start immediately on mobile
@@ -204,7 +206,15 @@ export default function Home() {
                 fontSize: { xs: "1.1rem" },
               }}
             >
-              {subtitleText}
+              <span className="ddTypewriterText">{subtitleText}</span>
+              <span
+                className={
+                  typingFinished
+                    ? "ddTypewriterCaret ddTypewriterCaret--idle"
+                    : "ddTypewriterCaret"
+                }
+                aria-hidden="true"
+              />
             </Typography>
 
             <Button
@@ -326,7 +336,15 @@ export default function Home() {
               letterSpacing: 1.2,
             }}
           >
-            {subtitleText}
+            <span className="ddTypewriterText">{subtitleText}</span>
+            <span
+              className={
+                typingFinished
+                  ? "ddTypewriterCaret ddTypewriterCaret--idle"
+                  : "ddTypewriterCaret"
+              }
+              aria-hidden="true"
+            />
           </Typography>
 
           <Stack spacing={2}>
