@@ -53,10 +53,7 @@ export async function getAllDishes(): Promise<ActionResponse> {
   try {
     await dbConnect();
 
-    const dishes = await Dish.find({})
-      .sort({ name: 1 })
-      .lean()
-      .exec();
+    const dishes = await Dish.find({}).sort({ name: 1 }).lean().exec();
 
     // Sanitize to remove Mongoose special objects
     const serializedDishes = JSON.parse(JSON.stringify(dishes));

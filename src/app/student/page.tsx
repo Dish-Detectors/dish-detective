@@ -249,10 +249,7 @@ export default function Page() {
         <DesktopActionCard
           icon={<RestaurantIcon sx={{ fontSize: 40, color: "text.primary" }} />}
           title="Popis restorana"
-          descriptions={[
-            "• Pregled svih menzi",
-            "• Dnevna ponuda jela",
-          ]}
+          descriptions={["• Pregled svih menzi", "• Dnevna ponuda jela"]}
           onClick={() => router.push("/student/restaurants")}
           animationDelay="0.1s"
         />
@@ -271,4 +268,3 @@ export default function Page() {
     </Box>
   );
 }
-

@@ -7,7 +7,7 @@ export interface Location {
 
 export interface IShift {
   start: string; // HH:mm
-  end: string;   // HH:mm
+  end: string; // HH:mm
 }
 
 export interface IWorkingDay {

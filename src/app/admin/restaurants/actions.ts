@@ -149,14 +149,10 @@ export async function updateRestaurant(
       updateData.imageUrl = input.imageUrl.trim();
     if (input.location !== undefined) updateData.location = input.location;
 
-    const updatedRest = await Restaurant.findByIdAndUpdate(
-      restId,
-      updateData,
-      {
-        new: true,
-        runValidators: true,
-      },
-    );
+    const updatedRest = await Restaurant.findByIdAndUpdate(restId, updateData, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!updatedRest) {
       return {

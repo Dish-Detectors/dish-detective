@@ -42,12 +42,16 @@ export async function fetchAllDishesForMenza(
     _id: { $in: dishIds },
   }).lean();
 
-  const dishesMap = new Map(dishes.map((dish: any) => [dish._id.toString(), dish]));
+  const dishesMap = new Map(
+    dishes.map((dish: any) => [dish._id.toString(), dish]),
+  );
 
   return menuItems.map((item: any) => ({
     id: item._id.toString(),
-    name: (dishesMap.get(item.dishId.toString()) as any)?.name || "Nepoznato jelo",
-    description: (dishesMap.get(item.dishId.toString()) as any)?.description || "",
+    name:
+      (dishesMap.get(item.dishId.toString()) as any)?.name || "Nepoznato jelo",
+    description:
+      (dishesMap.get(item.dishId.toString()) as any)?.description || "",
     allergens: (dishesMap.get(item.dishId.toString()) as any)?.allergens || [],
     category: (dishesMap.get(item.dishId.toString()) as any)?.category || "",
     imageUrl: (dishesMap.get(item.dishId.toString()) as any)?.imageUrl || "",
@@ -103,15 +107,21 @@ export async function fetchTodaysOfferForMenza(
     _id: { $in: dishIds },
   }).lean();
 
-  const dishesMap = new Map(dishes.map((dish: any) => [dish._id.toString(), dish]));
+  const dishesMap = new Map(
+    dishes.map((dish: any) => [dish._id.toString(), dish]),
+  );
 
   return menuItems
     .filter((item: any) => item.available)
     .map((item: any) => ({
       id: item._id.toString(),
-      name: (dishesMap.get(item.dishId.toString()) as any)?.name || "Nepoznato jelo",
-      description: (dishesMap.get(item.dishId.toString()) as any)?.description || "",
-      allergens: (dishesMap.get(item.dishId.toString()) as any)?.allergens || [],
+      name:
+        (dishesMap.get(item.dishId.toString()) as any)?.name ||
+        "Nepoznato jelo",
+      description:
+        (dishesMap.get(item.dishId.toString()) as any)?.description || "",
+      allergens:
+        (dishesMap.get(item.dishId.toString()) as any)?.allergens || [],
       category: (dishesMap.get(item.dishId.toString()) as any)?.category || "",
       imageUrl: (dishesMap.get(item.dishId.toString()) as any)?.imageUrl || "",
     }));

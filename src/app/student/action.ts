@@ -39,7 +39,7 @@ export async function rateDish(params: {
     const dishRating = await DishRating.findOneAndUpdate(
       { dishId: params.dishId, userId },
       { rating: params.rating },
-      { upsert: true, new: true }
+      { upsert: true, new: true },
     );
 
     if (!dishRating) {
@@ -55,7 +55,6 @@ export async function rateDish(params: {
     return { success: false, message: "Failed to save rating" };
   }
 }
-
 
 export async function getRestaurantOffer(restaurantId: string) {
   await dbConnect();
@@ -83,9 +82,9 @@ export async function getRestaurantOffer(restaurantId: string) {
     allergens: (dishesMap.get(item.dishId.toString()) as any)?.allergens || [],
     lastServed: item.lastServed
       ? new Date(item.lastServed).toLocaleTimeString("hr-HR", {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
+          hour: "2-digit",
+          minute: "2-digit",
+        })
       : "--:--",
     available: item.available,
   }));
