@@ -67,25 +67,44 @@ export async function getRestaurantOffer(restaurantId: string) {
     _id: { $in: menu.items },
   }).lean();
 
-  const dishIds = menuItems.map((item) => item.dishId);
+  const dishIds = menuItems.map((item) => item.dishId.toString());
   const dishes = await Dish.find({ _id: { $in: dishIds } }).lean();
   const dishesMap = new Map(dishes.map((dish) => [dish._id.toString(), dish]));
 
-  return menuItems.map((item) => ({
-    id: item._id.toString(),
-    dishId: item.dishId.toString(),
-    name:
-      (dishesMap.get(item.dishId.toString()) as any)?.name || "Nepoznato jelo",
-    description:
-      (dishesMap.get(item.dishId.toString()) as any)?.description || "",
-    imageUrl: (dishesMap.get(item.dishId.toString()) as any)?.imageUrl || "",
-    allergens: (dishesMap.get(item.dishId.toString()) as any)?.allergens || [],
-    lastServed: item.lastServed
-      ? new Date(item.lastServed).toLocaleTimeString("hr-HR", {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      : "--:--",
-    available: item.available,
-  }));
+  const ratingsData = await DishRating.aggregate([
+    { $match: { dishId: { $in: dishIds } } },
+    {
+      $group: {
+        _id: "$dishId",
+        avgRating: { $avg: "$rating" },
+      },
+    },
+  ]);
+
+  const ratingsMap = new Map(
+    ratingsData.map((r) => [r._id.toString(), r.avgRating])
+  );
+
+  return menuItems.map((item) => {
+    const dishIdStr = item.dishId.toString();
+    const dishDetails = dishesMap.get(dishIdStr) as any;
+    const averageRating = ratingsMap.get(dishIdStr) || 0;
+
+    return {
+      id: item._id.toString(),
+      dishId: dishIdStr,
+      name: dishDetails?.name || "Nepoznato jelo",
+      description: dishDetails?.description || "",
+      imageUrl: dishDetails?.imageUrl || "",
+      allergens: dishDetails?.allergens || [],
+      lastServed: item.lastServed
+        ? new Date(item.lastServed).toLocaleTimeString("hr-HR", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : "--:--",
+      available: item.available,
+      rating: averageRating, 
+    };
+  });
 }
