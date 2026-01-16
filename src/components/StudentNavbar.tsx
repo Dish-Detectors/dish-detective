@@ -6,6 +6,8 @@ import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import MapIcon from "@mui/icons-material/Map";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import NotificationCenter from "./NotificationCenter";
+import React from "react";
 
 export const navWidth = 80;
 export const headerHeight = 64;
@@ -19,6 +21,11 @@ export default function StudentNavbar({
 }: StudentNavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const [notifAnchor, setNotifAnchor] = React.useState<null | HTMLElement>(null);
+
+  const handleToggleNotif = (event: React.MouseEvent<HTMLElement>) => {
+    setNotifAnchor(notifAnchor ? null : event.currentTarget);
+  };
 
   const isActive = (path: string) => {
     if (path === "/student") {
@@ -42,21 +49,21 @@ export default function StudentNavbar({
         position: "fixed",
         ...(isMobile
           ? {
-              top: "auto",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              width: "100%",
-              height: "64px",
-              boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
-            }
+            top: "auto",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            width: "100%",
+            height: "64px",
+            boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
+          }
           : {
-              top: `${headerHeight}px`,
-              left: 0,
-              bottom: 0,
-              width: `${navWidth}px`,
-              boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
-            }),
+            top: `${headerHeight}px`,
+            left: 0,
+            bottom: 0,
+            width: `${navWidth}px`,
+            boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
+          }),
         bgcolor: "common.white",
         display: "flex",
         flexDirection: isMobile ? "row" : "column",
@@ -93,14 +100,22 @@ export default function StudentNavbar({
           <MapIcon />
         </IconButton>
         <IconButton
+          onClick={handleToggleNotif}
           sx={{
-            color: "text.primary",
+            color: notifAnchor ? "primary.main" : "text.primary",
+            bgcolor: notifAnchor ? "grey.100" : "transparent",
             "&:hover": { bgcolor: "grey.100" },
           }}
         >
           <NotificationsIcon />
         </IconButton>
       </Stack>
+
+      <NotificationCenter
+        open={Boolean(notifAnchor)}
+        anchorEl={notifAnchor}
+        onClose={() => setNotifAnchor(null)}
+      />
     </Box>
   );
 }
