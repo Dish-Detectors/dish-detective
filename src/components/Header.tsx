@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { UserButton, useUser } from "@clerk/nextjs"; // Import useUser
 import {
   Menu,
@@ -34,13 +34,35 @@ export default function Header() {
     setAnchorEl(event.currentTarget);
   };
 
+  const [showHomepageHeader, setShowHomepageHeader] = useState(false);
+
+  useEffect(() => {
+    if (isHomepage) {
+      if (isMobile) {
+        // On mobile, show header immediately
+        setShowHomepageHeader(true);
+        return;
+      }
+      setShowHomepageHeader(false); // Reset to hidden when navigating to homepage
+      const timeout = setTimeout(() => setShowHomepageHeader(true), 1850);
+      return () => clearTimeout(timeout);
+    } else {
+      setShowHomepageHeader(false);
+    }
+  }, [isHomepage, isMobile]);
+
   if (isHomepage) {
     // ... (Homepage header remains unchanged)
     return (
       <AppBar
         position="absolute"
         elevation={0}
-        sx={{ background: "transparent", zIndex: 50 }}
+        sx={{
+          background: "transparent",
+          zIndex: 50,
+          opacity: isMobile ? 1 : showHomepageHeader ? 1 : 0,
+          transition: "opacity 600ms cubic-bezier(.4,1,.4,1)",
+        }}
       >
         <Toolbar
           sx={{
@@ -89,8 +111,10 @@ export default function Header() {
                 display: { xs: "none", sm: "flex" },
                 bgcolor: "white",
                 color: "black",
-                fontSize: "1rem",
-                fontWeight: 500,
+                fontSize: "0.9rem",
+                fontWeight: 600,
+                borderRadius: 2,
+                textTransform: "none",
                 "&:hover": {
                   bgcolor: "grey.200",
                 },
@@ -109,8 +133,10 @@ export default function Header() {
                 display: { xs: "none", sm: "flex" },
                 bgcolor: isMobile ? "#56aaf4" : "#ff8c00",
                 color: "white",
-                fontSize: "1rem",
-                fontWeight: 500,
+                fontSize: "0.9rem",
+                fontWeight: 600,
+                borderRadius: 2,
+                textTransform: "none",
                 "&:hover": {
                   bgcolor: isMobile ? "#4a94db" : "#f18501ff",
                 },
