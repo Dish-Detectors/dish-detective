@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import ManagerLayoutClient from "@/components/ManagerLayoutClient";
 
 export default async function ManagerLayout({
   children,
@@ -16,5 +17,5 @@ export default async function ManagerLayout({
     redirect("/");
   }
 
-  return <>{children}</>;
+  return <ManagerLayoutClient>{children}</ManagerLayoutClient>;
 }

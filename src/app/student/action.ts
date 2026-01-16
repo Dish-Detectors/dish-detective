@@ -28,39 +28,34 @@ export async function rateDish(params: {
   dishId: string;
   rating: number;
 }): Promise<ActionResponse> {
-  const conn = await dbConnect();
+  await dbConnect();
   const { userId } = await auth();
-  const dishRating = await DishRating.findOne({
-    dishId: params.dishId,
-    userId: userId,
-  });
 
-  if (!dishRating) {
-    const DishRatingModel = conn.model("DishRating", Dish.schema);
+  if (!userId) {
+    return { success: false, message: "Unauthorized" };
+  }
 
-    const dishRating = await DishRatingModel.create({
-      dishId: params.dishId,
-      ratings: params.rating,
-      userId: userId,
-    });
+  try {
+    const dishRating = await DishRating.findOneAndUpdate(
+      { dishId: params.dishId, userId },
+      { rating: params.rating },
+      { upsert: true, new: true }
+    );
+
     if (!dishRating) {
-      return {
-        success: false,
-        message: "Failed to rate dish",
-      };
+      return { success: false, message: "Failed to rate dish" };
     }
+
     return {
       success: true,
-      message: "Dish rated successfully",
+      message: "Dish rating saved successfully",
     };
+  } catch (error: any) {
+    console.error("Error rating dish:", error);
+    return { success: false, message: "Failed to save rating" };
   }
-  dishRating.rating = params.rating;
-  await dishRating.save();
-  return {
-    success: true,
-    message: "Dish rating updated successfully",
-  };
 }
+
 
 export async function getRestaurantOffer(restaurantId: string) {
   await dbConnect();
@@ -88,9 +83,9 @@ export async function getRestaurantOffer(restaurantId: string) {
     allergens: (dishesMap.get(item.dishId.toString()) as any)?.allergens || [],
     lastServed: item.lastServed
       ? new Date(item.lastServed).toLocaleTimeString("hr-HR", {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
+        hour: "2-digit",
+        minute: "2-digit",
+      })
       : "--:--",
     available: item.available,
   }));

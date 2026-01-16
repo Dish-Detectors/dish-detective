@@ -13,7 +13,7 @@ import {
 import WorkerNavbar, { navWidth } from "@/components/WorkerNavbar";
 import DishCard from "@/components/DishCard";
 import {
-  MenuItem,
+  WorkerMenuItem,
   getWorkerMenzaId,
   fetchAllDishesForMenza,
   fetchTodaysOfferDishIdsForMenza,
@@ -26,7 +26,7 @@ export default function Page() {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [menzaId, setMenzaId] = useState<string | null>(null);
-  const [dishes, setDishes] = useState<MenuItem[]>([]);
+  const [dishes, setDishes] = useState<WorkerMenuItem[]>([]);
   const [todaysOfferDishIds, setTodaysOfferDishIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 

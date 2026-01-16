@@ -5,15 +5,43 @@ export interface Location {
   coordinates: [number, number]; // [longitude, latitude]
 }
 
+export interface IShift {
+  start: string; // HH:mm
+  end: string;   // HH:mm
+}
+
+export interface IWorkingDay {
+  day: number; // 0 (Sunday) to 6 (Saturday)
+  shifts: IShift[];
+}
+
 export interface IRestaurant extends Document {
   name: string;
   address: string;
   imageUrl: string;
-  workingHours: string[];
+  workingHours: IWorkingDay[];
   location: Location;
   createdAt: Date;
   updatedAt: Date;
 }
+
+const shiftSchema = new Schema<IShift>({
+  start: { type: String, required: true },
+  end: { type: String, required: true },
+});
+
+shiftSchema.pre("validate", function (next) {
+  if (this.start && this.end && this.start >= this.end) {
+    next(new Error("End time must be after start time"));
+  } else {
+    next();
+  }
+});
+
+const workingDaySchema = new Schema<IWorkingDay>({
+  day: { type: Number, required: true, min: 0, max: 6 },
+  shifts: [shiftSchema],
+});
 
 const restaurantSchema = new Schema<IRestaurant>(
   {
@@ -33,14 +61,8 @@ const restaurantSchema = new Schema<IRestaurant>(
       trim: true,
     },
     workingHours: {
-      type: [String],
+      type: [workingDaySchema],
       required: [true, "Working hours are required"],
-      validate: {
-        validator: function (arr: string[]) {
-          return arr.length > 0;
-        },
-        message: "Working hours must contain at least one entry",
-      },
     },
     location: {
       type: {
@@ -65,9 +87,13 @@ const restaurantSchema = new Schema<IRestaurant>(
   },
 );
 
-// Use existing model if it exists to avoid OverwriteModelError
+// For dev reloads, we want to ensure the latest schema is used
+if (process.env.NODE_ENV !== "production" && mongoose.models.Restaurant) {
+  delete mongoose.models.Restaurant;
+}
+
 const Restaurant: Model<IRestaurant> =
-  (mongoose.models.Restaurant as Model<IRestaurant>) ||
+  mongoose.models.Restaurant ||
   mongoose.model<IRestaurant>("Restaurant", restaurantSchema);
 
 export default Restaurant;

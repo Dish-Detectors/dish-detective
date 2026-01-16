@@ -30,9 +30,12 @@ const dishRatingSchema = new Schema<IDishRating>(
 
 dishRatingSchema.index({ dishId: 1 }, { unique: true });
 
-// Use existing model if it exists to avoid OverwriteModelError
+if (process.env.NODE_ENV === "development") {
+  delete mongoose.models.DishRating;
+}
+
 const DishRating: Model<IDishRating> =
-  (mongoose.models.Dish as Model<IDishRating>) ||
+  (mongoose.models.DishRating as Model<IDishRating>) ||
   mongoose.model<IDishRating>("DishRating", dishRatingSchema);
 
 export default DishRating;
