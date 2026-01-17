@@ -23,6 +23,7 @@
     "@vis.gl/react-google-maps": "^1.7.1",
     "firebase": "^12.8.0",
     "firebase-admin": "^13.6.0",
+    "gsap": "^3.14.2",
     "mongoose": "^8.19.3",
     "next": "16.0.10",
     "prettier": "^3.6.2",
