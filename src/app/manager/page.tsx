@@ -17,6 +17,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUserFirstName } from "@/app/admin/actions";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
+import { headerHeight } from "@/components/ManagerNavbar";
 
 interface ActionButtonProps {
   children: ReactNode;
@@ -86,13 +87,13 @@ const DesktopActionCard = ({
     onClick={onClick}
     elevation={2}
     sx={{
-      flex: "1 1 320px",
+      flex: "1 1 360px",
       display: "flex",
       flexDirection: "column",
       alignItems: "flex-start",
-      minWidth: { xs: 260, md: 320, lg: 360 },
-      maxWidth: { xs: "100%", sm: 420, md: 520, lg: 620 },
-      p: { xs: 3, sm: 4, md: 5 },
+      minWidth: { xs: 280, md: 360, lg: 400 },
+      maxWidth: { xs: "100%", sm: 460, md: 560, lg: 680 },
+      p: { xs: 3.5, sm: 4.5, md: 5.5 },
       borderRadius: 3,
       cursor: "pointer",
       transition: "all 0.2s ease-in-out",
@@ -185,14 +186,12 @@ export default function ManagerPage() {
         <Typography
           variant="h4"
           fontWeight={780}
-          sx={{ color: "#212222", mb: 3, ml: 1 }}
+          sx={{ color: "#212222", mb: 2 }}
         >
           Dobrodošli{name ? `, ${name}` : ""}!
         </Typography>
 
-        <Box sx={{ px: 2 }}>
-          <Divider sx={{ borderBottomWidth: 2 }} />
-        </Box>
+        <Divider sx={{ mb: 4, borderBottomWidth: 2 }} />
 
         <Box sx={{ flexGrow: 1, py: 4 }}>
           <MobileActionCard
@@ -227,33 +226,45 @@ export default function ManagerPage() {
   return (
     <Box
       sx={{
-        height: "100vh",
+        height: `calc(100vh - ${headerHeight}px)`,
         bgcolor: "#f5f5f5",
         p: 5,
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <Typography
         variant="h4"
         fontWeight={780}
-        sx={{ color: "#212222", mb: 4, ml: 4 }}
+        sx={{ color: "#212222", mb: 4, ml: 0 }}
       >
         Dobrodošli{name ? `, ${name}` : ""}!
       </Typography>
 
-      <Box sx={{ px: 4, mt: -3 }}>
+      <Box sx={{ mt: -3 }}>
         <Divider sx={{ borderBottomWidth: 2 }} />
       </Box>
 
       <Box
         sx={{
+          flex: 1,
           px: { xs: 2, sm: 5 },
-          py: { xs: 4, sm: 6 },
           display: "flex",
-          gap: 3,
-          flexWrap: "wrap",
+          alignItems: "center",
           justifyContent: "center",
         }}
       >
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            mt: -7,
+            gap: 3.5,
+            flexWrap: "wrap",
+            justifyContent: "center",
+            alignContent: "center",
+          }}
+        >
         <DesktopActionCard
           icon={
             <MenuBookIcon
@@ -304,6 +315,7 @@ export default function ManagerPage() {
           onClick={() => router.push("/manager/stats")}
           animationDelay="0.5s"
         />
+        </Box>
       </Box>
     </Box>
   );

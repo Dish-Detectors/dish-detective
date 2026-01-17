@@ -166,6 +166,14 @@ export default function DailyMenuPage() {
           Kreiraj dnevni meni
         </Typography>
 
+        <Divider
+          sx={{
+            display: { xs: "block", sm: "none" },
+            mb: 1,
+            borderBottomWidth: 2,
+          }}
+        />
+
         <TextField
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -204,7 +212,7 @@ export default function DailyMenuPage() {
         <Box sx={{ display: { xs: "none", sm: "block" } }} />
       </Box>
 
-      <Divider sx={{ mb: 4 }} />
+      <Divider sx={{ display: { xs: "none", sm: "block" }, mb: 4 }} />
 
       <Box sx={{ flex: 1, overflowY: "auto", pr: 1, scrollbarGutter: "stable" }}>
         {/* Današnji Meni Section */}
@@ -272,7 +280,7 @@ export default function DailyMenuPage() {
                 lg: "repeat(4, 1fr)",
               },
               gap: 3,
-              pb: { xs: 12, sm: 8 },
+              pb: { xs: 6, sm: 8 },
             }}
           >
             {filteredAvailableDishes.map((dish, index) => (

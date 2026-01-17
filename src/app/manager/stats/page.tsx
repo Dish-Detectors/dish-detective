@@ -8,18 +8,38 @@ import {
   Paper,
   TextField,
   InputAdornment,
+  IconButton,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import SortIcon from "@mui/icons-material/Sort";
 import DishCard from "@/components/DishCard";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
-import { getManagerRestaurant } from "@/app/manager/menu/actions";
-import { fetchAllDishesForMenza, WorkerMenuItem } from "@/app/worker/actions";
+import { getAllDishes, getManagerRestaurant } from "@/app/manager/menu/actions";
+import { getSubscriptionCountsForMenuItems } from "@/app/manager/stats/actions";
+
+type SortMode = "alpha" | "subcount";
+
+type ManagerDish = {
+  _id: string;
+  name: string;
+  imageUrl: string;
+  category: string;
+  description: string;
+  allergens: string[];
+};
 
 export default function ManagerStatsPage() {
   const [menzaId, setMenzaId] = useState<string | null>(null);
-  const [dishes, setDishes] = useState<WorkerMenuItem[]>([]);
+  const [dishes, setDishes] = useState<ManagerDish[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortMode, setSortMode] = useState<SortMode>("alpha");
+  const [sortAnchorEl, setSortAnchorEl] = useState<null | HTMLElement>(null);
+  const [subCounts, setSubCounts] = useState<Record<string, number>>({});
+
+  const sortMenuOpen = Boolean(sortAnchorEl);
 
   useEffect(() => {
     let cancelled = false;
@@ -29,11 +49,24 @@ export default function ManagerStatsPage() {
 
       const restaurantRes = await getManagerRestaurant();
       const id = restaurantRes?.success ? (restaurantRes.data?._id as string) : "";
-      const result = id ? await fetchAllDishesForMenza(id) : [];
+      const result = id ? ((await getAllDishes()) as ManagerDish[]) : [];
+
+      // Fetch subscription counts (server placeholder for now)
+      let counts: Record<string, number> = {};
+      if (result.length > 0) {
+        try {
+          counts = await getSubscriptionCountsForMenuItems(
+            result.map((d) => d._id),
+          );
+        } catch (err) {
+          console.error("Failed to load subscription counts", err);
+        }
+      }
 
       if (cancelled) return;
       setMenzaId(id || null);
       setDishes(result);
+      setSubCounts(counts);
       setLoading(false);
     }
 
@@ -51,18 +84,32 @@ export default function ManagerStatsPage() {
         )
       : dishes;
 
-    return [...filtered].sort((a, b) => a.name.localeCompare(b.name));
-  }, [dishes, searchQuery]);
+    const getSubCount = (dishId: string) => subCounts[dishId] ?? 0;
+
+    const next = [...filtered];
+    if (sortMode === "subcount") {
+      next.sort((a, b) => {
+        const diff = getSubCount(b._id) - getSubCount(a._id);
+        return diff !== 0 ? diff : a.name.localeCompare(b.name);
+      });
+      return next;
+    }
+
+    next.sort((a, b) => a.name.localeCompare(b.name));
+    return next;
+  }, [dishes, searchQuery, sortMode, subCounts]);
 
   return (
     <Box
       sx={{
         height: "100vh",
         bgcolor: "#f5f5f5",
+        display: "flex",
+        flexDirection: "column",
         px: { xs: 3, sm: 5 },
         py: { xs: 3, sm: 5 },
         pt: 0,
-        pb: { xs: "100px", sm: 6 },
+        pb: { xs: "140px", sm: 8 },
         overflow: "hidden",
       }}
     >
@@ -76,18 +123,47 @@ export default function ManagerStatsPage() {
           mb: 2,
         }}
       >
-        <Typography
-          variant="h4"
+        <Box
           sx={{
-            fontWeight: 780,
-            color: "#212222",
-            flexShrink: 0,
-            lineHeight: 1.2,
-            justifySelf: "start",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            justifySelf: "stretch",
+            width: "100%",
+            gap: 1,
           }}
         >
-          Statistika
-        </Typography>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 780,
+              color: "#212222",
+              flexShrink: 0,
+              lineHeight: 1.2,
+            }}
+          >
+            Statistika
+          </Typography>
+
+          <IconButton
+            aria-label="Sortiraj"
+            aria-controls={sortMenuOpen ? "stats-sort-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={sortMenuOpen ? "true" : undefined}
+            onClick={(e) => setSortAnchorEl(e.currentTarget)}
+            sx={{ display: { xs: "inline-flex", sm: "none" } }}
+          >
+            <SortIcon />
+          </IconButton>
+        </Box>
+
+        <Divider
+          sx={{
+            display: { xs: "block", sm: "none" },
+            mb: 1,
+            borderBottomWidth: 2,
+          }}
+        />
 
         <TextField
           value={searchQuery}
@@ -124,18 +200,68 @@ export default function ManagerStatsPage() {
           }}
         />
 
-        {/* right-side spacer to keep the search truly centered */}
-        <Box sx={{ display: { xs: "none", sm: "block" } }} />
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: { xs: "flex-end", sm: "flex-end" },
+            justifySelf: { xs: "end", sm: "end" },
+          }}
+        >
+          <IconButton
+            aria-label="Sortiraj"
+            aria-controls={sortMenuOpen ? "stats-sort-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={sortMenuOpen ? "true" : undefined}
+            onClick={(e) => setSortAnchorEl(e.currentTarget)}
+            sx={{
+              display: { xs: "none", sm: "inline-flex" },
+            }}
+          >
+            <SortIcon />
+          </IconButton>
+
+          <Menu
+            id="stats-sort-menu"
+            anchorEl={sortAnchorEl}
+            open={sortMenuOpen}
+            onClose={() => setSortAnchorEl(null)}
+            slotProps={{
+              paper: {
+                sx: { mt: 1, borderRadius: 2, minWidth: 220 },
+              },
+            }}
+          >
+            <MenuItem
+              selected={sortMode === "alpha"}
+              onClick={() => {
+                setSortMode("alpha");
+                setSortAnchorEl(null);
+              }}
+            >
+              Abecedno
+            </MenuItem>
+            <MenuItem
+              selected={sortMode === "subcount"}
+              onClick={() => {
+                setSortMode("subcount");
+                setSortAnchorEl(null);
+              }}
+            >
+              Po zainteresiranosti
+            </MenuItem>
+          </Menu>
+        </Box>
       </Box>
 
-      <Divider sx={{ mb: 4 }} />
+      <Divider sx={{ display: { xs: "none", sm: "block" }, mb: 4 }} />
 
       <Box
         sx={{
           flex: 1,
           overflowY: "auto",
+          overflowX: "hidden",
           pr: 1,
-          pb: 4,
+          pb: { xs: 0, sm: 4 },
           scrollbarGutter: "stable",
         }}
       >
@@ -146,6 +272,8 @@ export default function ManagerStatsPage() {
               justifyContent: "center",
               alignItems: "center",
               height: "50vh",
+              width: "100%",
+              overflowX: "hidden",
             }}
           >
             <PancakeStackLoader />
@@ -194,7 +322,7 @@ export default function ManagerStatsPage() {
           >
             {sortedDishes.map((dish, index) => (
               <Box
-                key={dish.id}
+                key={dish._id}
                 sx={{
                   opacity: 0,
                   animation: `fadeInUp 0.6s ease-out ${index * 0.06}s forwards`,
@@ -211,7 +339,7 @@ export default function ManagerStatsPage() {
                   imageUrl={dish.imageUrl}
                   allergens={dish.allergens}
                   showActions={false}
-                  extraInfo={`Broj zainteresiranih: 0`}
+                  extraInfo={`Broj zainteresiranih: ${subCounts[dish._id] ?? 0}`}
                 />
               </Box>
             ))}

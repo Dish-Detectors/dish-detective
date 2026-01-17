@@ -277,7 +277,8 @@ export default function WorkingHoursPage() {
                     key={index}
                     sx={{
                       display: "flex",
-                      alignItems: "center",
+                      flexDirection: { xs: "column", sm: "row" },
+                      alignItems: { xs: "stretch", sm: "center" },
                       gap: 2,
                       p: 2,
                       borderRadius: 3,
@@ -294,8 +295,10 @@ export default function WorkingHoursPage() {
                       sx={{
                         flex: 1,
                         display: "flex",
-                        alignItems: "center",
+                        flexDirection: { xs: "column", sm: "row" },
+                        alignItems: { xs: "stretch", sm: "center" },
                         gap: 2,
+                        minWidth: 0,
                       }}
                     >
                       <TextField
@@ -315,10 +318,15 @@ export default function WorkingHoursPage() {
                         sx={{
                           bgcolor: "white",
                           "& .MuiOutlinedInput-root": { borderRadius: 2 },
-                          width: 140,
+                          width: { xs: "100%", sm: 140 },
                         }}
                       />
-                      <Typography color="text.secondary">do</Typography>
+                      <Typography
+                        color="text.secondary"
+                        sx={{ display: { xs: "none", sm: "block" } }}
+                      >
+                        do
+                      </Typography>
                       <TextField
                         label="Kraj"
                         type="time"
@@ -336,13 +344,14 @@ export default function WorkingHoursPage() {
                         sx={{
                           bgcolor: "white",
                           "& .MuiOutlinedInput-root": { borderRadius: 2 },
-                          width: 140,
+                          width: { xs: "100%", sm: 140 },
                         }}
                       />
                     </Box>
                     <IconButton
                       onClick={() => handleRemoveShift(index)}
                       sx={{
+                        alignSelf: { xs: "flex-end", sm: "auto" },
                         color: "error.main",
                         bgcolor: "rgba(211, 47, 47, 0.05)",
                         "&:hover": { bgcolor: "rgba(211, 47, 47, 0.1)" },
