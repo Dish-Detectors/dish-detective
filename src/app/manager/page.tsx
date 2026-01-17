@@ -265,56 +265,56 @@ export default function ManagerPage() {
             alignContent: "center",
           }}
         >
-        <DesktopActionCard
-          icon={
-            <MenuBookIcon
-              sx={{
-                fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
-                color: "text.primary",
-              }}
-            />
-          }
-          title="Kreiraj dnevni meni"
-          descriptions={[
-            "• Dodavanje jela na dnevni meni",
-            "• Pregled i uklanjanje stavki",
-          ]}
-          onClick={() => router.push("/manager/menu")}
-          animationDelay="0.1s"
-        />
+          <DesktopActionCard
+            icon={
+              <MenuBookIcon
+                sx={{
+                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                  color: "text.primary",
+                }}
+              />
+            }
+            title="Kreiraj dnevni meni"
+            descriptions={[
+              "• Dodavanje jela na dnevni meni",
+              "• Pregled i uklanjanje stavki",
+            ]}
+            onClick={() => router.push("/manager/menu")}
+            animationDelay="0.1s"
+          />
 
-        <DesktopActionCard
-          icon={
-            <AccessTimeIcon
-              sx={{
-                fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
-                color: "text.primary",
-              }}
-            />
-          }
-          title="Radno vrijeme"
-          descriptions={[
-            "• Postavljanje radnog vremena",
-            "• Više smjena po danu",
-          ]}
-          onClick={() => router.push("/manager/hours")}
-          animationDelay="0.3s"
-        />
+          <DesktopActionCard
+            icon={
+              <AccessTimeIcon
+                sx={{
+                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                  color: "text.primary",
+                }}
+              />
+            }
+            title="Radno vrijeme"
+            descriptions={[
+              "• Postavljanje radnog vremena",
+              "• Više smjena po danu",
+            ]}
+            onClick={() => router.push("/manager/hours")}
+            animationDelay="0.3s"
+          />
 
-        <DesktopActionCard
-          icon={
-            <GroupsIcon
-              sx={{
-                fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
-                color: "text.primary",
-              }}
-            />
-          }
-          title="Statistika"
-          descriptions={["• Pregled zainteresiranih"]}
-          onClick={() => router.push("/manager/stats")}
-          animationDelay="0.5s"
-        />
+          <DesktopActionCard
+            icon={
+              <GroupsIcon
+                sx={{
+                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                  color: "text.primary",
+                }}
+              />
+            }
+            title="Statistika"
+            descriptions={["• Pregled zainteresiranih"]}
+            onClick={() => router.push("/manager/stats")}
+            animationDelay="0.5s"
+          />
         </Box>
       </Box>
     </Box>

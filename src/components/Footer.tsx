@@ -6,11 +6,7 @@ import { usePathname } from "next/navigation";
 
 export const footerHeight = 28;
 
-export default function Footer({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function Footer({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));

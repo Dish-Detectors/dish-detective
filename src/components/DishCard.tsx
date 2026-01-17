@@ -185,7 +185,12 @@ const DishCard = ({
             {!showActions && extraInfo && (
               <Typography
                 variant="body2"
-                sx={{ mt: "auto", pt: 1, fontWeight: 700, color: "text.secondary" }}
+                sx={{
+                  mt: "auto",
+                  pt: 1,
+                  fontWeight: 700,
+                  color: "text.secondary",
+                }}
               >
                 {extraInfo}
               </Typography>

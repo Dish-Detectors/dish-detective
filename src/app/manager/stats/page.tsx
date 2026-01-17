@@ -48,7 +48,9 @@ export default function ManagerStatsPage() {
       setLoading(true);
 
       const restaurantRes = await getManagerRestaurant();
-      const id = restaurantRes?.success ? (restaurantRes.data?._id as string) : "";
+      const id = restaurantRes?.success
+        ? (restaurantRes.data?._id as string)
+        : "";
       const result = id ? ((await getAllDishes()) as ManagerDish[]) : [];
 
       // Fetch subscription counts (server placeholder for now)

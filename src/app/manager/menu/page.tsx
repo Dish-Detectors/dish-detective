@@ -214,7 +214,9 @@ export default function DailyMenuPage() {
 
       <Divider sx={{ display: { xs: "none", sm: "block" }, mb: 4 }} />
 
-      <Box sx={{ flex: 1, overflowY: "auto", pr: 1, scrollbarGutter: "stable" }}>
+      <Box
+        sx={{ flex: 1, overflowY: "auto", pr: 1, scrollbarGutter: "stable" }}
+      >
         {/* Današnji Meni Section */}
         <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: "#444" }}>
           Današnji meni ({menuItems.length})
