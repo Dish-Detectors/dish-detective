@@ -68,24 +68,6 @@ export async function deleteNotification(
   };
 }
 
-
-export async function getDishSubscriptionStats(params: {
-  dishIds: string[];
-  menzaId?: string;
-}): Promise<Record<string, number>> {
-  void params;
-
-  // Placeholder so UI can render
-  await dbConnect();
-
-  const result: Record<string, number> = {};
-  for (const dishId of params.dishIds) {
-    result[dishId] = 0;
-  }
-
-  return result;
-}
-
 export async function getAllRatingsForDish(
   dishId: string,
 ): Promise<IDishRating[]> {
