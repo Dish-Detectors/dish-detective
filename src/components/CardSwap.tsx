@@ -104,6 +104,7 @@ const CardSwap: React.FC<CardSwapProps> = ({
 
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const intervalRef = useRef<number>(0);
+  const timeoutRef = useRef<number>(0);
   const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -168,28 +169,41 @@ const CardSwap: React.FC<CardSwapProps> = ({
       });
     };
 
-    swap();
-    intervalRef.current = window.setInterval(swap, delay);
+    // Start swapping after the configured delay so the initial card order is visible first.
+    timeoutRef.current = window.setTimeout(() => {
+      swap();
+      intervalRef.current = window.setInterval(swap, delay);
+    }, delay);
 
     if (pauseOnHover) {
       const node = container.current!;
       const pause = () => {
         tlRef.current?.pause();
+        clearTimeout(timeoutRef.current);
         clearInterval(intervalRef.current);
       };
       const resume = () => {
         tlRef.current?.play();
-        intervalRef.current = window.setInterval(swap, delay);
+        clearTimeout(timeoutRef.current);
+        clearInterval(intervalRef.current);
+        timeoutRef.current = window.setTimeout(() => {
+          swap();
+          intervalRef.current = window.setInterval(swap, delay);
+        }, delay);
       };
       node.addEventListener('mouseenter', pause);
       node.addEventListener('mouseleave', resume);
       return () => {
         node.removeEventListener('mouseenter', pause);
         node.removeEventListener('mouseleave', resume);
+        clearTimeout(timeoutRef.current);
         clearInterval(intervalRef.current);
       };
     }
-    return () => clearInterval(intervalRef.current);
+    return () => {
+      clearTimeout(timeoutRef.current);
+      clearInterval(intervalRef.current);
+    };
   }, [cardDistance, verticalDistance, delay, pauseOnHover, skewAmount, easing]);
 
   const rendered = childArr.map((child, i) =>
