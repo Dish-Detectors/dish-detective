@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
+import Image from "next/image";
 import {
   Box,
   Button,
@@ -18,6 +19,7 @@ import SchoolIcon from '@mui/icons-material/School';
 import PancakeStackLoader from "@/components/PancakeStackLoader";
 import HomeRevealAnimation from "@/components/HomeRevealAnimation";
 import HomeRevealGate from "@/components/HomeRevealGate";
+import CardSwap, { Card } from "@/components/CardSwap";
 import { getUserRole } from "./actions";
 
 export default function Home() {
@@ -41,6 +43,64 @@ export default function Home() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isShortScreen = useMediaQuery("(max-height: 740px)");
+  const showDesktopCards = useMediaQuery("(min-width: 1400px)");
+
+  const [cardSwapLayout, setCardSwapLayout] = useState(() => ({
+    cardWidth: 520,
+    cardHeight: 340,
+    wrapperWidth: 590,
+    wrapperHeight: 460,
+    cardDistance: 55,
+    verticalDistance: 65,
+  }));
+
+  const cardSwapImageSizes = `${cardSwapLayout.cardWidth}px`;
+
+  useEffect(() => {
+    if (!showDesktopCards) return;
+
+    const clamp = (min: number, value: number, max: number) => Math.max(min, Math.min(max, value));
+    let rafId = 0;
+
+    const recompute = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      // Scale mostly with width, but cap by height so it doesn't get cramped on short screens.
+      const cardWidth = clamp(520, Math.round(vw * 0.33), 780);
+      const idealCardHeight = cardWidth * (340 / 520);
+      const maxCardHeight = Math.min(540, Math.round(vh * 0.58));
+      const cardHeight = clamp(340, Math.round(idealCardHeight), maxCardHeight);
+
+      // Keep roughly the same extra breathing room as before: +60w / +120h.
+      const wrapperWidth = cardWidth + 70;
+      const wrapperHeight = cardHeight + 130;
+
+      const cardDistance = clamp(55, Math.round(cardWidth * 0.12), 90);
+      const verticalDistance = clamp(65, Math.round(cardHeight * 0.22), 110);
+
+      setCardSwapLayout({
+        cardWidth,
+        cardHeight,
+        wrapperWidth,
+        wrapperHeight,
+        cardDistance,
+        verticalDistance,
+      });
+    };
+
+    const onResize = () => {
+      cancelAnimationFrame(rafId);
+      rafId = window.requestAnimationFrame(recompute);
+    };
+
+    recompute();
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      cancelAnimationFrame(rafId);
+    };
+  }, [showDesktopCards]);
 
   const typingFinished = subtitleText.length >= fullSubtitle.length;
 
@@ -310,88 +370,271 @@ export default function Home() {
 
         <Box
           sx={{
-            maxWidth: 600,
             zIndex: 1,
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 8,
+            pr: "clamp(80px, 6vw, 200px)",
           }}
         >
-          <Typography
-            variant="h2"
-            fontWeight={800}
-            sx={{
-              color: "white",
-              mb: 2,
-              lineHeight: 1.2,
-              wordBreak: "break-word",
-              letterSpacing: -1,
-            }}
-          >
-            Poboljšaj svoje iskustvo u menzi
-          </Typography>
-
-          <Typography
-            variant="h5"
-            sx={{
-              mb: 3,
-              color: "lightgrey",
-              letterSpacing: 1.2,
-            }}
-          >
-            <span className="ddTypewriterText">{subtitleText}</span>
-            <span
-              className={
-                typingFinished
-                  ? "ddTypewriterCaret ddTypewriterCaret--idle"
-                  : "ddTypewriterCaret"
-              }
-              aria-hidden="true"
-            />
-          </Typography>
-
-          <Stack spacing={2}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={(e) => setAnchorEl(e.currentTarget)}
+          <Box sx={{ maxWidth: 600 }}>
+            <Typography
+              variant="h2"
+              fontWeight={800}
               sx={{
-                fontWeight: 600,
-                borderRadius: 3,
-                width: "25%",
-                minHeight: 45,
                 color: "white",
-                textTransform: "none",
+                mb: 2,
+                lineHeight: 1.2,
+                wordBreak: "break-word",
+                letterSpacing: -1,
               }}
             >
-              Prijava
-            </Button>
+              Poboljšaj svoje iskustvo u menzi
+            </Typography>
 
-            <Menu
-              anchorEl={anchorEl}
-              open={open}
-              onClose={() => setAnchorEl(null)}
-              slotProps={{
-                list: {
-                  disablePadding: true,
-                },
-                paper: {
-                  sx: { minWidth: 300, mt: 1, borderRadius: 2 },
-                },
+            <Typography
+              variant="h5"
+              sx={{
+                mb: 3,
+                color: "lightgrey",
+                letterSpacing: 1.2,
               }}
             >
-              <MenuItem
-                onClick={() => router.push("/login/employee")}
-                sx={{ fontSize: "1rem", py: 1.2, display: 'flex', alignItems: 'center' }}
+              <span className="ddTypewriterText">{subtitleText}</span>
+              <span
+                className={
+                  typingFinished
+                    ? "ddTypewriterCaret ddTypewriterCaret--idle"
+                    : "ddTypewriterCaret"
+                }
+                aria-hidden="true"
+              />
+            </Typography>
+
+            <Stack spacing={2}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={(e) => setAnchorEl(e.currentTarget)}
+                sx={{
+                  fontWeight: 600,
+                  borderRadius: 3,
+                  width: "25%",
+                  minHeight: 45,
+                  color: "white",
+                  textTransform: "none",
+                }}
               >
-                <RestaurantIcon fontSize="small" sx={{ mr: 1 }} /> Radnik u menzi
-              </MenuItem>
-              <Box sx={{ borderBottom: "1px solid black", my: 0 }} />
-              <MenuItem
-                onClick={() => router.push("/login/student")}
-                sx={{ fontSize: "1rem", py: 1.2, display: 'flex', alignItems: 'center' }}
+                Prijava
+              </Button>
+
+              <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={() => setAnchorEl(null)}
+                slotProps={{
+                  list: {
+                    disablePadding: true,
+                  },
+                  paper: {
+                    sx: { minWidth: 300, mt: 1, borderRadius: 2 },
+                  },
+                }}
               >
-                <SchoolIcon fontSize="small" sx={{ mr: 1 }} /> Student
-              </MenuItem>
-            </Menu>
-          </Stack>
+                <MenuItem
+                  onClick={() => router.push("/login/employee")}
+                  sx={{ fontSize: "1rem", py: 1.2, display: "flex", alignItems: "center" }}
+                >
+                  <RestaurantIcon fontSize="small" sx={{ mr: 1 }} /> Radnik u menzi
+                </MenuItem>
+                <Box sx={{ borderBottom: "1px solid black", my: 0 }} />
+                <MenuItem
+                  onClick={() => router.push("/login/student")}
+                  sx={{ fontSize: "1rem", py: 1.2, display: "flex", alignItems: "center" }}
+                >
+                  <SchoolIcon fontSize="small" sx={{ mr: 1 }} /> Student
+                </MenuItem>
+              </Menu>
+            </Stack>
+          </Box>
+
+          <Box
+            sx={{
+              position: "relative",
+              width: cardSwapLayout.wrapperWidth,
+              height: cardSwapLayout.wrapperHeight,
+              flex: "0 0 auto",
+              display: "none",
+              "@media (min-width: 1400px)": {
+                display: "block",
+              },
+            }}
+            aria-hidden="true"
+          >
+            <CardSwap
+              width={cardSwapLayout.cardWidth}
+              height={cardSwapLayout.cardHeight}
+              cardDistance={cardSwapLayout.cardDistance}
+              verticalDistance={cardSwapLayout.verticalDistance}
+              delay={5200}
+              pauseOnHover
+            >
+              <Card
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.78) 100%)",
+                  border: "1px solid rgba(255,255,255,0.45)",
+                  borderRadius: 18,
+                  boxShadow: "0 18px 50px rgba(0,0,0,0.22)",
+                  overflow: "hidden",
+                  backdropFilter: "blur(10px)",
+                  WebkitBackdropFilter: "blur(10px)",
+                }}
+              >
+                <Box sx={{ p: 1.5, height: "100%", display: "flex", flexDirection: "column" }}>
+                  <Box
+                    sx={{
+                      width: 56,
+                      height: 4,
+                      borderRadius: 999,
+                      background: "#56AAF5",
+                      mb: 1,
+                    }}
+                  />
+                  <Typography variant="subtitle1" fontWeight={800} sx={{ color: "#111827", lineHeight: 1.1 }}>
+                    Real-time meni
+                  </Typography>
+                  <Box
+                    sx={{
+                      mt: 0.75,
+                      width: "100%",
+                      aspectRatio: "1380 / 780",
+                      borderRadius: 2,
+                      background: "#f6f7f9",
+                      border: "1px solid rgba(0,0,0,0.10)",
+                      overflow: "hidden",
+                      p: 0,
+                    }}
+                  >
+                    <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+                      <Image
+                        src="/menuview.png"
+                        alt="Student view"
+                        fill
+                        sizes={cardSwapImageSizes}
+                        style={{ objectFit: "contain", objectPosition: "center" }}
+                        priority
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+              </Card>
+
+              <Card
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.78) 100%)",
+                  border: "1px solid rgba(255,255,255,0.45)",
+                  borderRadius: 18,
+                  boxShadow: "0 18px 50px rgba(0,0,0,0.22)",
+                  overflow: "hidden",
+                  backdropFilter: "blur(10px)",
+                  WebkitBackdropFilter: "blur(10px)",
+                }}
+              >
+                <Box sx={{ p: 1.5, height: "100%", display: "flex", flexDirection: "column" }}>
+                  <Box
+                    sx={{
+                      width: 56,
+                      height: 4,
+                      borderRadius: 999,
+                      background: "#56AAF5",
+                      mb: 1,
+                      opacity: 0.9,
+                    }}
+                  />
+                  <Typography variant="subtitle1" fontWeight={800} sx={{ color: "#111827", lineHeight: 1.1 }}>
+                    Jednostavan pregled menzi
+                  </Typography>
+                  <Box
+                    sx={{
+                      mt: 0.75,
+                      width: "100%",
+                      aspectRatio: "1380 / 780",
+                      borderRadius: 2,
+                      background: "#f6f7f9",
+                      border: "1px solid rgba(0,0,0,0.10)",
+                      overflow: "hidden",
+                      p: 0,
+                    }}
+                  >
+                    <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+                      <Image
+                        src="/menzamap.png"
+                        alt="Menza map"
+                        fill
+                        sizes={cardSwapImageSizes}
+                        style={{ objectFit: "contain", objectPosition: "center" }}
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+              </Card>
+
+              <Card
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.78) 100%)",
+                  border: "1px solid rgba(255,255,255,0.45)",
+                  borderRadius: 18,
+                  boxShadow: "0 18px 50px rgba(0,0,0,0.22)",
+                  overflow: "hidden",
+                  backdropFilter: "blur(10px)",
+                  WebkitBackdropFilter: "blur(10px)",
+                }}
+              >
+                <Box sx={{ p: 1.75, height: "100%", display: "flex", flexDirection: "column" }}>
+                  <Box
+                    sx={{
+                      width: 56,
+                      height: 4,
+                      borderRadius: 999,
+                      background: "#56AAF5",
+                      mb: 1,
+                      opacity: 0.85,
+                    }}
+                  />
+                  <Typography variant="subtitle1" fontWeight={800} sx={{ color: "#111827", lineHeight: 1.1 }}>
+                    Obavijesti u stvarnom vremenu
+                  </Typography>
+                  <Box
+                    sx={{
+                      width: "100%",
+                      mt: 0.75,
+                      aspectRatio: "1380 / 780",
+                      borderRadius: 2,
+                      background: "#f6f7f9",
+                      border: "1px solid rgba(0,0,0,0.10)",
+                      overflow: "hidden",
+                      p: 0,
+                    }}
+                  >
+                    <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+                      <Image
+                        src="/notification.png"
+                        alt="Notifications"
+                        fill
+                        sizes={cardSwapImageSizes}
+                        style={{ objectFit: "contain", objectPosition: "center" }}
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+              </Card>
+            </CardSwap>
+          </Box>
         </Box>
       </HomeRevealGate>
     </Box>
