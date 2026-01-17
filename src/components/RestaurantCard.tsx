@@ -14,6 +14,12 @@ import EditIcon from "@mui/icons-material/Edit";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PlaceIcon from "@mui/icons-material/Place";
 
+interface WorkingDay {
+  day: number;
+  shifts: { start: string; end: string }[];
+  _id?: string;
+}
+
 interface RestaurantCardProps {
   name: string;
   address: string;
@@ -23,6 +29,25 @@ interface RestaurantCardProps {
   onDelete: () => void;
 }
 
+const formatHours = (hours: string[] | WorkingDay[]): string[] => {
+  if (!hours || hours.length === 0) return [];
+
+  if (typeof hours[0] === "string") {
+    return hours as string[];
+  }
+
+  const daysMap = ["NED", "PON", "UTO", "SRI", "ČET", "PET", "SUB"];
+  const rawHours = hours as WorkingDay[];
+
+  return rawHours.map((item) => {
+    const dayName = daysMap[item.day];
+    if (item.shifts && item.shifts.length > 0) {
+      return `${dayName}: ${item.shifts[0].start} - ${item.shifts[0].end}`;
+    }
+    return `${dayName}: Zatvoreno`;
+  });
+};
+
 export default function RestaurantCard({
   name,
   address,
@@ -31,6 +56,9 @@ export default function RestaurantCard({
   onEdit,
   onDelete,
 }: RestaurantCardProps) {
+
+  const displayHours = formatHours(workingHours);
+
   const buttonStyle = {
     flex: 1,
     borderRadius: 2.5,
@@ -85,8 +113,8 @@ export default function RestaurantCard({
             sx={{ fontSize: 18, color: "text.secondary", mt: 0.5 }}
           />
           <Box>
-            {workingHours && workingHours.length > 0 ? (
-              workingHours.slice(0, 2).map((hour, index) => (
+            {displayHours && displayHours.length > 0 ? (
+              displayHours.slice(0, 2).map((hour, index) => (
                 <Typography
                   key={index}
                   variant="body2"
@@ -101,9 +129,9 @@ export default function RestaurantCard({
                 Nije uneseno
               </Typography>
             )}
-            {workingHours && workingHours.length > 2 && (
+            {displayHours && displayHours.length > 2 && (
               <Typography variant="caption" color="primary" fontWeight="bold">
-                +{workingHours.length - 2} više...
+                +{displayHours.length - 2} više...
               </Typography>
             )}
           </Box>
