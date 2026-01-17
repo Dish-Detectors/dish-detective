@@ -89,11 +89,19 @@ export default function WorkerNavbar({ isMobile = false }: WorkerNavbarProps) {
         <IconButton
           onClick={handleToggleNotif}
           sx={{
-            color: notifAnchor ? "primary.main" : "text.primary",
-            bgcolor: notifAnchor ? "grey.100" : "transparent",
-            "&:hover": { bgcolor: "grey.100" },
+            bgcolor: "transparent",
+            "&:hover": { bgcolor: "transparent" },
+            "&.Mui-focusVisible": { bgcolor: "transparent" },
+            "& .MuiSvgIcon-root": {
+              color: notifAnchor ? "primary.main" : "text.primary",
+              transition: "color 180ms ease",
+            },
+            "&:hover .MuiSvgIcon-root": {
+              color: "primary.main",
+            },
           }}
           aria-label="Notifications"
+          disableRipple
         >
           <SmsIcon />
         </IconButton>
