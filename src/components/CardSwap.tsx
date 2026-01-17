@@ -57,6 +57,7 @@ interface Slot {
   y: number;
   z: number;
   zIndex: number;
+  depth: number;
 }
 
 const makeSlot = (
@@ -69,10 +70,23 @@ const makeSlot = (
   y: Math.round(-i * distY),
   z: Math.round(-i * distX * 1.5),
   zIndex: total - i,
+  depth: i,
 });
 
-const placeNow = (el: HTMLElement, slot: Slot, skew: number) =>
-  gsap.set(el, {
+const depthVisual = (depth: number) => {
+  // depth=0 => front card
+  // Increase fade + blur for back cards.
+  const opacity = Math.max(0.5, 1 - depth * 0.2);
+  const blurPx = depth * 1.8;
+  return {
+    opacity,
+    filter: blurPx > 0 ? `blur(${blurPx}px)` : "none",
+  };
+};
+
+const placeNow = (el: HTMLElement, slot: Slot, skew: number) => {
+  const visual = depthVisual(slot.depth);
+  return gsap.set(el, {
     x: slot.x,
     y: slot.y,
     z: slot.z,
@@ -81,8 +95,11 @@ const placeNow = (el: HTMLElement, slot: Slot, skew: number) =>
     skewY: skew,
     transformOrigin: "center center",
     zIndex: slot.zIndex,
+    opacity: visual.opacity,
+    filter: visual.filter,
     force3D: true,
   });
+};
 
 const CardSwap: React.FC<CardSwapProps> = ({
   width = 500,
@@ -211,6 +228,7 @@ const CardSwap: React.FC<CardSwapProps> = ({
       rest.forEach((idx, i) => {
         const el = refs[idx].current!;
         const slot = makeSlot(i, cardDistance, verticalDistance, refs.length);
+        const visual = depthVisual(slot.depth);
         tl.set(el, { zIndex: slot.zIndex }, "promote");
         tl.to(
           el,
@@ -218,6 +236,8 @@ const CardSwap: React.FC<CardSwapProps> = ({
             x: slot.x,
             y: slot.y,
             z: slot.z,
+            opacity: visual.opacity,
+            filter: visual.filter,
             duration: config.durMove,
             ease: config.ease,
           },
@@ -231,6 +251,7 @@ const CardSwap: React.FC<CardSwapProps> = ({
         verticalDistance,
         refs.length,
       );
+      const backVisual = depthVisual(backSlot.depth);
       tl.addLabel("return", `promote+=${config.durMove * config.returnDelay}`);
       tl.call(
         () => {
@@ -245,6 +266,8 @@ const CardSwap: React.FC<CardSwapProps> = ({
           x: backSlot.x,
           y: backSlot.y,
           z: backSlot.z,
+          opacity: backVisual.opacity,
+          filter: backVisual.filter,
           duration: config.durReturn,
           ease: config.ease,
         },
