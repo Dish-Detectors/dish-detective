@@ -272,7 +272,7 @@ export default function DailyMenuPage() {
                 lg: "repeat(4, 1fr)",
               },
               gap: 3,
-              pb: 2,
+              pb: { xs: 12, sm: 8 },
             }}
           >
             {filteredAvailableDishes.map((dish, index) => (
