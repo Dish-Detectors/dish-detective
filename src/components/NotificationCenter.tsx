@@ -71,8 +71,16 @@ export default function NotificationCenter({
 
   if (!open || !anchorEl) return null;
 
+  const handleClickAway = (event: MouseEvent | TouchEvent) => {
+    const target = event.target as Node | null;
+    if (target && anchorEl.contains(target)) {
+      return;
+    }
+    onClose();
+  };
+
   return (
-    <ClickAwayListener onClickAway={onClose}>
+    <ClickAwayListener onClickAway={handleClickAway}>
       <Fade in={open}>
         <Paper
           elevation={4}

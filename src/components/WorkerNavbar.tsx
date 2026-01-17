@@ -96,8 +96,13 @@ export default function WorkerNavbar({ isMobile = false }: WorkerNavbarProps) {
               color: notifAnchor ? "primary.main" : "text.primary",
               transition: "color 180ms ease",
             },
-            "&:hover .MuiSvgIcon-root": {
+            "&:active .MuiSvgIcon-root": {
               color: "primary.main",
+            },
+            "@media (hover: hover) and (pointer: fine)": {
+              "&:hover .MuiSvgIcon-root": {
+                color: "primary.main",
+              },
             },
           }}
           aria-label="Notifications"
