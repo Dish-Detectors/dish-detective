@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Box, Divider, Typography, Paper } from "@mui/material";
+import {
+  Box,
+  Divider,
+  Typography,
+  Paper,
+  TextField,
+  InputAdornment,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import DishCard from "@/components/DishCard";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
 import { getManagerRestaurant } from "@/app/manager/menu/actions";
@@ -11,6 +19,7 @@ export default function ManagerStatsPage() {
   const [menzaId, setMenzaId] = useState<string | null>(null);
   const [dishes, setDishes] = useState<WorkerMenuItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -34,10 +43,16 @@ export default function ManagerStatsPage() {
     };
   }, []);
 
-  const sortedDishes = useMemo(
-    () => [...dishes].sort((a, b) => a.name.localeCompare(b.name)),
-    [dishes],
-  );
+  const sortedDishes = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    const filtered = q
+      ? dishes.filter((d) =>
+          `${d.name} ${d.category}`.toLowerCase().includes(q),
+        )
+      : dishes;
+
+    return [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+  }, [dishes, searchQuery]);
 
   return (
     <Box
@@ -51,17 +66,68 @@ export default function ManagerStatsPage() {
         overflow: "hidden",
       }}
     >
-      <Typography
-        variant="h4"
+      <Box
         sx={{
-          fontWeight: 780,
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", sm: "1fr auto 1fr" },
+          alignItems: "center",
+          columnGap: 3,
+          rowGap: 2,
           mb: 2,
-          color: "#212222",
-          flexShrink: 0,
         }}
       >
-        Statistika
-      </Typography>
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 780,
+            color: "#212222",
+            flexShrink: 0,
+            lineHeight: 1.2,
+            justifySelf: "start",
+          }}
+        >
+          Statistika
+        </Typography>
+
+        <TextField
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Pretraži jela..."
+          size="small"
+          sx={{
+            width: { xs: "100%", sm: 360, md: 520, lg: 640 },
+            maxWidth: "100%",
+            justifySelf: { xs: "stretch", sm: "center" },
+            bgcolor: "white",
+            borderRadius: 999,
+            "& .MuiOutlinedInput-root": {
+              borderRadius: 999,
+              "& fieldset": {
+                borderColor: "#e0e0e0",
+              },
+              "&:hover fieldset": {
+                borderColor: "primary.main",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "primary.main",
+              },
+            },
+          }}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: "#999" }} />
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+
+        {/* right-side spacer to keep the search truly centered */}
+        <Box sx={{ display: { xs: "none", sm: "block" } }} />
+      </Box>
+
       <Divider sx={{ mb: 4 }} />
 
       <Box
@@ -70,6 +136,7 @@ export default function ManagerStatsPage() {
           overflowY: "auto",
           pr: 1,
           pb: 4,
+          scrollbarGutter: "stable",
         }}
       >
         {loading ? (
