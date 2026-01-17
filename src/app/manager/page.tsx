@@ -11,12 +11,12 @@ import {
 
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import GroupsIcon from "@mui/icons-material/Groups";
 
 import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUserFirstName } from "@/app/admin/actions";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
-import { navWidth } from "@/components/ManagerNavbar";
 
 interface ActionButtonProps {
   children: ReactNode;
@@ -86,13 +86,13 @@ const DesktopActionCard = ({
     onClick={onClick}
     elevation={2}
     sx={{
-      flex: 1,
+      flex: "1 1 320px",
       display: "flex",
       flexDirection: "column",
       alignItems: "flex-start",
-      minWidth: 150,
-      maxWidth: 350,
-      p: 3,
+      minWidth: { xs: 260, md: 320, lg: 360 },
+      maxWidth: { xs: "100%", sm: 420, md: 520, lg: 620 },
+      p: { xs: 3, sm: 4, md: 5 },
       borderRadius: 3,
       cursor: "pointer",
       transition: "all 0.2s ease-in-out",
@@ -112,7 +112,7 @@ const DesktopActionCard = ({
     {icon}
     <Typography
       sx={{
-        fontSize: "clamp(1rem, 1.7vw, 2rem)",
+        fontSize: "clamp(1.25rem, 1.8vw, 2.25rem)",
         fontWeight: "600",
         color: "text.primary",
         pt: 1,
@@ -124,7 +124,7 @@ const DesktopActionCard = ({
       <Typography
         key={index}
         sx={{
-          fontSize: "clamp(0.75rem, 0.9vw, 1.2rem)",
+          fontSize: "clamp(0.85rem, 1vw, 1.25rem)",
           fontWeight: "550",
           color: "text.secondary",
           pt: index === 0 ? 1 : 0,
@@ -211,6 +211,14 @@ export default function ManagerPage() {
           >
             Radno vrijeme
           </MobileActionCard>
+
+          <MobileActionCard
+            onClick={() => router.push("/manager/stats")}
+            icon={<GroupsIcon sx={{ fontSize: 32, color: "text.primary" }} />}
+            animationDelay="0.5s"
+          >
+            Statistika
+          </MobileActionCard>
         </Box>
       </Box>
     );
@@ -238,8 +246,8 @@ export default function ManagerPage() {
 
       <Box
         sx={{
-          px: 5,
-          py: 6,
+          px: { xs: 2, sm: 5 },
+          py: { xs: 4, sm: 6 },
           display: "flex",
           gap: 3,
           flexWrap: "wrap",
@@ -247,7 +255,14 @@ export default function ManagerPage() {
         }}
       >
         <DesktopActionCard
-          icon={<MenuBookIcon sx={{ fontSize: 40, color: "text.primary" }} />}
+          icon={
+            <MenuBookIcon
+              sx={{
+                fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                color: "text.primary",
+              }}
+            />
+          }
           title="Kreiraj dnevni meni"
           descriptions={[
             "• Dodavanje jela na dnevni meni",
@@ -258,7 +273,14 @@ export default function ManagerPage() {
         />
 
         <DesktopActionCard
-          icon={<AccessTimeIcon sx={{ fontSize: 40, color: "text.primary" }} />}
+          icon={
+            <AccessTimeIcon
+              sx={{
+                fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                color: "text.primary",
+              }}
+            />
+          }
           title="Radno vrijeme"
           descriptions={[
             "• Postavljanje radnog vremena",
@@ -266,6 +288,21 @@ export default function ManagerPage() {
           ]}
           onClick={() => router.push("/manager/hours")}
           animationDelay="0.3s"
+        />
+
+        <DesktopActionCard
+          icon={
+            <GroupsIcon
+              sx={{
+                fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                color: "text.primary",
+              }}
+            />
+          }
+          title="Statistika"
+          descriptions={["• Pregled zainteresiranih"]}
+          onClick={() => router.push("/manager/stats")}
+          animationDelay="0.5s"
         />
       </Box>
     </Box>
