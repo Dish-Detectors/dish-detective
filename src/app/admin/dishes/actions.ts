@@ -21,20 +21,9 @@ type ActionResponse = {
 
 export async function deleteDish(dishId: string): Promise<ActionResponse> {
   try {
-    const conn = await dbConnect();
-    // Needed because we use a custom connection
-    const DishModel = conn.model("Dish", Dish.schema);
+    await dbConnect();
 
-    // Validate id
-    if (!conn.Types.ObjectId.isValid(dishId)) {
-      return {
-        success: false,
-        message: "Invalid dish ID format",
-        errors: { id: "Invalid ObjectId format" },
-      };
-    }
-
-    const deletedDish = await DishModel.findByIdAndDelete(dishId);
+    const deletedDish = await Dish.findByIdAndDelete(dishId);
 
     if (!deletedDish) {
       return {
@@ -62,22 +51,12 @@ export async function deleteDish(dishId: string): Promise<ActionResponse> {
 
 export async function getAllDishes(): Promise<ActionResponse> {
   try {
-    const conn = await dbConnect();
-    // Needed because we use a custom connection
-    const DishModel = conn.model("Dish", Dish.schema);
+    await dbConnect();
 
-    const dishes = await DishModel.find({})
-      .sort({ name: 1 }) // Sort while we still have MongoDB objects to be more efficient
-      .lean() // Returns plain JavaScript objects
-      .exec();
+    const dishes = await Dish.find({}).sort({ name: 1 }).lean().exec();
 
-    // Convert _id to string for JSON serialization
-    const serializedDishes = dishes.map((dish) => ({
-      ...dish,
-      _id: dish._id.toString(),
-      createdAt: dish.createdAt.toISOString(),
-      updatedAt: dish.updatedAt.toISOString(),
-    }));
+    // Sanitize to remove Mongoose special objects
+    const serializedDishes = JSON.parse(JSON.stringify(dishes));
 
     return {
       success: true,

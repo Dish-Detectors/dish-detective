@@ -52,7 +52,10 @@ const notifSchema = new Schema<INotification>(
 notifSchema.index({ type: 1 });
 notifSchema.index({ targetUserId: 1 });
 
-// Use existing model if it exists to avoid OverwriteModelError
+if (process.env.NODE_ENV === "development") {
+  delete mongoose.models.Notification;
+}
+
 const Notification: Model<INotification> =
   (mongoose.models.Notification as Model<INotification>) ||
   mongoose.model<INotification>("Notification", notifSchema);

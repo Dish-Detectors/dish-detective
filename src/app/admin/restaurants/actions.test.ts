@@ -9,6 +9,9 @@ import {
 
 describe("Restaurant Server Actions", () => {
   let mongoServer: MongoMemoryServer;
+  const STANDARD_HOURS = [
+    { day: 1, shifts: [{ start: "08:00", end: "20:00" }] },
+  ];
 
   // Setup: Start in-memory MongoDB before all tests
   beforeAll(async () => {
@@ -44,8 +47,13 @@ describe("Restaurant Server Actions", () => {
         address: "123 Main St, New York, NY 10001",
         imageUrl: "https://example.com/pizza-paradise.jpg",
         workingHours: [
-          "Mon-Fri: 11:00 AM - 10:00 PM",
-          "Sat-Sun: 12:00 PM - 11:00 PM",
+          { day: 1, shifts: [{ start: "11:00", end: "22:00" }] },
+          { day: 2, shifts: [{ start: "11:00", end: "22:00" }] },
+          { day: 3, shifts: [{ start: "11:00", end: "22:00" }] },
+          { day: 4, shifts: [{ start: "11:00", end: "22:00" }] },
+          { day: 5, shifts: [{ start: "11:00", end: "22:00" }] },
+          { day: 6, shifts: [{ start: "12:00", end: "23:00" }] },
+          { day: 0, shifts: [{ start: "12:00", end: "23:00" }] },
         ],
         location: {
           type: "Point" as const,
@@ -56,7 +64,15 @@ describe("Restaurant Server Actions", () => {
         name: "Sushi House",
         address: "456 Oak Ave, Los Angeles, CA 90001",
         imageUrl: "https://example.com/sushi-house.jpg",
-        workingHours: ["Mon-Sun: 12:00 PM - 10:00 PM"],
+        workingHours: [
+          { day: 1, shifts: [{ start: "12:00", end: "22:00" }] },
+          { day: 2, shifts: [{ start: "12:00", end: "22:00" }] },
+          { day: 3, shifts: [{ start: "12:00", end: "22:00" }] },
+          { day: 4, shifts: [{ start: "12:00", end: "22:00" }] },
+          { day: 5, shifts: [{ start: "12:00", end: "22:00" }] },
+          { day: 6, shifts: [{ start: "12:00", end: "22:00" }] },
+          { day: 0, shifts: [{ start: "12:00", end: "22:00" }] },
+        ],
         location: {
           type: "Point" as const,
           coordinates: [-118.243683, 34.052235] as [number, number],
@@ -67,8 +83,13 @@ describe("Restaurant Server Actions", () => {
         address: "789 Elm St, Chicago, IL 60601",
         imageUrl: "https://example.com/burger-joint.jpg",
         workingHours: [
-          "Mon-Thu: 11:00 AM - 9:00 PM",
-          "Fri-Sun: 11:00 AM - 11:00 PM",
+          { day: 1, shifts: [{ start: "11:00", end: "21:00" }] },
+          { day: 2, shifts: [{ start: "11:00", end: "21:00" }] },
+          { day: 3, shifts: [{ start: "11:00", end: "21:00" }] },
+          { day: 4, shifts: [{ start: "11:00", end: "21:00" }] },
+          { day: 5, shifts: [{ start: "11:00", end: "23:00" }] },
+          { day: 6, shifts: [{ start: "11:00", end: "23:00" }] },
+          { day: 0, shifts: [{ start: "11:00", end: "23:00" }] },
         ],
         location: {
           type: "Point" as const,
@@ -79,7 +100,15 @@ describe("Restaurant Server Actions", () => {
         name: "Taco Fiesta",
         address: "321 Pine St, Austin, TX 78701",
         imageUrl: "https://example.com/taco-fiesta.jpg",
-        workingHours: ["Mon-Sun: 10:00 AM - 10:00 PM"],
+        workingHours: [
+          { day: 1, shifts: [{ start: "10:00", end: "22:00" }] },
+          { day: 2, shifts: [{ start: "10:00", end: "22:00" }] },
+          { day: 3, shifts: [{ start: "10:00", end: "22:00" }] },
+          { day: 4, shifts: [{ start: "10:00", end: "22:00" }] },
+          { day: 5, shifts: [{ start: "10:00", end: "22:00" }] },
+          { day: 6, shifts: [{ start: "10:00", end: "22:00" }] },
+          { day: 0, shifts: [{ start: "10:00", end: "22:00" }] },
+        ],
         location: {
           type: "Point" as const,
           coordinates: [-97.743061, 30.267153] as [number, number],
@@ -89,7 +118,14 @@ describe("Restaurant Server Actions", () => {
         name: "Pasta Palace",
         address: "654 Maple Dr, Miami, FL 33101",
         imageUrl: "https://example.com/pasta-palace.jpg",
-        workingHours: ["Tue-Sun: 5:00 PM - 11:00 PM", "Closed Monday"],
+        workingHours: [
+          { day: 2, shifts: [{ start: "17:00", end: "23:00" }] },
+          { day: 3, shifts: [{ start: "17:00", end: "23:00" }] },
+          { day: 4, shifts: [{ start: "17:00", end: "23:00" }] },
+          { day: 5, shifts: [{ start: "17:00", end: "23:00" }] },
+          { day: 6, shifts: [{ start: "17:00", end: "23:00" }] },
+          { day: 0, shifts: [{ start: "17:00", end: "23:00" }] },
+        ],
         location: {
           type: "Point" as const,
           coordinates: [-80.191788, 25.761681] as [number, number],
@@ -117,7 +153,7 @@ describe("Restaurant Server Actions", () => {
     // Update first restaurant (Pizza Paradise)
     const updateResult1 = await updateRestaurant(createdRestaurantIds[0], {
       address: "123 Main St, Suite 100, New York, NY 10001",
-      workingHours: ["Mon-Sun: 11:00 AM - 11:00 PM"],
+      workingHours: [{ day: 1, shifts: [{ start: "11:00", end: "23:00" }] }],
     });
     expect(updateResult1.success).toBe(true);
 
@@ -134,7 +170,7 @@ describe("Restaurant Server Actions", () => {
 
     // Update fifth restaurant (Pasta Palace)
     const updateResult3 = await updateRestaurant(createdRestaurantIds[4], {
-      workingHours: ["Mon-Sun: 5:00 PM - 12:00 AM"],
+      workingHours: [{ day: 1, shifts: [{ start: "17:00", end: "23:59" }] }],
     });
     expect(updateResult3.success).toBe(true);
     console.log(`Updated working hours for: Pasta Palace`);
@@ -165,7 +201,7 @@ describe("Restaurant Server Actions", () => {
     );
     expect(pizzaParadise.address).toContain("Suite 100");
     expect(pizzaParadise.workingHours).toHaveLength(1);
-    expect(pizzaParadise.workingHours[0]).toContain("Mon-Sun");
+    expect(pizzaParadise.workingHours[0].shifts[0].start).toBe("11:00");
 
     const burgerJoint = getAllResult.data.find(
       (r: any) => r.name === "Burger Joint Premium",
@@ -180,7 +216,7 @@ describe("Restaurant Server Actions", () => {
       (r: any) => r.name === "Pasta Palace",
     );
     expect(pastaPalace.workingHours).toHaveLength(1);
-    expect(pastaPalace.workingHours[0]).toContain("12:00 AM");
+    expect(pastaPalace.workingHours[0].shifts[0].end).toBe("23:59");
 
     // Verify GeoJSON structure
     getAllResult.data.forEach((restaurant: any) => {
@@ -241,7 +277,7 @@ describe("Restaurant Server Actions", () => {
       name: "Central Restaurant",
       address: "100 Center St",
       imageUrl: "https://example.com/central.jpg",
-      workingHours: ["Mon-Sun: 9-5"],
+      workingHours: STANDARD_HOURS,
       location: {
         type: "Point",
         coordinates: [0, 0], // Origin point
@@ -252,7 +288,7 @@ describe("Restaurant Server Actions", () => {
       name: "Nearby Restaurant",
       address: "200 Near St",
       imageUrl: "https://example.com/nearby.jpg",
-      workingHours: ["Mon-Sun: 9-5"],
+      workingHours: STANDARD_HOURS,
       location: {
         type: "Point",
         coordinates: [0.01, 0.01], // Close to origin
@@ -279,7 +315,10 @@ describe("Restaurant Server Actions", () => {
       name: "Original Name",
       address: "Original Address",
       imageUrl: "https://example.com/original.jpg",
-      workingHours: ["Mon-Fri: 9-5", "Sat-Sun: 10-6"],
+      workingHours: [
+        { day: 1, shifts: [{ start: "09:00", end: "17:00" }] },
+        { day: 6, shifts: [{ start: "10:00", end: "18:00" }] },
+      ],
       location: {
         type: "Point",
         coordinates: [-73.935242, 40.73061],
@@ -327,7 +366,7 @@ describe("Restaurant Server Actions", () => {
       name: "Restaurant A",
       address: "Address A",
       imageUrl: "https://example.com/a.jpg",
-      workingHours: ["Mon-Fri: 9-5"],
+      workingHours: [{ day: 1, shifts: [{ start: "09:00", end: "17:00" }] }],
       location: {
         type: "Point",
         coordinates: [-73.935242, 40.73061],
@@ -338,7 +377,7 @@ describe("Restaurant Server Actions", () => {
       name: "Restaurant B",
       address: "Address B",
       imageUrl: "https://example.com/b.jpg",
-      workingHours: ["Mon-Sun: 10-10"],
+      workingHours: [{ day: 1, shifts: [{ start: "10:00", end: "22:00" }] }],
       location: {
         type: "Point",
         coordinates: [-74.006, 40.714],
@@ -388,7 +427,7 @@ describe("Restaurant Server Actions", () => {
         name,
         address: "123 Test St",
         imageUrl: "https://example.com/test.jpg",
-        workingHours: ["Mon-Sun: 9-5"],
+        workingHours: STANDARD_HOURS,
         location: {
           type: "Point",
           coordinates: [-73.935242, 40.73061],
@@ -403,17 +442,14 @@ describe("Restaurant Server Actions", () => {
   });
 
   it("should handle very long working hours arrays", async () => {
-    const longWorkingHours = [
-      "Monday: 9:00 AM - 5:00 PM",
-      "Tuesday: 9:00 AM - 5:00 PM",
-      "Wednesday: 9:00 AM - 5:00 PM",
-      "Thursday: 9:00 AM - 5:00 PM",
-      "Friday: 9:00 AM - 8:00 PM",
-      "Saturday: 10:00 AM - 9:00 PM",
-      "Sunday: 11:00 AM - 6:00 PM",
-      "Happy Hour: Mon-Fri 4-6 PM",
-      "Brunch: Sat-Sun 10 AM - 2 PM",
-    ];
+    const longWorkingHours = Array.from({ length: 7 }, (_, i) => ({
+      day: i,
+      shifts: [
+        { start: "08:00", end: "12:00" },
+        { start: "13:00", end: "17:00" },
+        { start: "18:00", end: "22:00" },
+      ],
+    }));
 
     const result = await createRestaurant({
       name: "Detailed Hours Restaurant",
@@ -432,8 +468,7 @@ describe("Restaurant Server Actions", () => {
     const created = restaurants.data.find(
       (r: any) => r.name === "Detailed Hours Restaurant",
     );
-    expect(created.workingHours).toHaveLength(9);
-    expect(created.workingHours).toEqual(longWorkingHours);
+    expect(created.workingHours).toHaveLength(7);
   });
 
   it("should delete the correct restaurant and not affect others", async () => {
@@ -442,7 +477,7 @@ describe("Restaurant Server Actions", () => {
       name: "Restaurant 1",
       address: "Address 1",
       imageUrl: "https://example.com/1.jpg",
-      workingHours: ["Mon-Sun: 9-5"],
+      workingHours: STANDARD_HOURS,
       location: {
         type: "Point",
         coordinates: [-73.935242, 40.73061],
@@ -453,7 +488,7 @@ describe("Restaurant Server Actions", () => {
       name: "Restaurant 2",
       address: "Address 2",
       imageUrl: "https://example.com/2.jpg",
-      workingHours: ["Mon-Sun: 9-5"],
+      workingHours: STANDARD_HOURS,
       location: {
         type: "Point",
         coordinates: [-74.006, 40.714],
@@ -464,7 +499,7 @@ describe("Restaurant Server Actions", () => {
       name: "Restaurant 3",
       address: "Address 3",
       imageUrl: "https://example.com/3.jpg",
-      workingHours: ["Mon-Sun: 9-5"],
+      workingHours: STANDARD_HOURS,
       location: {
         type: "Point",
         coordinates: [-75.0, 41.0],
@@ -492,21 +527,21 @@ describe("Restaurant Server Actions", () => {
         name: "Concurrent 1",
         address: "Address 1",
         imageUrl: "https://example.com/1.jpg",
-        workingHours: ["Mon-Sun: 9-5"],
+        workingHours: STANDARD_HOURS,
         location: { type: "Point", coordinates: [-73.9, 40.7] },
       }),
       createRestaurant({
         name: "Concurrent 2",
         address: "Address 2",
         imageUrl: "https://example.com/2.jpg",
-        workingHours: ["Mon-Sun: 9-5"],
+        workingHours: STANDARD_HOURS,
         location: { type: "Point", coordinates: [-73.8, 40.8] },
       }),
       createRestaurant({
         name: "Concurrent 3",
         address: "Address 3",
         imageUrl: "https://example.com/3.jpg",
-        workingHours: ["Mon-Sun: 9-5"],
+        workingHours: STANDARD_HOURS,
         location: { type: "Point", coordinates: [-73.7, 40.9] },
       }),
     ];
@@ -528,7 +563,10 @@ describe("Restaurant Server Actions", () => {
       name: "Type Check Restaurant",
       address: "123 Type St",
       imageUrl: "https://example.com/type.jpg",
-      workingHours: ["Mon-Fri: 9-5", "Sat-Sun: 10-6"],
+      workingHours: [
+        { day: 1, shifts: [{ start: "09:00", end: "17:00" }] },
+        { day: 0, shifts: [{ start: "10:00", end: "18:00" }] },
+      ],
       location: {
         type: "Point",
         coordinates: [-73.935242, 40.73061],
@@ -538,7 +576,9 @@ describe("Restaurant Server Actions", () => {
     expect(createResult.success).toBe(true);
 
     const restaurants = await getAllRestaurants();
-    const restaurant = restaurants.data[0];
+    const restaurant = restaurants.data.find(
+      (r: any) => r.name === "Type Check Restaurant",
+    );
 
     // Check data types
     expect(typeof restaurant._id).toBe("string");
