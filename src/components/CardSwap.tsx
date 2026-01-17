@@ -65,9 +65,9 @@ const makeSlot = (
   distY: number,
   total: number,
 ): Slot => ({
-  x: i * distX,
-  y: -i * distY,
-  z: -i * distX * 1.5,
+  x: Math.round(i * distX),
+  y: Math.round(-i * distY),
+  z: Math.round(-i * distX * 1.5),
   zIndex: total - i,
 });
 

@@ -57,6 +57,9 @@
   overflow: hidden;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
 
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
   transform-style: preserve-3d;
   will-change: transform;
   backface-visibility: hidden;
