@@ -364,7 +364,7 @@ export default function Home() {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.13)",
+            backgroundColor: "rgba(0, 0, 0, 0.2)",
             zIndex: 0,
           }}
         />
@@ -486,6 +486,7 @@ export default function Home() {
             aria-hidden="true"
           >
             <CardSwap
+              appearDelayMs={2500}
               width={cardSwapLayout.cardWidth}
               height={cardSwapLayout.cardHeight}
               cardDistance={cardSwapLayout.cardDistance}
@@ -493,7 +494,7 @@ export default function Home() {
               delay={5200}
               pauseOnHover
               staggerFadeIn
-              staggerFadeInDelayMs={2600}
+              staggerFadeInDelayMs={150}
               staggerFadeInEachMs={160}
               staggerFadeInDurationSec={0.55}
             >

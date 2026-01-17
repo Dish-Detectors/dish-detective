@@ -11,10 +11,13 @@ import React, {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import gsap from "gsap";
 
 export interface CardSwapProps {
+  // Delay (ms) before the CardSwap becomes visible and starts its intro/swap timers.
+  appearDelayMs?: number;
   width?: number | string;
   height?: number | string;
   cardDistance?: number;
@@ -102,6 +105,7 @@ const placeNow = (el: HTMLElement, slot: Slot, skew: number) => {
 };
 
 const CardSwap: React.FC<CardSwapProps> = ({
+  appearDelayMs = 0,
   width = 500,
   height = 400,
   cardDistance = 60,
@@ -157,10 +161,27 @@ const CardSwap: React.FC<CardSwapProps> = ({
   const timeoutRef = useRef<number>(0);
   const didIntroRef = useRef(false);
   const container = useRef<HTMLDivElement>(null);
+  const [ready, setReady] = useState(() => appearDelayMs <= 0);
+
+  useEffect(() => {
+    didIntroRef.current = false;
+    if (appearDelayMs <= 0) {
+      setReady(true);
+      return;
+    }
+    setReady(false);
+    const t = window.setTimeout(() => setReady(true), appearDelayMs);
+    return () => window.clearTimeout(t);
+  }, [appearDelayMs]);
 
   useEffect(() => {
     const node = container.current;
     if (!node) return;
+
+    if (!ready) {
+      gsap.set(node, { opacity: 0 });
+      return;
+    }
 
     if (staggerFadeIn) {
       gsap.set(node, { opacity: 1 });
@@ -183,7 +204,7 @@ const CardSwap: React.FC<CardSwapProps> = ({
     return () => {
       tween.kill();
     };
-  }, [fadeIn, fadeInDelayMs, fadeInDurationSec]);
+  }, [ready, fadeIn, fadeInDelayMs, fadeInDurationSec, staggerFadeIn]);
 
   useEffect(() => {
     const total = refs.length;
@@ -195,14 +216,23 @@ const CardSwap: React.FC<CardSwapProps> = ({
       ),
     );
 
+    if (!ready) {
+      return;
+    }
+
     if (staggerFadeIn && !didIntroRef.current) {
       didIntroRef.current = true;
       const cardEls = refs
         .map((r) => r.current)
         .filter(Boolean) as HTMLElement[];
-      gsap.set(cardEls, { opacity: 0 });
+      // Fade cards in one-by-one, but end at the per-depth opacity
+      // so back cards remain more faded.
+      cardEls.forEach((el, i) => {
+        const visual = depthVisual(i);
+        gsap.set(el, { opacity: 0, filter: visual.filter });
+      });
       gsap.to(cardEls, {
-        opacity: 1,
+        opacity: (i: number) => depthVisual(i).opacity,
         duration: staggerFadeInDurationSec,
         delay: staggerFadeInDelayMs / 1000,
         stagger: staggerFadeInEachMs / 1000,
@@ -314,7 +344,15 @@ const CardSwap: React.FC<CardSwapProps> = ({
       clearTimeout(timeoutRef.current);
       clearInterval(intervalRef.current);
     };
-  }, [cardDistance, verticalDistance, delay, pauseOnHover, skewAmount, easing]);
+  }, [
+    ready,
+    cardDistance,
+    verticalDistance,
+    delay,
+    pauseOnHover,
+    skewAmount,
+    easing,
+  ]);
 
   const rendered = childArr.map((child, i) =>
     isValidElement<CardProps>(child)
@@ -334,7 +372,12 @@ const CardSwap: React.FC<CardSwapProps> = ({
     <div
       ref={container}
       className="card-swap-container"
-      style={{ width, height, opacity: fadeIn && !staggerFadeIn ? 0 : 1 }}
+      style={{
+        width,
+        height,
+        opacity: !ready ? 0 : fadeIn && !staggerFadeIn ? 0 : 1,
+        pointerEvents: !ready ? "none" : undefined,
+      }}
     >
       {rendered}
     </div>
