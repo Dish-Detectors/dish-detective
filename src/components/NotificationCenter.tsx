@@ -15,6 +15,7 @@ import {
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import {
   getAllStudentNotifications,
+  getAllWorkerNotifications,
   deleteNotification,
 } from "@/actions/notification";
 import { INotification } from "@/models/Notification";
@@ -23,12 +24,14 @@ interface NotificationCenterProps {
   open: boolean;
   anchorEl: HTMLElement | null;
   onClose: () => void;
+  audience?: "student" | "worker";
 }
 
 export default function NotificationCenter({
   open,
   anchorEl,
   onClose,
+  audience = "student",
 }: NotificationCenterProps) {
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [loading, setLoading] = useState(false);
@@ -42,7 +45,10 @@ export default function NotificationCenter({
   const loadNotifications = async () => {
     setLoading(true);
     try {
-      const data = await getAllStudentNotifications();
+      const data =
+        audience === "worker"
+          ? await getAllWorkerNotifications()
+          : await getAllStudentNotifications();
       // Ensure we treat the returning data as INotification[]
       setNotifications(data as any);
     } catch (error) {
