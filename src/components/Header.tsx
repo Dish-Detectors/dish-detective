@@ -16,8 +16,8 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import RestaurantIcon from '@mui/icons-material/Restaurant';
-import SchoolIcon from '@mui/icons-material/School';
+import RestaurantIcon from "@mui/icons-material/Restaurant";
+import SchoolIcon from "@mui/icons-material/School";
 
 export default function Header() {
   const pathname = usePathname();
@@ -182,7 +182,8 @@ export default function Header() {
               }}
             >
               <MenuItem onClick={() => router.push("/login/employee")}>
-                <RestaurantIcon fontSize="small" sx={{ mr: 1 }} /> Radnik u menzi
+                <RestaurantIcon fontSize="small" sx={{ mr: 1 }} /> Radnik u
+                menzi
               </MenuItem>
               <Box sx={{ borderBottom: "1px solid #e0e0e0", my: 0 }} />
               <MenuItem onClick={() => router.push("/login/student")}>

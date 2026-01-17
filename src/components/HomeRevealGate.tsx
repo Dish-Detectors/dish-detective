@@ -6,7 +6,11 @@ import HomeRevealAnimation from "@/components/HomeRevealAnimation";
  * Wraps homepage content, hiding it until the reveal animation completes,
  * then fades in children one by one.
  */
-export default function HomeRevealGate({ children }: { children: React.ReactNode }) {
+export default function HomeRevealGate({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [showContent, setShowContent] = useState(false);
 
   useEffect(() => {
@@ -40,7 +44,7 @@ export default function HomeRevealGate({ children }: { children: React.ReactNode
             >
               {child}
             </div>
-          ) : null
+          ) : null,
         )}
       </div>
       <style jsx>{`

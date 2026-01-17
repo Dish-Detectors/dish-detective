@@ -14,8 +14,8 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import RestaurantIcon from '@mui/icons-material/Restaurant';
-import SchoolIcon from '@mui/icons-material/School';
+import RestaurantIcon from "@mui/icons-material/Restaurant";
+import SchoolIcon from "@mui/icons-material/School";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
 import HomeRevealAnimation from "@/components/HomeRevealAnimation";
 import HomeRevealGate from "@/components/HomeRevealGate";
@@ -59,7 +59,8 @@ export default function Home() {
   useEffect(() => {
     if (!showDesktopCards) return;
 
-    const clamp = (min: number, value: number, max: number) => Math.max(min, Math.min(max, value));
+    const clamp = (min: number, value: number, max: number) =>
+      Math.max(min, Math.min(max, value));
     let rafId = 0;
 
     const recompute = () => {
@@ -195,141 +196,141 @@ export default function Home() {
           backgroundRepeat: "no-repeat",
         }}
       >
+        <Box
+          sx={{
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            borderRadius: 4,
+            padding: 4,
+            maxWidth: "90%",
+            boxShadow: 3,
+            mt: 2,
+            mb: 2,
+            "@media (max-height: 740px)": {
+              mt: 5,
+            },
+          }}
+        >
           <Box
             sx={{
-              backgroundColor: "rgba(255, 255, 255, 0.8)",
-              borderRadius: 4,
-              padding: 4,
-              maxWidth: "90%",
-              boxShadow: 3,
-              mt: 2,
-              mb: 2,
-              "@media (max-height: 740px)": {
-                mt: 5,
-              },
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              mb: 3,
             }}
           >
             <Box
+              component="img"
+              src="logoDark.png"
+              alt="Dish Detective Logo"
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                mb: 3,
+                width: "18vh",
+                height: "18vh",
+                mb: 1,
+                "@media (min-height: 900px)": {
+                  width: "20vh",
+                  height: "20vh",
+                },
               }}
-            >
-              <Box
-                component="img"
-                src="logoDark.png"
-                alt="Dish Detective Logo"
-                sx={{
-                  width: "18vh",
-                  height: "18vh",
-                  mb: 1,
-                  "@media (min-height: 900px)": {
-                    width: "20vh",
-                    height: "20vh",
-                  },
-                }}
-              />
-              <Typography
-                variant="h5"
-                sx={{
-                  color: "#000000d4",
-                  fontWeight: 750,
-                  textAlign: "center",
-                }}
-              >
-                Dish Detective
-              </Typography>
-            </Box>
+            />
             <Typography
-              variant="h3"
-              fontWeight={800}
+              variant="h5"
               sx={{
                 color: "#000000d4",
-                mb: 2,
+                fontWeight: 750,
                 textAlign: "center",
-                letterSpacing: -1,
-                fontSize: { xs: "6vh" },
               }}
             >
-              Poboljšaj svoje iskustvo u menzi
+              Dish Detective
             </Typography>
-
-            <Typography
-              variant="h6"
-              fontWeight={600}
-              sx={{
-                mb: 3,
-                color: "#3c403d",
-                textAlign: "center",
-                fontSize: { xs: "1.1rem" },
-              }}
-            >
-              <span className="ddTypewriterText">{subtitleText}</span>
-              <span
-                className={
-                  typingFinished
-                    ? "ddTypewriterCaret ddTypewriterCaret--idle"
-                    : "ddTypewriterCaret"
-                }
-                aria-hidden="true"
-              />
-            </Typography>
-
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={(e) => setAnchorEl(e.currentTarget)}
-              fullWidth
-              sx={{
-                fontWeight: 600,
-                borderRadius: 3,
-                minHeight: 50,
-                textTransform: "none",
-              }}
-            >
-              Prijava
-            </Button>
-
-            <Menu
-              anchorEl={anchorEl}
-              open={open}
-              onClose={() => setAnchorEl(null)}
-              // We make the menu open upwards on short screens
-              // TODO: Think of a better responsive fix, I guess?
-              anchorOrigin={{
-                vertical: isShortScreen ? "top" : "bottom",
-                horizontal: "center",
-              }}
-              transformOrigin={{
-                vertical: isShortScreen ? "bottom" : "top",
-                horizontal: "center",
-              }}
-              slotProps={{
-                list: {
-                  disablePadding: true,
-                },
-                paper: {
-                  sx: { minWidth: 300, mt: 1, borderRadius: 2 },
-                },
-              }}
-            >
-              <MenuItem
-                onClick={() => router.push("/login/employee")}
-                sx={{ fontSize: "1.2rem", py: 1.2 }}
-              >
-                <RestaurantIcon fontSize="small" sx={{ mr: 1 }} /> Radnik u menzi
-              </MenuItem>
-              <Box sx={{ borderBottom: "1px solid black", my: 0 }} />
-              <MenuItem
-                onClick={() => router.push("/login/student")}
-                sx={{ fontSize: "1.2rem", py: 1.2 }}
-              >
-                <SchoolIcon fontSize="small" sx={{ mr: 1 }} /> Student
-              </MenuItem>
-            </Menu>
           </Box>
+          <Typography
+            variant="h3"
+            fontWeight={800}
+            sx={{
+              color: "#000000d4",
+              mb: 2,
+              textAlign: "center",
+              letterSpacing: -1,
+              fontSize: { xs: "6vh" },
+            }}
+          >
+            Poboljšaj svoje iskustvo u menzi
+          </Typography>
+
+          <Typography
+            variant="h6"
+            fontWeight={600}
+            sx={{
+              mb: 3,
+              color: "#3c403d",
+              textAlign: "center",
+              fontSize: { xs: "1.1rem" },
+            }}
+          >
+            <span className="ddTypewriterText">{subtitleText}</span>
+            <span
+              className={
+                typingFinished
+                  ? "ddTypewriterCaret ddTypewriterCaret--idle"
+                  : "ddTypewriterCaret"
+              }
+              aria-hidden="true"
+            />
+          </Typography>
+
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={(e) => setAnchorEl(e.currentTarget)}
+            fullWidth
+            sx={{
+              fontWeight: 600,
+              borderRadius: 3,
+              minHeight: 50,
+              textTransform: "none",
+            }}
+          >
+            Prijava
+          </Button>
+
+          <Menu
+            anchorEl={anchorEl}
+            open={open}
+            onClose={() => setAnchorEl(null)}
+            // We make the menu open upwards on short screens
+            // TODO: Think of a better responsive fix, I guess?
+            anchorOrigin={{
+              vertical: isShortScreen ? "top" : "bottom",
+              horizontal: "center",
+            }}
+            transformOrigin={{
+              vertical: isShortScreen ? "bottom" : "top",
+              horizontal: "center",
+            }}
+            slotProps={{
+              list: {
+                disablePadding: true,
+              },
+              paper: {
+                sx: { minWidth: 300, mt: 1, borderRadius: 2 },
+              },
+            }}
+          >
+            <MenuItem
+              onClick={() => router.push("/login/employee")}
+              sx={{ fontSize: "1.2rem", py: 1.2 }}
+            >
+              <RestaurantIcon fontSize="small" sx={{ mr: 1 }} /> Radnik u menzi
+            </MenuItem>
+            <Box sx={{ borderBottom: "1px solid black", my: 0 }} />
+            <MenuItem
+              onClick={() => router.push("/login/student")}
+              sx={{ fontSize: "1.2rem", py: 1.2 }}
+            >
+              <SchoolIcon fontSize="small" sx={{ mr: 1 }} /> Student
+            </MenuItem>
+          </Menu>
+        </Box>
       </Box>
     );
   }
@@ -445,14 +446,25 @@ export default function Home() {
               >
                 <MenuItem
                   onClick={() => router.push("/login/employee")}
-                  sx={{ fontSize: "1rem", py: 1.2, display: "flex", alignItems: "center" }}
+                  sx={{
+                    fontSize: "1rem",
+                    py: 1.2,
+                    display: "flex",
+                    alignItems: "center",
+                  }}
                 >
-                  <RestaurantIcon fontSize="small" sx={{ mr: 1 }} /> Radnik u menzi
+                  <RestaurantIcon fontSize="small" sx={{ mr: 1 }} /> Radnik u
+                  menzi
                 </MenuItem>
                 <Box sx={{ borderBottom: "1px solid black", my: 0 }} />
                 <MenuItem
                   onClick={() => router.push("/login/student")}
-                  sx={{ fontSize: "1rem", py: 1.2, display: "flex", alignItems: "center" }}
+                  sx={{
+                    fontSize: "1rem",
+                    py: 1.2,
+                    display: "flex",
+                    alignItems: "center",
+                  }}
                 >
                   <SchoolIcon fontSize="small" sx={{ mr: 1 }} /> Student
                 </MenuItem>
@@ -497,7 +509,14 @@ export default function Home() {
                   WebkitBackdropFilter: "blur(10px)",
                 }}
               >
-                <Box sx={{ p: 1.5, height: "100%", display: "flex", flexDirection: "column" }}>
+                <Box
+                  sx={{
+                    p: 1.5,
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
                   <Box
                     sx={{
                       width: 56,
@@ -507,7 +526,11 @@ export default function Home() {
                       mb: 1,
                     }}
                   />
-                  <Typography variant="subtitle1" fontWeight={800} sx={{ color: "#111827", lineHeight: 1.1 }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={800}
+                    sx={{ color: "#111827", lineHeight: 1.1 }}
+                  >
                     Real-time meni
                   </Typography>
                   <Box
@@ -522,13 +545,22 @@ export default function Home() {
                       p: 0,
                     }}
                   >
-                    <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+                    <Box
+                      sx={{
+                        position: "relative",
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    >
                       <Image
                         src="/menuview.png"
                         alt="Student view"
                         fill
                         sizes={cardSwapImageSizes}
-                        style={{ objectFit: "contain", objectPosition: "center" }}
+                        style={{
+                          objectFit: "contain",
+                          objectPosition: "center",
+                        }}
                         priority
                       />
                     </Box>
@@ -548,7 +580,14 @@ export default function Home() {
                   WebkitBackdropFilter: "blur(10px)",
                 }}
               >
-                <Box sx={{ p: 1.5, height: "100%", display: "flex", flexDirection: "column" }}>
+                <Box
+                  sx={{
+                    p: 1.5,
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
                   <Box
                     sx={{
                       width: 56,
@@ -559,7 +598,11 @@ export default function Home() {
                       opacity: 0.9,
                     }}
                   />
-                  <Typography variant="subtitle1" fontWeight={800} sx={{ color: "#111827", lineHeight: 1.1 }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={800}
+                    sx={{ color: "#111827", lineHeight: 1.1 }}
+                  >
                     Jednostavan pregled menzi
                   </Typography>
                   <Box
@@ -574,13 +617,22 @@ export default function Home() {
                       p: 0,
                     }}
                   >
-                    <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+                    <Box
+                      sx={{
+                        position: "relative",
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    >
                       <Image
                         src="/menzamap.png"
                         alt="Menza map"
                         fill
                         sizes={cardSwapImageSizes}
-                        style={{ objectFit: "contain", objectPosition: "center" }}
+                        style={{
+                          objectFit: "contain",
+                          objectPosition: "center",
+                        }}
                       />
                     </Box>
                   </Box>
@@ -599,7 +651,14 @@ export default function Home() {
                   WebkitBackdropFilter: "blur(10px)",
                 }}
               >
-                <Box sx={{ p: 1.75, height: "100%", display: "flex", flexDirection: "column" }}>
+                <Box
+                  sx={{
+                    p: 1.75,
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
                   <Box
                     sx={{
                       width: 56,
@@ -610,7 +669,11 @@ export default function Home() {
                       opacity: 0.85,
                     }}
                   />
-                  <Typography variant="subtitle1" fontWeight={800} sx={{ color: "#111827", lineHeight: 1.1 }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={800}
+                    sx={{ color: "#111827", lineHeight: 1.1 }}
+                  >
                     Obavijesti u stvarnom vremenu
                   </Typography>
                   <Box
@@ -625,13 +688,22 @@ export default function Home() {
                       p: 0,
                     }}
                   >
-                    <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+                    <Box
+                      sx={{
+                        position: "relative",
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    >
                       <Image
                         src="/notification.png"
                         alt="Notifications"
                         fill
                         sizes={cardSwapImageSizes}
-                        style={{ objectFit: "contain", objectPosition: "center" }}
+                        style={{
+                          objectFit: "contain",
+                          objectPosition: "center",
+                        }}
                       />
                     </Box>
                   </Box>

@@ -110,7 +110,8 @@ export default function HomeRevealAnimation({
 
         @keyframes ddForkMove {
           0% {
-            transform: translate(calc(-50% - 60vw), calc(-50% - 60vh)) scale(1.2);
+            transform: translate(calc(-50% - 60vw), calc(-50% - 60vh))
+              scale(1.2);
             opacity: 0;
           }
           18% {
@@ -131,7 +132,8 @@ export default function HomeRevealAnimation({
 
         @keyframes ddKnifeMove {
           0% {
-            transform: translate(calc(-50% + 60vw), calc(-50% - 60vh)) scaleX(-1) scale(1.2);
+            transform: translate(calc(-50% + 60vw), calc(-50% - 60vh))
+              scaleX(-1) scale(1.2);
             opacity: 0;
           }
           18% {
