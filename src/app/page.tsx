@@ -377,7 +377,7 @@ export default function Home() {
             alignItems: "center",
             justifyContent: "space-between",
             gap: 8,
-            pr: "clamp(80px, 6vw, 200px)",
+            pr: "clamp(80px, 2vw, 200px)",
           }}
         >
           <Box sx={{ maxWidth: 600 }}>
