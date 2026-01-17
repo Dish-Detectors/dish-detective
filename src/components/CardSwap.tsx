@@ -24,6 +24,13 @@ export interface CardSwapProps {
   onCardClick?: (idx: number) => void;
   skewAmount?: number;
   easing?: 'linear' | 'elastic';
+  fadeIn?: boolean;
+  fadeInDelayMs?: number;
+  fadeInDurationSec?: number;
+  staggerFadeIn?: boolean;
+  staggerFadeInDelayMs?: number;
+  staggerFadeInEachMs?: number;
+  staggerFadeInDurationSec?: number;
   children: ReactNode;
 }
 
@@ -76,6 +83,13 @@ const CardSwap: React.FC<CardSwapProps> = ({
   onCardClick,
   skewAmount = 6,
   easing = 'elastic',
+  fadeIn = false,
+  fadeInDelayMs = 1500,
+  fadeInDurationSec = 0.6,
+  staggerFadeIn = false,
+  staggerFadeInDelayMs = 1500,
+  staggerFadeInEachMs = 140,
+  staggerFadeInDurationSec = 0.5,
   children
 }) => {
   const config =
@@ -105,11 +119,52 @@ const CardSwap: React.FC<CardSwapProps> = ({
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const intervalRef = useRef<number>(0);
   const timeoutRef = useRef<number>(0);
+  const didIntroRef = useRef(false);
   const container = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const node = container.current;
+    if (!node) return;
+
+    if (staggerFadeIn) {
+      gsap.set(node, { opacity: 1 });
+      return;
+    }
+
+    if (!fadeIn) {
+      gsap.set(node, { opacity: 1 });
+      return;
+    }
+
+    gsap.set(node, { opacity: 0 });
+    const tween = gsap.to(node, {
+      opacity: 1,
+      duration: fadeInDurationSec,
+      delay: fadeInDelayMs / 1000,
+      ease: 'power2.out'
+    });
+
+    return () => {
+      tween.kill();
+    };
+  }, [fadeIn, fadeInDelayMs, fadeInDurationSec]);
 
   useEffect(() => {
     const total = refs.length;
     refs.forEach((r, i) => placeNow(r.current!, makeSlot(i, cardDistance, verticalDistance, total), skewAmount));
+
+    if (staggerFadeIn && !didIntroRef.current) {
+      didIntroRef.current = true;
+      const cardEls = refs.map(r => r.current).filter(Boolean) as HTMLElement[];
+      gsap.set(cardEls, { opacity: 0 });
+      gsap.to(cardEls, {
+        opacity: 1,
+        duration: staggerFadeInDurationSec,
+        delay: staggerFadeInDelayMs / 1000,
+        stagger: staggerFadeInEachMs / 1000,
+        ease: 'power2.out'
+      });
+    }
 
     const swap = () => {
       if (order.current.length < 2) return;
@@ -221,7 +276,11 @@ const CardSwap: React.FC<CardSwapProps> = ({
   );
 
   return (
-    <div ref={container} className="card-swap-container" style={{ width, height }}>
+    <div
+      ref={container}
+      className="card-swap-container"
+      style={{ width, height, opacity: fadeIn && !staggerFadeIn ? 0 : 1 }}
+    >
       {rendered}
     </div>
   );

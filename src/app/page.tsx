@@ -480,6 +480,10 @@ export default function Home() {
               verticalDistance={cardSwapLayout.verticalDistance}
               delay={5200}
               pauseOnHover
+              staggerFadeIn
+              staggerFadeInDelayMs={2600}
+              staggerFadeInEachMs={160}
+              staggerFadeInDurationSec={0.55}
             >
               <Card
                 style={{
