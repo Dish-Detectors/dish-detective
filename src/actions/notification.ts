@@ -24,15 +24,11 @@ export async function getAllWorkerNotifications(): Promise<any[]> {
       try {
         const user = await client.users.getUser(notif.postedBy);
         return {
-          ...notif,
-          _id: notif._id.toString(),
+          ...JSON.parse(JSON.stringify(notif)),
           postedBy: `${user.firstName || "Nepoznato ime"} ${user.lastName || "Nepoznato prezime"}`,
         };
       } catch (e) {
-        return {
-          ...notif,
-          _id: notif._id.toString(),
-        };
+        return JSON.parse(JSON.stringify(notif));
       }
     }),
   );
@@ -62,15 +58,11 @@ export async function getAllStudentNotifications(): Promise<any[]> {
       try {
         const user = await client.users.getUser(notif.postedBy);
         return {
-          ...notif,
-          _id: notif._id.toString(),
+          ...JSON.parse(JSON.stringify(notif)),
           postedBy: `${user.firstName || "Nepoznato ime"} ${user.lastName || "Nepoznato prezime"}`,
         };
       } catch (e) {
-        return {
-          ...notif,
-          _id: notif._id.toString(),
-        };
+        return JSON.parse(JSON.stringify(notif));
       }
     }),
   );

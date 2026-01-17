@@ -1,6 +1,6 @@
 "use server";
 
-import Restaurant, { Location } from "../../../models/Restaurant";
+import Restaurant, { Location, IWorkingDay } from "../../../models/Restaurant";
 import dbConnect from "../../../utils/dbConnect";
 import { Types } from "mongoose";
 
@@ -8,7 +8,7 @@ type RestaurantInput = {
   name: string;
   address: string;
   imageUrl: string;
-  workingHours: string[];
+  workingHours: IWorkingDay[];
   location: Location;
 };
 
@@ -23,11 +23,9 @@ export async function createRestaurant(
   input: RestaurantInput,
 ): Promise<ActionResponse> {
   try {
-    const conn = await dbConnect();
-    // Needed because we use a custom connection
-    const RestaurantModel = conn.model("Restaurant", Restaurant.schema);
+    await dbConnect();
 
-    const restaurant = await RestaurantModel.create({
+    const restaurant = await Restaurant.create({
       name: input.name.trim(),
       address: input.address.trim(),
       location: input.location,
@@ -79,21 +77,9 @@ export async function deleteRestaurant(
   restaurantId: string,
 ): Promise<ActionResponse> {
   try {
-    const conn = await dbConnect();
-    // Needed because we use a custom connection
-    const RestaurantModel = conn.model("Restaurant", Restaurant.schema);
+    await dbConnect();
 
-    // Validate id
-    if (!conn.Types.ObjectId.isValid(restaurantId)) {
-      return {
-        success: false,
-        message: "Invalid restaurant ID format",
-        errors: { id: "Invalid ObjectId format" },
-      };
-    }
-
-    const deletedRestaurant =
-      await RestaurantModel.findByIdAndDelete(restaurantId);
+    const deletedRestaurant = await Restaurant.findByIdAndDelete(restaurantId);
 
     if (!deletedRestaurant) {
       return {
@@ -112,6 +98,13 @@ export async function deleteRestaurant(
   } catch (error: any) {
     console.error("Error deleting restaurant:", error);
 
+    if (error.name === "CastError") {
+      return {
+        success: false,
+        message: "Invalid restaurant ID format",
+      };
+    }
+
     return {
       success: false,
       message: "Failed to delete restaurant. Please try again.",
@@ -121,22 +114,15 @@ export async function deleteRestaurant(
 
 export async function getAllRestaurants(): Promise<ActionResponse> {
   try {
-    const conn = await dbConnect();
-    // Needed because we use a custom connection
-    const RestaurantModel = conn.model("Restaurant", Restaurant.schema);
+    await dbConnect();
 
-    const restaurants = await RestaurantModel.find({})
-      .sort({ name: 1 }) // Sort while we still have MongoDB objects to be more efficient
-      .lean() // Returns plain JavaScript objects
+    const restaurants = await Restaurant.find({})
+      .sort({ name: 1 })
+      .lean()
       .exec();
 
-    // Convert _id to string for JSON serialization
-    const serializedRestaurants = restaurants.map((rest) => ({
-      ...rest,
-      _id: rest._id.toString(),
-      createdAt: rest.createdAt.toISOString(),
-      updatedAt: rest.updatedAt.toISOString(),
-    }));
+    // Sanitize to remove Mongoose special objects (Buffers, etc.)
+    const serializedRestaurants = JSON.parse(JSON.stringify(restaurants));
 
     return {
       success: true,
@@ -158,18 +144,7 @@ export async function updateRestaurant(
   input: Partial<RestaurantInput>,
 ): Promise<ActionResponse> {
   try {
-    const conn = await dbConnect();
-    // Needed because we use a custom connection
-    const RestaurantModel = conn.model("Restaurant", Restaurant.schema);
-
-    // Validate id
-    if (!conn.Types.ObjectId.isValid(restId)) {
-      return {
-        success: false,
-        message: "Invalid restaurant ID format",
-        errors: { id: "Invalid ObjectId format" },
-      };
-    }
+    await dbConnect();
 
     // Update only whats provided
     const updateData: any = {};
@@ -181,14 +156,10 @@ export async function updateRestaurant(
       updateData.imageUrl = input.imageUrl.trim();
     if (input.location !== undefined) updateData.location = input.location;
 
-    const updatedRest = await RestaurantModel.findByIdAndUpdate(
-      restId,
-      updateData,
-      {
-        new: true,
-        runValidators: true,
-      },
-    );
+    const updatedRest = await Restaurant.findByIdAndUpdate(restId, updateData, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!updatedRest) {
       return {
@@ -226,6 +197,13 @@ export async function updateRestaurant(
         success: false,
         message: "Validation failed",
         errors,
+      };
+    }
+
+    if (error.name === "CastError") {
+      return {
+        success: false,
+        message: "Invalid restaurant ID format",
       };
     }
 

@@ -11,7 +11,7 @@ export interface IMenuItem extends Document {
 export interface IMenu extends Document {
   restaurantId: Types.ObjectId;
   date: Date;
-  lastUpdatedBy: Types.ObjectId;
+  lastUpdatedBy: string;
   items: IMenuItem[];
   createdAt: Date;
   updatedAt: Date;
@@ -46,12 +46,12 @@ const menuSchema = new Schema<IMenu>(
       required: [true, "Date is required"],
     },
     lastUpdatedBy: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+      type: String,
       required: [true, "Last updated by user ID is required"],
     },
     items: {
       type: [Schema.Types.ObjectId],
+      ref: "MenuItem",
       default: [],
     },
   },
@@ -60,7 +60,12 @@ const menuSchema = new Schema<IMenu>(
   },
 );
 
-// Use existing model if it exists to avoid OverwriteModelError
+// Force-clear the model in development if schema changed
+if (process.env.NODE_ENV === "development") {
+  delete mongoose.models.Menu;
+  delete mongoose.models.MenuItem;
+}
+
 const Menu: Model<IMenu> =
   (mongoose.models.Menu as Model<IMenu>) ||
   mongoose.model<IMenu>("Menu", menuSchema);

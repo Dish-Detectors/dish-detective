@@ -14,7 +14,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DishCard from "@/components/DishCard";
 import WorkerNavbar, { navWidth } from "@/components/WorkerNavbar";
 import {
-  MenuItem,
+  WorkerMenuItem,
   getWorkerMenzaId,
   fetchTodaysOfferForMenza,
   removeDishFromTodaysOffer,
@@ -27,7 +27,7 @@ export default function Page() {
   const router = useRouter();
 
   const [menzaId, setMenzaId] = useState<string | null>(null);
-  const [dishes, setDishes] = useState<MenuItem[]>([]);
+  const [dishes, setDishes] = useState<WorkerMenuItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
