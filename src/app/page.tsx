@@ -46,12 +46,12 @@ export default function Home() {
   const showDesktopCards = useMediaQuery("(min-width: 1400px)");
 
   const [cardSwapLayout, setCardSwapLayout] = useState(() => ({
-    cardWidth: 520,
-    cardHeight: 340,
-    wrapperWidth: 590,
-    wrapperHeight: 460,
-    cardDistance: 55,
-    verticalDistance: 65,
+    cardWidth: 500,
+    cardHeight: 327,
+    wrapperWidth: 560,
+    wrapperHeight: 447,
+    cardDistance: 52,
+    verticalDistance: 62,
   }));
 
   const cardSwapImageSizes = `${cardSwapLayout.cardWidth}px`;
@@ -68,17 +68,17 @@ export default function Home() {
       const vh = window.innerHeight;
 
       // Scale mostly with width, but cap by height so it doesn't get cramped on short screens.
-      const cardWidth = clamp(520, Math.round(vw * 0.33), 780);
+      const cardWidth = clamp(500, Math.round(vw * 0.32), 740);
       const idealCardHeight = cardWidth * (340 / 520);
       const maxCardHeight = Math.min(540, Math.round(vh * 0.58));
-      const cardHeight = clamp(340, Math.round(idealCardHeight), maxCardHeight);
+      const cardHeight = clamp(327, Math.round(idealCardHeight), maxCardHeight);
 
       // Keep roughly the same extra breathing room as before: +60w / +120h.
-      const wrapperWidth = cardWidth + 70;
-      const wrapperHeight = cardHeight + 130;
+      const wrapperWidth = cardWidth + 60;
+      const wrapperHeight = cardHeight + 120;
 
-      const cardDistance = clamp(55, Math.round(cardWidth * 0.12), 90);
-      const verticalDistance = clamp(65, Math.round(cardHeight * 0.22), 110);
+      const cardDistance = clamp(52, Math.round(cardWidth * 0.12), 86);
+      const verticalDistance = clamp(62, Math.round(cardHeight * 0.22), 104);
 
       setCardSwapLayout({
         cardWidth,
