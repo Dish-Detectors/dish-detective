@@ -95,7 +95,7 @@ export default function ManagerStatsPage() {
           placeholder="Pretraži jela..."
           size="small"
           sx={{
-            width: { xs: "100%", sm: 360, md: 520, lg: 640 },
+            width: { xs: "100%", sm: 340, md: 440, lg: 520 },
             maxWidth: "100%",
             justifySelf: { xs: "stretch", sm: "center" },
             bgcolor: "white",

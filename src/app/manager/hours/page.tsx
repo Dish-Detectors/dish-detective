@@ -191,13 +191,15 @@ export default function WorkingHoursPage() {
         variant="h4"
         sx={{
           fontWeight: 780,
-          mb: 4,
+          mb: 2,
           color: "#212222",
           flexShrink: 0,
         }}
       >
         Radno vrijeme
       </Typography>
+
+      <Divider sx={{ mb: 4 }} />
 
       <Box
         sx={{

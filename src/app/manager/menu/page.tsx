@@ -143,31 +143,53 @@ export default function DailyMenuPage() {
         overflow: "hidden",
       }}
     >
-      <Typography
-        variant="h4"
-        sx={{
-          fontWeight: 780,
-          mb: 4,
-          color: "#212222",
-          flexShrink: 0,
-        }}
-      >
-        Kreiraj dnevni meni
-      </Typography>
-
-      {/* Search Bar */}
       <Box
         sx={{
-          mb: 4,
-          maxWidth: { xs: "100%", sm: 600 },
-          flexShrink: 0,
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", sm: "1fr auto 1fr" },
+          alignItems: "center",
+          columnGap: 3,
+          rowGap: 2,
+          mb: 2,
         }}
       >
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 780,
+            color: "#212222",
+            flexShrink: 0,
+            lineHeight: 1.2,
+            justifySelf: "start",
+          }}
+        >
+          Kreiraj dnevni meni
+        </Typography>
+
         <TextField
-          fullWidth
-          placeholder="Pretraži jela za dodavanje..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Pretraži jela za dodavanje..."
+          size="small"
+          sx={{
+            width: { xs: "100%", sm: 340, md: 440, lg: 520 },
+            maxWidth: "100%",
+            justifySelf: { xs: "stretch", sm: "center" },
+            bgcolor: "white",
+            borderRadius: 999,
+            "& .MuiOutlinedInput-root": {
+              borderRadius: 999,
+              "& fieldset": {
+                borderColor: "#e0e0e0",
+              },
+              "&:hover fieldset": {
+                borderColor: "primary.main",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "primary.main",
+              },
+            },
+          }}
           slotProps={{
             input: {
               startAdornment: (
@@ -177,20 +199,14 @@ export default function DailyMenuPage() {
               ),
             },
           }}
-          sx={{
-            bgcolor: "white",
-            borderRadius: 10,
-            "& .MuiOutlinedInput-root": {
-              borderRadius: 10,
-              "& fieldset": {
-                borderColor: "#e0e0e0",
-              },
-            },
-          }}
         />
+
+        <Box sx={{ display: { xs: "none", sm: "block" } }} />
       </Box>
 
-      <Box sx={{ flex: 1, overflowY: "auto", pr: 1 }}>
+      <Divider sx={{ mb: 4 }} />
+
+      <Box sx={{ flex: 1, overflowY: "auto", pr: 1, scrollbarGutter: "stable" }}>
         {/* Današnji Meni Section */}
         <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: "#444" }}>
           Današnji meni ({menuItems.length})
