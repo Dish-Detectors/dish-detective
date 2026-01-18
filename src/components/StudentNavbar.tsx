@@ -7,7 +7,9 @@ import RestaurantIcon from "@mui/icons-material/Restaurant";
 import MapIcon from "@mui/icons-material/Map";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import NotificationCenter from "./NotificationCenter";
-import React from "react";
+import React, { useEffect } from "react";
+import { Badge } from "@mui/material";
+import { getUnreadNotificationCount } from "@/actions/notification";
 
 export const navWidth = 80;
 export const headerHeight = 64;
@@ -24,6 +26,19 @@ export default function StudentNavbar({
   const [notifAnchor, setNotifAnchor] = React.useState<null | HTMLElement>(
     null,
   );
+  const [unreadCount, setUnreadCount] = React.useState(0);
+
+  const fetchUnreadCount = async () => {
+    const count = await getUnreadNotificationCount();
+    setUnreadCount(count);
+  };
+
+  useEffect(() => {
+    fetchUnreadCount();
+    // Poll for notifications every 30 seconds
+    const interval = setInterval(fetchUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleToggleNotif = (event: React.MouseEvent<HTMLElement>) => {
     setNotifAnchor(notifAnchor ? null : event.currentTarget);
@@ -51,21 +66,21 @@ export default function StudentNavbar({
         position: "fixed",
         ...(isMobile
           ? {
-              top: "auto",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              width: "100%",
-              height: "64px",
-              boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
-            }
+            top: "auto",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            width: "100%",
+            height: "64px",
+            boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
+          }
           : {
-              top: `${headerHeight}px`,
-              left: 0,
-              bottom: 0,
-              width: `${navWidth}px`,
-              boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
-            }),
+            top: `${headerHeight}px`,
+            left: 0,
+            bottom: 0,
+            width: `${navWidth}px`,
+            boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
+          }),
         bgcolor: "common.white",
         display: "flex",
         flexDirection: isMobile ? "row" : "column",
@@ -109,7 +124,9 @@ export default function StudentNavbar({
             "&:hover": { bgcolor: "grey.100" },
           }}
         >
-          <NotificationsIcon />
+          <Badge badgeContent={unreadCount} color="error">
+            <NotificationsIcon />
+          </Badge>
         </IconButton>
       </Stack>
 
@@ -117,6 +134,7 @@ export default function StudentNavbar({
         open={Boolean(notifAnchor)}
         anchorEl={notifAnchor}
         onClose={() => setNotifAnchor(null)}
+        onRead={() => fetchUnreadCount()}
       />
     </Box>
   );

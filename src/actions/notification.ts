@@ -228,3 +228,65 @@ export async function syncDeviceSubscriptions(token: string) {
     return { success: false, error: error.message };
   }
 }
+
+export async function markNotificationAsRead(notificationId: string) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+  await dbConnect();
+
+  try {
+    await Notification.findOneAndUpdate(
+      { _id: notificationId, targetUserId: userId },
+      { read: true }
+    );
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function markAllNotificationsAsRead() {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+  await dbConnect();
+
+  try {
+    await Notification.updateMany(
+      { targetUserId: userId, read: false },
+      { read: true }
+    );
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function getUnreadNotificationCount() {
+  const { userId } = await auth();
+  if (!userId) return 0;
+  await dbConnect();
+
+  try {
+    const count = await Notification.countDocuments({
+      targetUserId: userId,
+      read: false,
+    });
+    return count;
+  } catch (error) {
+    console.error("Failed to count unread notifications", error);
+    return 0;
+  }
+}
+
+export async function deleteAllNotifications() {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+  await dbConnect();
+
+  try {
+    await Notification.deleteMany({ targetUserId: userId });
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
