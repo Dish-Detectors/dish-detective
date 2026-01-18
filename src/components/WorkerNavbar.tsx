@@ -4,6 +4,8 @@ import { Box, Stack, IconButton } from "@mui/material";
 import { usePathname, useRouter } from "next/navigation";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import SmsIcon from "@mui/icons-material/Sms";
+import NotificationCenter from "./NotificationCenter";
+import React from "react";
 
 export const navWidth = 80;
 export const headerHeight = 64;
@@ -15,6 +17,13 @@ interface WorkerNavbarProps {
 export default function WorkerNavbar({ isMobile = false }: WorkerNavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const [notifAnchor, setNotifAnchor] = React.useState<null | HTMLElement>(
+    null,
+  );
+
+  const handleToggleNotif = (event: React.MouseEvent<HTMLElement>) => {
+    setNotifAnchor(notifAnchor ? null : event.currentTarget);
+  };
 
   const isActive = (path: string) => {
     if (path === "/worker") {
@@ -78,13 +87,37 @@ export default function WorkerNavbar({ isMobile = false }: WorkerNavbarProps) {
           <HomeFilledIcon />
         </IconButton>
         <IconButton
-          onClick={() => router.push("/worker/notifications")}
-          sx={getIconButtonStyle("/worker/notifications")}
+          onClick={handleToggleNotif}
+          sx={{
+            bgcolor: "transparent",
+            "&:hover": { bgcolor: "transparent" },
+            "&.Mui-focusVisible": { bgcolor: "transparent" },
+            "& .MuiSvgIcon-root": {
+              color: notifAnchor ? "primary.main" : "text.primary",
+              transition: "color 180ms ease",
+            },
+            "&:active .MuiSvgIcon-root": {
+              color: "primary.main",
+            },
+            "@media (hover: hover) and (pointer: fine)": {
+              "&:hover .MuiSvgIcon-root": {
+                color: "primary.main",
+              },
+            },
+          }}
           aria-label="Notifications"
+          disableRipple
         >
           <SmsIcon />
         </IconButton>
       </Stack>
+
+      <NotificationCenter
+        open={Boolean(notifAnchor)}
+        anchorEl={notifAnchor}
+        onClose={() => setNotifAnchor(null)}
+        audience="worker"
+      />
     </Box>
   );
 }
