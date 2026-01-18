@@ -50,12 +50,13 @@ export default async function RestaurantOfferPage({
             >
               <StudentDishCard
                 menuItemId={item.id}
+                dishId={item.dishId}
                 name={item.name}
                 description={item.description}
                 imageUrl={item.imageUrl}
                 allergens={item.allergens}
                 lastServed={item.lastServed}
-                rating={0}
+                rating={item.rating}
                 isInitiallySubscribed={subscriptions.includes(item.id)}
               />
             </Grid>

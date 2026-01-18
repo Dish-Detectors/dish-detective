@@ -28,7 +28,7 @@ const dishRatingSchema = new Schema<IDishRating>(
   },
 );
 
-dishRatingSchema.index({ dishId: 1 }, { unique: true });
+dishRatingSchema.index({ dishId: 1, userId: 1 }, { unique: true });
 
 if (process.env.NODE_ENV === "development") {
   delete mongoose.models.DishRating;
