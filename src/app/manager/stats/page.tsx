@@ -15,9 +15,11 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import SortIcon from "@mui/icons-material/Sort";
 import DishCard from "@/components/DishCard";
+import StatDishCard from "@/components/StatDishCard";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
 import { getAllDishes, getManagerRestaurant } from "@/app/manager/menu/actions";
 import { getSubscriptionCountsForMenuItems } from "@/app/manager/stats/actions";
+import { BarChart } from "@mui/x-charts/BarChart";
 
 type SortMode = "alpha" | "subcount";
 
@@ -82,8 +84,8 @@ export default function ManagerStatsPage() {
     const q = searchQuery.trim().toLowerCase();
     const filtered = q
       ? dishes.filter((d) =>
-          `${d.name} ${d.category}`.toLowerCase().includes(q),
-        )
+        `${d.name} ${d.category}`.toLowerCase().includes(q),
+      )
       : dishes;
 
     const getSubCount = (dishId: string) => subCounts[dishId] ?? 0;
@@ -257,6 +259,43 @@ export default function ManagerStatsPage() {
 
       <Divider sx={{ display: { xs: "none", sm: "block" }, mb: 4 }} />
 
+      {loading ? null : menzaId && dishes.length > 0 && (
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            mb: 4,
+            borderRadius: 3,
+            bgcolor: "white",
+            border: "1px solid #e0e0e0",
+            height: 350,
+            width: "100%",
+          }}
+        >
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+            Zainteresiranost po jelima
+          </Typography>
+          <Box sx={{ width: "100%", height: 280 }}>
+            <BarChart
+              loading={loading}
+              dataset={dishes
+                .map((d) => ({
+                  name: d.name.length > 20 ? `${d.name.substring(0, 17)}...` : d.name,
+                  count: subCounts[d._id] ?? 0,
+                }))
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 10)}
+              xAxis={[{ scaleType: "band", dataKey: "name" }]}
+              series={[{ dataKey: "count", label: "Broj zainteresiranih", color: "#1976d2" }]}
+              margin={{ top: 10, bottom: 30, left: 40, right: 10 }}
+              slotProps={{
+                legend: { hidden: true } as any
+              }}
+            />
+          </Box>
+        </Paper>
+      )}
+
       <Box
         sx={{
           flex: 1,
@@ -314,11 +353,10 @@ export default function ManagerStatsPage() {
               display: "grid",
               gridTemplateColumns: {
                 xs: "1fr",
-                sm: "repeat(2, 1fr)",
-                md: "repeat(3, 1fr)",
-                lg: "repeat(4, 1fr)",
+                lg: "repeat(2, 1fr)",
+                xl: "repeat(3, 1fr)",
               },
-              gap: 3,
+              gap: 2,
               pb: 2,
             }}
           >
@@ -327,21 +365,17 @@ export default function ManagerStatsPage() {
                 key={dish._id}
                 sx={{
                   opacity: 0,
-                  animation: `fadeInUp 0.6s ease-out ${index * 0.06}s forwards`,
+                  animation: `fadeInUp 0.6s ease-out ${index * 0.04}s forwards`,
                   "@keyframes fadeInUp": {
-                    from: { opacity: 0, transform: "translateY(20px)" },
+                    from: { opacity: 0, transform: "translateY(10px)" },
                     to: { opacity: 1, transform: "translateY(0)" },
                   },
                 }}
               >
-                <DishCard
+                <StatDishCard
                   name={dish.name}
-                  restaurantName={dish.category}
-                  position={dish.description}
                   imageUrl={dish.imageUrl}
-                  allergens={dish.allergens}
-                  showActions={false}
-                  extraInfo={`Broj zainteresiranih: ${subCounts[dish._id] ?? 0}`}
+                  count={subCounts[dish._id] ?? 0}
                 />
               </Box>
             ))}
