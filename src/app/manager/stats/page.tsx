@@ -84,8 +84,8 @@ export default function ManagerStatsPage() {
     const q = searchQuery.trim().toLowerCase();
     const filtered = q
       ? dishes.filter((d) =>
-        `${d.name} ${d.category}`.toLowerCase().includes(q),
-      )
+          `${d.name} ${d.category}`.toLowerCase().includes(q),
+        )
       : dishes;
 
     const getSubCount = (dishId: string) => subCounts[dishId] ?? 0;
@@ -259,42 +259,54 @@ export default function ManagerStatsPage() {
 
       <Divider sx={{ display: { xs: "none", sm: "block" }, mb: 4 }} />
 
-      {loading ? null : menzaId && dishes.length > 0 && (
-        <Paper
-          elevation={0}
-          sx={{
-            p: 3,
-            mb: 4,
-            borderRadius: 3,
-            bgcolor: "white",
-            border: "1px solid #e0e0e0",
-            height: 350,
-            width: "100%",
-          }}
-        >
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-            Zainteresiranost po jelima
-          </Typography>
-          <Box sx={{ width: "100%", height: 280 }}>
-            <BarChart
-              loading={loading}
-              dataset={dishes
-                .map((d) => ({
-                  name: d.name.length > 20 ? `${d.name.substring(0, 17)}...` : d.name,
-                  count: subCounts[d._id] ?? 0,
-                }))
-                .sort((a, b) => b.count - a.count)
-                .slice(0, 10)}
-              xAxis={[{ scaleType: "band", dataKey: "name" }]}
-              series={[{ dataKey: "count", label: "Broj zainteresiranih", color: "#1976d2" }]}
-              margin={{ top: 10, bottom: 30, left: 40, right: 10 }}
-              slotProps={{
-                legend: { hidden: true } as any
+      {loading
+        ? null
+        : menzaId &&
+          dishes.length > 0 && (
+            <Paper
+              elevation={0}
+              sx={{
+                p: 3,
+                mb: 4,
+                borderRadius: 3,
+                bgcolor: "white",
+                border: "1px solid #e0e0e0",
+                height: 350,
+                width: "100%",
               }}
-            />
-          </Box>
-        </Paper>
-      )}
+            >
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                Zainteresiranost po jelima
+              </Typography>
+              <Box sx={{ width: "100%", height: 280 }}>
+                <BarChart
+                  loading={loading}
+                  dataset={dishes
+                    .map((d) => ({
+                      name:
+                        d.name.length > 20
+                          ? `${d.name.substring(0, 17)}...`
+                          : d.name,
+                      count: subCounts[d._id] ?? 0,
+                    }))
+                    .sort((a, b) => b.count - a.count)
+                    .slice(0, 10)}
+                  xAxis={[{ scaleType: "band", dataKey: "name" }]}
+                  series={[
+                    {
+                      dataKey: "count",
+                      label: "Broj zainteresiranih",
+                      color: "#1976d2",
+                    },
+                  ]}
+                  margin={{ top: 10, bottom: 30, left: 40, right: 10 }}
+                  slotProps={{
+                    legend: { hidden: true } as any,
+                  }}
+                />
+              </Box>
+            </Paper>
+          )}
 
       <Box
         sx={{
