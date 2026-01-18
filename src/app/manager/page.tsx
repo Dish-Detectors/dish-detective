@@ -11,12 +11,13 @@ import {
 
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import GroupsIcon from "@mui/icons-material/Groups";
 
 import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUserFirstName } from "@/app/admin/actions";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
-import { navWidth } from "@/components/ManagerNavbar";
+import { headerHeight } from "@/components/ManagerNavbar";
 
 interface ActionButtonProps {
   children: ReactNode;
@@ -86,13 +87,13 @@ const DesktopActionCard = ({
     onClick={onClick}
     elevation={2}
     sx={{
-      flex: 1,
+      flex: "1 1 360px",
       display: "flex",
       flexDirection: "column",
       alignItems: "flex-start",
-      minWidth: 150,
-      maxWidth: 350,
-      p: 3,
+      minWidth: { xs: 280, md: 360, lg: 400 },
+      maxWidth: { xs: "100%", sm: 460, md: 560, lg: 680 },
+      p: { xs: 3.5, sm: 4.5, md: 5.5 },
       borderRadius: 3,
       cursor: "pointer",
       transition: "all 0.2s ease-in-out",
@@ -112,7 +113,7 @@ const DesktopActionCard = ({
     {icon}
     <Typography
       sx={{
-        fontSize: "clamp(1rem, 1.7vw, 2rem)",
+        fontSize: "clamp(1.25rem, 1.8vw, 2.25rem)",
         fontWeight: "600",
         color: "text.primary",
         pt: 1,
@@ -124,7 +125,7 @@ const DesktopActionCard = ({
       <Typography
         key={index}
         sx={{
-          fontSize: "clamp(0.75rem, 0.9vw, 1.2rem)",
+          fontSize: "clamp(0.85rem, 1vw, 1.25rem)",
           fontWeight: "550",
           color: "text.secondary",
           pt: index === 0 ? 1 : 0,
@@ -185,14 +186,12 @@ export default function ManagerPage() {
         <Typography
           variant="h4"
           fontWeight={780}
-          sx={{ color: "#212222", mb: 3, ml: 1 }}
+          sx={{ color: "#212222", mb: 2 }}
         >
           Dobrodošli{name ? `, ${name}` : ""}!
         </Typography>
 
-        <Box sx={{ px: 2 }}>
-          <Divider sx={{ borderBottomWidth: 2 }} />
-        </Box>
+        <Divider sx={{ mb: 4, borderBottomWidth: 2 }} />
 
         <Box sx={{ flexGrow: 1, py: 4 }}>
           <MobileActionCard
@@ -211,6 +210,14 @@ export default function ManagerPage() {
           >
             Radno vrijeme
           </MobileActionCard>
+
+          <MobileActionCard
+            onClick={() => router.push("/manager/stats")}
+            icon={<GroupsIcon sx={{ fontSize: 32, color: "text.primary" }} />}
+            animationDelay="0.5s"
+          >
+            Statistika
+          </MobileActionCard>
         </Box>
       </Box>
     );
@@ -219,54 +226,96 @@ export default function ManagerPage() {
   return (
     <Box
       sx={{
-        height: "100vh",
+        height: `calc(100vh - ${headerHeight}px)`,
         bgcolor: "#f5f5f5",
         p: 5,
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <Typography
         variant="h4"
         fontWeight={780}
-        sx={{ color: "#212222", mb: 4, ml: 4 }}
+        sx={{ color: "#212222", mb: 4, ml: 0 }}
       >
         Dobrodošli{name ? `, ${name}` : ""}!
       </Typography>
 
-      <Box sx={{ px: 4, mt: -3 }}>
+      <Box sx={{ mt: -3 }}>
         <Divider sx={{ borderBottomWidth: 2 }} />
       </Box>
 
       <Box
         sx={{
-          px: 5,
-          py: 6,
+          flex: 1,
+          px: { xs: 2, sm: 5 },
           display: "flex",
-          gap: 3,
-          flexWrap: "wrap",
+          alignItems: "center",
           justifyContent: "center",
         }}
       >
-        <DesktopActionCard
-          icon={<MenuBookIcon sx={{ fontSize: 40, color: "text.primary" }} />}
-          title="Kreiraj dnevni meni"
-          descriptions={[
-            "• Dodavanje jela na dnevni meni",
-            "• Pregled i uklanjanje stavki",
-          ]}
-          onClick={() => router.push("/manager/menu")}
-          animationDelay="0.1s"
-        />
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            mt: -7,
+            gap: 3.5,
+            flexWrap: "wrap",
+            justifyContent: "center",
+            alignContent: "center",
+          }}
+        >
+          <DesktopActionCard
+            icon={
+              <MenuBookIcon
+                sx={{
+                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                  color: "text.primary",
+                }}
+              />
+            }
+            title="Kreiraj dnevni meni"
+            descriptions={[
+              "• Dodavanje jela na dnevni meni",
+              "• Pregled i uklanjanje stavki",
+            ]}
+            onClick={() => router.push("/manager/menu")}
+            animationDelay="0.1s"
+          />
 
-        <DesktopActionCard
-          icon={<AccessTimeIcon sx={{ fontSize: 40, color: "text.primary" }} />}
-          title="Radno vrijeme"
-          descriptions={[
-            "• Postavljanje radnog vremena",
-            "• Više smjena po danu",
-          ]}
-          onClick={() => router.push("/manager/hours")}
-          animationDelay="0.3s"
-        />
+          <DesktopActionCard
+            icon={
+              <AccessTimeIcon
+                sx={{
+                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                  color: "text.primary",
+                }}
+              />
+            }
+            title="Radno vrijeme"
+            descriptions={[
+              "• Postavljanje radnog vremena",
+              "• Više smjena po danu",
+            ]}
+            onClick={() => router.push("/manager/hours")}
+            animationDelay="0.3s"
+          />
+
+          <DesktopActionCard
+            icon={
+              <GroupsIcon
+                sx={{
+                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                  color: "text.primary",
+                }}
+              />
+            }
+            title="Statistika"
+            descriptions={["• Pregled zainteresiranih"]}
+            onClick={() => router.push("/manager/stats")}
+            animationDelay="0.5s"
+          />
+        </Box>
       </Box>
     </Box>
   );
