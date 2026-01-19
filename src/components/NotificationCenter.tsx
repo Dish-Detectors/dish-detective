@@ -231,9 +231,19 @@ export default function NotificationCenter({
                 <Stack spacing={2} sx={{ p: 2 }}>
                   {[1, 2, 3].map((i) => (
                     <Box key={i} sx={{ display: "flex", width: "100%" }}>
-                      <Skeleton variant="rectangular" width={48} height={48} sx={{ mr: 2, borderRadius: 2 }} />
+                      <Skeleton
+                        variant="rectangular"
+                        width={48}
+                        height={48}
+                        sx={{ mr: 2, borderRadius: 2 }}
+                      />
                       <Box sx={{ flexGrow: 1 }}>
-                        <Skeleton variant="text" width="60%" height={24} sx={{ mb: 0.5 }} />
+                        <Skeleton
+                          variant="text"
+                          width="60%"
+                          height={24}
+                          sx={{ mb: 0.5 }}
+                        />
                         <Skeleton variant="text" width="90%" height={20} />
                         <Skeleton variant="text" width="40%" height={16} />
                       </Box>
@@ -283,7 +293,7 @@ export default function NotificationCenter({
                             mt: 0.5,
                             boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
                             cursor: "pointer",
-                            "&:hover": { opacity: 0.9 }
+                            "&:hover": { opacity: 0.9 },
                           }}
                         />
                       )}
@@ -306,7 +316,7 @@ export default function NotificationCenter({
                                 objectFit: "cover",
                                 boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
                                 cursor: "pointer",
-                                "&:hover": { opacity: 0.9 }
+                                "&:hover": { opacity: 0.9 },
                               }}
                             />
                           ) : (
@@ -321,7 +331,7 @@ export default function NotificationCenter({
                                 height: 48,
                                 bgcolor: "grey.100",
                                 borderRadius: 2,
-                                "&:hover": { bgcolor: "grey.200" }
+                                "&:hover": { bgcolor: "grey.200" },
                               }}
                             >
                               <DownloadIcon color="action" />
@@ -442,7 +452,13 @@ export default function NotificationCenter({
         maxWidth="md"
         fullWidth
         onClick={() => setTimeout(() => setPreviewImage(null), 0)}
-        sx={{ "& .MuiDialog-paper": { bgcolor: "transparent", boxShadow: "none", overflow: "hidden" } }}
+        sx={{
+          "& .MuiDialog-paper": {
+            bgcolor: "transparent",
+            boxShadow: "none",
+            overflow: "hidden",
+          },
+        }}
       >
         <Box
           component="img"
@@ -452,7 +468,7 @@ export default function NotificationCenter({
             height: "auto",
             maxHeight: "90vh",
             objectFit: "contain",
-            cursor: "pointer"
+            cursor: "pointer",
           }}
         />
       </Dialog>

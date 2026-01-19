@@ -20,7 +20,7 @@ const formatTime = (date: Date) => {
   return date.toLocaleTimeString("hr-HR", {
     hour: "2-digit",
     minute: "2-digit",
-    hour12: false
+    hour12: false,
   });
 };
 import AttachFileIcon from "@mui/icons-material/AttachFile";
@@ -135,7 +135,7 @@ export default function AnnouncementChatPage() {
   }, [selectedAudience]);
 
   const handleSendMessage = async () => {
-    if ((!messageInput.trim() && !selectedFile)) return;
+    if (!messageInput.trim() && !selectedFile) return;
 
     // 1. Upload file if exists
     let attachmentData = undefined;
@@ -165,17 +165,23 @@ export default function AnnouncementChatPage() {
       text: messageInput,
       time: formatTime(new Date()),
       isAdmin: true,
-      file: attachmentData ? { ...attachmentData, date: new Date().toLocaleDateString() } : undefined
+      file: attachmentData
+        ? { ...attachmentData, date: new Date().toLocaleDateString() }
+        : undefined,
     };
 
-    setMessages(prev => [...prev, newMessage]);
+    setMessages((prev) => [...prev, newMessage]);
     setMessageInput("");
     setSelectedFile(null); // Clear file selection
 
-    const result = await sendAnnouncement(selectedAudience, newMessage.text, attachmentData);
+    const result = await sendAnnouncement(
+      selectedAudience,
+      newMessage.text,
+      attachmentData,
+    );
     if (!result.success) {
       // Rollback on failure
-      setMessages(prev => prev.filter(m => m.id !== optimisticId));
+      setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
       console.error("Failed to send:", result.error);
       setSnackbar({
         open: true,
@@ -301,7 +307,6 @@ export default function AnnouncementChatPage() {
                   alignItems: "flex-end",
                 }}
               >
-
                 <Box
                   sx={{
                     bgcolor: "#5faef4",
@@ -331,10 +336,10 @@ export default function AnnouncementChatPage() {
                         textDecoration: "none",
                         color: "text.primary",
                         minWidth: 240,
-                        cursor: msg.file.url ? 'pointer' : 'default',
+                        cursor: msg.file.url ? "pointer" : "default",
                         "&:hover": {
-                          bgcolor: "grey.100"
-                        }
+                          bgcolor: "grey.100",
+                        },
                       }}
                     >
                       <PictureAsPdfIcon
@@ -357,7 +362,12 @@ export default function AnnouncementChatPage() {
                 {/* Time Below */}
                 <Typography
                   variant="caption"
-                  sx={{ color: "text.secondary", mt: 0.5, mr: 1, fontSize: '0.7rem' }}
+                  sx={{
+                    color: "text.secondary",
+                    mt: 0.5,
+                    mr: 1,
+                    fontSize: "0.7rem",
+                  }}
                 >
                   {msg.time}
                 </Typography>
@@ -368,10 +378,14 @@ export default function AnnouncementChatPage() {
           {/* Input Bar */}
           <Box sx={{ p: 3, bgcolor: "white" }}>
             {selectedFile && (
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, px: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center", mb: 1, px: 2 }}>
                 <AttachFileIcon fontSize="small" color="action" />
-                <Typography variant="caption" sx={{ ml: 1 }}>{selectedFile.name}</Typography>
-                <IconButton size="small" onClick={() => setSelectedFile(null)}><CloseIcon fontSize="small" /></IconButton>
+                <Typography variant="caption" sx={{ ml: 1 }}>
+                  {selectedFile.name}
+                </Typography>
+                <IconButton size="small" onClick={() => setSelectedFile(null)}>
+                  <CloseIcon fontSize="small" />
+                </IconButton>
               </Box>
             )}
             <Box
@@ -397,7 +411,10 @@ export default function AnnouncementChatPage() {
               <label htmlFor="attachment-button-file">
                 <IconButton
                   size="small"
-                  sx={{ color: selectedFile ? "primary.main" : "text.secondary", mr: 1 }}
+                  sx={{
+                    color: selectedFile ? "primary.main" : "text.secondary",
+                    mr: 1,
+                  }}
                   aria-label="attach file"
                   component="span"
                 >
@@ -415,10 +432,15 @@ export default function AnnouncementChatPage() {
               />
               <IconButton
                 onClick={handleSendMessage}
-                disabled={(!messageInput.trim() && !selectedFile) || isUploading}
+                disabled={
+                  (!messageInput.trim() && !selectedFile) || isUploading
+                }
                 aria-label="send message"
                 sx={{
-                  bgcolor: (messageInput.trim() || selectedFile) ? "#5faef4" : "rgba(0,0,0,0.05)",
+                  bgcolor:
+                    messageInput.trim() || selectedFile
+                      ? "#5faef4"
+                      : "rgba(0,0,0,0.05)",
                   color: "white",
                   "&:hover": {
                     bgcolor: "#4a9ce6",

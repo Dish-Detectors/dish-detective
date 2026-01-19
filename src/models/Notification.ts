@@ -44,7 +44,7 @@ const notifSchema = new Schema<INotification>(
       name: { type: String },
       url: { type: String },
       type: { type: String },
-      size: { type: String }
+      size: { type: String },
     },
     postedBy: {
       type: String,

@@ -21,7 +21,7 @@ export async function getAllWorkerNotifications(): Promise<any[]> {
   if (!notifications.length) return [];
 
   const readReceipts = await ReadReceipt.find({ userId }).lean();
-  const readSet = new Set(readReceipts.map(r => r.notificationId.toString()));
+  const readSet = new Set(readReceipts.map((r) => r.notificationId.toString()));
 
   const client = await clerkClient();
 
@@ -32,7 +32,9 @@ export async function getAllWorkerNotifications(): Promise<any[]> {
       // If personal (targetUserId exists), check notif.read (though personal worker notifs might not exist yet, logic stands)
       // Actually worker notifications are currently ALL broadcasts (type defined by sender usually, but here 'worker' type is generic).
       // Assuming 'worker' type notifications are broadcasts to all workers.
-      const isRead = notif.targetUserId ? notif.read : readSet.has(notif._id.toString());
+      const isRead = notif.targetUserId
+        ? notif.read
+        : readSet.has(notif._id.toString());
 
       try {
         const user = await client.users.getUser(notif.postedBy);
@@ -58,7 +60,11 @@ export async function getAllStudentNotifications(): Promise<any[]> {
 
   const notifications = await Notification.find({
     type: "student",
-    $or: [{ targetUserId: userId }, { targetUserId: { $exists: false } }, { targetUserId: null }],
+    $or: [
+      { targetUserId: userId },
+      { targetUserId: { $exists: false } },
+      { targetUserId: null },
+    ],
   })
     .sort({ createdAt: -1 })
     .lean();
@@ -66,7 +72,7 @@ export async function getAllStudentNotifications(): Promise<any[]> {
   if (!notifications.length) return [];
 
   const readReceipts = await ReadReceipt.find({ userId }).lean();
-  const readSet = new Set(readReceipts.map(r => r.notificationId.toString()));
+  const readSet = new Set(readReceipts.map((r) => r.notificationId.toString()));
 
   const client = await clerkClient();
 
@@ -76,7 +82,9 @@ export async function getAllStudentNotifications(): Promise<any[]> {
       // If it's MY personal notification, use the 'read' field on the doc.
       // If it's a broadcast (targetUserId is null/missing), use ReadReceipt.
       const isBroadcast = !notif.targetUserId;
-      const isRead = isBroadcast ? readSet.has(notif._id.toString()) : notif.read;
+      const isRead = isBroadcast
+        ? readSet.has(notif._id.toString())
+        : notif.read;
 
       try {
         const user = await client.users.getUser(notif.postedBy);
@@ -313,8 +321,9 @@ export async function markAllNotificationsAsRead() {
     // Alternative: Client calls this. We can just insert receipts for ALL broadcasts currently visible?
     // Or just fetch IDs of unread broadcasts and insert.
 
-    const typeFilter = role === "worker" || role === "manager" ? "worker" : "student";
-    // Wait, managers might want student notifs too? 
+    const typeFilter =
+      role === "worker" || role === "manager" ? "worker" : "student";
+    // Wait, managers might want student notifs too?
     // Let's rely on what getAllStudentNotifications fetches.
     // Currently users usually act as one role.
 
@@ -322,16 +331,16 @@ export async function markAllNotificationsAsRead() {
     const query = {
       $or: [{ targetUserId: { $exists: false } }, { targetUserId: null }],
       // If we want to be strict about type, we need to know context.
-      // But usually marking *all* as read implies all visible. 
+      // But usually marking *all* as read implies all visible.
       // Let's just find ALL broadcasts.
     };
 
-    const allBroadcasts = await Notification.find(query).select('_id').lean();
+    const allBroadcasts = await Notification.find(query).select("_id").lean();
 
     // Insert receipts for all of them. Use ordered: false to ignore duplicates.
-    const receipts = allBroadcasts.map(n => ({
+    const receipts = allBroadcasts.map((n) => ({
       userId,
-      notificationId: n._id
+      notificationId: n._id,
     }));
 
     if (receipts.length > 0) {
@@ -370,18 +379,18 @@ export async function getUnreadNotificationCount() {
 
     // If worker/manager, check 'worker' type broadcasts.
     // If student (or undefined role), check 'student' type.
-    const type = (role === "worker" || role === "manager") ? "worker" : "student";
+    const type = role === "worker" || role === "manager" ? "worker" : "student";
     // NOTE: This assumes a user only checks ONE stream.
 
     const broadcastQuery = {
       type: type,
-      $or: [{ targetUserId: { $exists: false } }, { targetUserId: null }]
+      $or: [{ targetUserId: { $exists: false } }, { targetUserId: null }],
     };
 
     const totalBroadcasts = await Notification.countDocuments(broadcastQuery);
 
     // Count receipts for this user that correspond to these broadcasts
-    // (We count receipts where notificationId is in the set of broadcast IDs? 
+    // (We count receipts where notificationId is in the set of broadcast IDs?
     //  Or just count all receipts for this user and assume they match?
     //  Safest: Count receipts for notifications of this type.)
 
@@ -401,12 +410,14 @@ export async function getUnreadNotificationCount() {
 
     // Let's mirror `getAllStudentNotifications` logic but just count.
 
-    const allBroadcasts = await Notification.find(broadcastQuery).select('_id').lean();
-    const broadcastIds = allBroadcasts.map(b => b._id.toString());
+    const allBroadcasts = await Notification.find(broadcastQuery)
+      .select("_id")
+      .lean();
+    const broadcastIds = allBroadcasts.map((b) => b._id.toString());
 
     const readCount = await ReadReceipt.countDocuments({
       userId,
-      notificationId: { $in: broadcastIds }
+      notificationId: { $in: broadcastIds },
     });
 
     return personalCount + (allBroadcasts.length - readCount);
