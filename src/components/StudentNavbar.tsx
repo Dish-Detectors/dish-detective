@@ -133,7 +133,10 @@ export default function StudentNavbar({
       <NotificationCenter
         open={Boolean(notifAnchor)}
         anchorEl={notifAnchor}
-        onClose={() => setNotifAnchor(null)}
+        onClose={() => {
+          setNotifAnchor(null);
+          setTimeout(fetchUnreadCount, 500);
+        }}
         onRead={() => fetchUnreadCount()}
       />
     </Box>

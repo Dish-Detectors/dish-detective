@@ -10,6 +10,12 @@ export interface INotification extends Document {
   createdAt: Date;
   type: "worker" | "student";
   read: boolean;
+  attachment?: {
+    name: string;
+    url: string;
+    type: string;
+    size: string;
+  };
 }
 
 const notifSchema = new Schema<INotification>(
@@ -22,8 +28,9 @@ const notifSchema = new Schema<INotification>(
     },
     description: {
       type: String,
-      required: [true, "Description is required"],
+      // required: [true, "Description is required"], // Removed requirement to allow attachment-only messages
       trim: true,
+      default: "",
     },
     imageUrl: {
       type: String,
@@ -32,6 +39,12 @@ const notifSchema = new Schema<INotification>(
       type: String,
       enum: ["worker", "student"],
       required: [true, "Type is required"],
+    },
+    attachment: {
+      name: { type: String },
+      url: { type: String },
+      type: { type: String },
+      size: { type: String },
     },
     postedBy: {
       type: String,

@@ -24,13 +24,10 @@ export default function NotificationSync() {
       // If denied or default, we might need a sync
       if (permission !== "granted") {
         // 2. Check if user has any subscriptions in DB
-        const subs = await getUserSubscriptions();
+        // const subs = await getUserSubscriptions();
 
-        if (subs.length > 0) {
-          // User has subs, but this device isn't registered
-          // Show a prompt to enable notifications on this device
-          setOpen(true);
-        }
+        // Always prompt to enable notifications if not granted, so they get announcements
+        setOpen(true);
       }
     };
 
@@ -55,7 +52,7 @@ export default function NotificationSync() {
   return (
     <Snackbar
       open={open}
-      message="Imate aktivne pretplate na jela. Želite li primati obavijesti i na ovom uređaju?"
+      message="Želite li primati obavijesti o novostima i jelima?"
       action={
         <React.Fragment>
           <Button
