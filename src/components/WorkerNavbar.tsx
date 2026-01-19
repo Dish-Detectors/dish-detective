@@ -3,7 +3,7 @@
 import { Box, Stack, IconButton } from "@mui/material";
 import { usePathname, useRouter } from "next/navigation";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
-import SmsIcon from "@mui/icons-material/Sms";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 import NotificationCenter from "./NotificationCenter";
 import React from "react";
 
@@ -14,15 +14,38 @@ interface WorkerNavbarProps {
   isMobile?: boolean;
 }
 
+import { Badge } from "@mui/material";
+import { getUnreadNotificationCount } from "@/actions/notification";
+
 export default function WorkerNavbar({ isMobile = false }: WorkerNavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [notifAnchor, setNotifAnchor] = React.useState<null | HTMLElement>(
     null,
   );
+  const [unreadCount, setUnreadCount] = React.useState(0);
+
+  const fetchUnreadCount = async () => {
+    const count = await getUnreadNotificationCount();
+    setUnreadCount(count);
+  };
+
+  React.useEffect(() => {
+    fetchUnreadCount();
+    const interval = setInterval(fetchUnreadCount, 30000); // Check every 30s
+    return () => clearInterval(interval);
+  }, []);
 
   const handleToggleNotif = (event: React.MouseEvent<HTMLElement>) => {
     setNotifAnchor(notifAnchor ? null : event.currentTarget);
+    if (!notifAnchor) {
+      // When opening, we might want to refresh the list, handled by component
+      // When closing, we mark as read, handled by component
+    } else {
+      // Closing manually via button (rare since it's toggle)
+      // NotificationCenter handles read on close
+      fetchUnreadCount();
+    }
   };
 
   const isActive = (path: string) => {
@@ -108,15 +131,23 @@ export default function WorkerNavbar({ isMobile = false }: WorkerNavbarProps) {
           aria-label="Notifications"
           disableRipple
         >
-          <SmsIcon />
+          <Badge badgeContent={unreadCount} color="error">
+            <NotificationsIcon />
+          </Badge>
         </IconButton>
       </Stack>
 
       <NotificationCenter
         open={Boolean(notifAnchor)}
         anchorEl={notifAnchor}
-        onClose={() => setNotifAnchor(null)}
+        onClose={() => {
+          setNotifAnchor(null);
+          // Updating count after close (assuming it marked as read)
+          // Small delay to allow DB update
+          setTimeout(fetchUnreadCount, 500);
+        }}
         audience="worker"
+        onRead={fetchUnreadCount}
       />
     </Box>
   );

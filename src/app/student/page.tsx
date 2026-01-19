@@ -86,13 +86,14 @@ const DesktopActionCard = ({
     onClick={onClick}
     elevation={2}
     sx={{
-      flex: 1,
+      width: "100%",
+      height: "100%",
       display: "flex",
       flexDirection: "column",
-      alignItems: "flex-start",
-      minWidth: 150,
-      maxWidth: 350,
-      p: 3,
+      alignItems: "center",
+      justifyContent: "center",
+      minHeight: 200,
+      p: { xs: 3.5, sm: 4.5 },
       borderRadius: 3,
       cursor: "pointer",
       transition: "all 0.2s ease-in-out",
@@ -112,7 +113,7 @@ const DesktopActionCard = ({
     {icon}
     <Typography
       sx={{
-        fontSize: "clamp(1rem, 1.7vw, 2rem)",
+        fontSize: "clamp(1.25rem, 1.8vw, 2.25rem)",
         fontWeight: "600",
         color: "text.primary",
         pt: 1,
@@ -120,19 +121,6 @@ const DesktopActionCard = ({
     >
       {title}
     </Typography>
-    {descriptions.map((desc, index) => (
-      <Typography
-        key={index}
-        sx={{
-          fontSize: "clamp(0.75rem, 0.9vw, 1.2rem)",
-          fontWeight: "550",
-          color: "text.secondary",
-          pt: index === 0 ? 1 : 0,
-        }}
-      >
-        {desc}
-      </Typography>
-    ))}
   </Paper>
 );
 
@@ -241,29 +229,51 @@ export default function Page() {
           px: 5,
           py: 6,
           display: "flex",
-          gap: 3,
-          flexWrap: "wrap",
+          alignItems: "center",
           justifyContent: "center",
         }}
       >
-        <DesktopActionCard
-          icon={<RestaurantIcon sx={{ fontSize: 40, color: "text.primary" }} />}
-          title="Popis restorana"
-          descriptions={["• Pregled svih menzi", "• Dnevna ponuda jela"]}
-          onClick={() => router.push("/student/restaurants")}
-          animationDelay="0.1s"
-        />
+        <Box
+          sx={{
+            width: "100%",
+            maxWidth: 900,
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gap: 3.5,
+            justifyContent: "center",
+            alignContent: "center",
+          }}
+        >
+          <DesktopActionCard
+            icon={
+              <RestaurantIcon
+                sx={{
+                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                  color: "text.primary",
+                }}
+              />
+            }
+            title="Popis restorana"
+            descriptions={[]}
+            onClick={() => router.push("/student/restaurants")}
+            animationDelay="0.1s"
+          />
 
-        <DesktopActionCard
-          icon={<MapIcon sx={{ fontSize: 40, color: "text.primary" }} />}
-          title="Karta"
-          descriptions={[
-            "• Lokacije restorana na karti",
-            "• Udaljenost od tvoje lokacije",
-          ]}
-          onClick={() => router.push("/student/map")}
-          animationDelay="0.3s"
-        />
+          <DesktopActionCard
+            icon={
+              <MapIcon
+                sx={{
+                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                  color: "text.primary",
+                }}
+              />
+            }
+            title="Karta"
+            descriptions={[]}
+            onClick={() => router.push("/student/map")}
+            animationDelay="0.3s"
+          />
+        </Box>
       </Box>
     </Box>
   );

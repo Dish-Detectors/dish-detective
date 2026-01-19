@@ -80,7 +80,10 @@ export default function StudentDishCard({
     }
   };
 
-  const handleRate = async (event: React.SyntheticEvent, newValue: number | null) => {
+  const handleRate = async (
+    event: React.SyntheticEvent,
+    newValue: number | null,
+  ) => {
     if (newValue === null) return;
     setCurrentRating(newValue);
 
@@ -88,7 +91,7 @@ export default function StudentDishCard({
       const result = await rateDish({ dishId, rating: newValue });
       if (!result.success) {
         console.error(result.message);
-        setCurrentRating(rating); 
+        setCurrentRating(rating);
       }
     } catch (error) {
       console.error("Failed to rate dish:", error);
@@ -152,10 +155,10 @@ export default function StudentDishCard({
             mt: 2,
           }}
         >
-          <Rating 
-            value={currentRating} 
+          <Rating
+            value={currentRating}
             onChange={handleRate} // Enables clicking
-            size="small" 
+            size="small"
           />
 
           <Button

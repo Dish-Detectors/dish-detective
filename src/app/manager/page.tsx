@@ -11,12 +11,14 @@ import {
 
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import CampaignIcon from "@mui/icons-material/Campaign";
+import BarChartIcon from "@mui/icons-material/BarChart";
 
 import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUserFirstName } from "@/app/admin/actions";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
-import { navWidth } from "@/components/ManagerNavbar";
+import { headerHeight } from "@/components/ManagerNavbar";
 
 interface ActionButtonProps {
   children: ReactNode;
@@ -86,13 +88,14 @@ const DesktopActionCard = ({
     onClick={onClick}
     elevation={2}
     sx={{
-      flex: 1,
+      width: "100%",
+      height: "100%",
       display: "flex",
       flexDirection: "column",
-      alignItems: "flex-start",
-      minWidth: 150,
-      maxWidth: 350,
-      p: 3,
+      alignItems: "center",
+      justifyContent: "center",
+      minHeight: 200, // Ensure some height
+      p: { xs: 3.5, sm: 4.5 },
       borderRadius: 3,
       cursor: "pointer",
       transition: "all 0.2s ease-in-out",
@@ -112,7 +115,7 @@ const DesktopActionCard = ({
     {icon}
     <Typography
       sx={{
-        fontSize: "clamp(1rem, 1.7vw, 2rem)",
+        fontSize: "clamp(1.25rem, 1.8vw, 2.25rem)",
         fontWeight: "600",
         color: "text.primary",
         pt: 1,
@@ -120,19 +123,6 @@ const DesktopActionCard = ({
     >
       {title}
     </Typography>
-    {descriptions.map((desc, index) => (
-      <Typography
-        key={index}
-        sx={{
-          fontSize: "clamp(0.75rem, 0.9vw, 1.2rem)",
-          fontWeight: "550",
-          color: "text.secondary",
-          pt: index === 0 ? 1 : 0,
-        }}
-      >
-        {desc}
-      </Typography>
-    ))}
   </Paper>
 );
 
@@ -185,14 +175,12 @@ export default function ManagerPage() {
         <Typography
           variant="h4"
           fontWeight={780}
-          sx={{ color: "#212222", mb: 3, ml: 1 }}
+          sx={{ color: "#212222", mb: 2 }}
         >
           Dobrodošli{name ? `, ${name}` : ""}!
         </Typography>
 
-        <Box sx={{ px: 2 }}>
-          <Divider sx={{ borderBottomWidth: 2 }} />
-        </Box>
+        <Divider sx={{ mb: 4, borderBottomWidth: 2 }} />
 
         <Box sx={{ flexGrow: 1, py: 4 }}>
           <MobileActionCard
@@ -200,7 +188,7 @@ export default function ManagerPage() {
             icon={<MenuBookIcon sx={{ fontSize: 32, color: "text.primary" }} />}
             animationDelay="0.1s"
           >
-            Kreiraj dnevni meni
+            Dnevni meni
           </MobileActionCard>
           <MobileActionCard
             onClick={() => router.push("/manager/hours")}
@@ -211,6 +199,22 @@ export default function ManagerPage() {
           >
             Radno vrijeme
           </MobileActionCard>
+
+          <MobileActionCard
+            onClick={() => router.push("/manager/stats")}
+            icon={<BarChartIcon sx={{ fontSize: 32, color: "text.primary" }} />}
+            animationDelay="0.5s"
+          >
+            Statistika
+          </MobileActionCard>
+
+          <MobileActionCard
+            onClick={() => router.push("/manager/announcements")}
+            icon={<CampaignIcon sx={{ fontSize: 32, color: "text.primary" }} />}
+            animationDelay="0.7s"
+          >
+            Obavijesti
+          </MobileActionCard>
         </Box>
       </Box>
     );
@@ -219,54 +223,106 @@ export default function ManagerPage() {
   return (
     <Box
       sx={{
-        height: "100vh",
+        height: `calc(100vh - ${headerHeight}px)`,
         bgcolor: "#f5f5f5",
         p: 5,
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <Typography
         variant="h4"
         fontWeight={780}
-        sx={{ color: "#212222", mb: 4, ml: 4 }}
+        sx={{ color: "#212222", mb: 4, ml: 0 }}
       >
         Dobrodošli{name ? `, ${name}` : ""}!
       </Typography>
 
-      <Box sx={{ px: 4, mt: -3 }}>
+      <Box sx={{ mt: -3 }}>
         <Divider sx={{ borderBottomWidth: 2 }} />
       </Box>
 
       <Box
         sx={{
-          px: 5,
-          py: 6,
+          flex: 1,
+          px: { xs: 2, sm: 5 },
           display: "flex",
-          gap: 3,
-          flexWrap: "wrap",
+          alignItems: "center",
           justifyContent: "center",
         }}
       >
-        <DesktopActionCard
-          icon={<MenuBookIcon sx={{ fontSize: 40, color: "text.primary" }} />}
-          title="Kreiraj dnevni meni"
-          descriptions={[
-            "• Dodavanje jela na dnevni meni",
-            "• Pregled i uklanjanje stavki",
-          ]}
-          onClick={() => router.push("/manager/menu")}
-          animationDelay="0.1s"
-        />
+        <Box
+          sx={{
+            width: "100%",
+            maxWidth: 900, // Limit max width for 2x2 grid
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            mt: -7,
+            gap: 3.5,
+            justifyContent: "center",
+            alignContent: "center",
+          }}
+        >
+          <DesktopActionCard
+            icon={
+              <MenuBookIcon
+                sx={{
+                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                  color: "text.primary",
+                }}
+              />
+            }
+            title="Dnevni meni"
+            descriptions={[]}
+            onClick={() => router.push("/manager/menu")}
+            animationDelay="0.1s"
+          />
 
-        <DesktopActionCard
-          icon={<AccessTimeIcon sx={{ fontSize: 40, color: "text.primary" }} />}
-          title="Radno vrijeme"
-          descriptions={[
-            "• Postavljanje radnog vremena",
-            "• Više smjena po danu",
-          ]}
-          onClick={() => router.push("/manager/hours")}
-          animationDelay="0.3s"
-        />
+          <DesktopActionCard
+            icon={
+              <AccessTimeIcon
+                sx={{
+                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                  color: "text.primary",
+                }}
+              />
+            }
+            title="Radno vrijeme"
+            descriptions={[]}
+            onClick={() => router.push("/manager/hours")}
+            animationDelay="0.3s"
+          />
+
+          <DesktopActionCard
+            icon={
+              <BarChartIcon
+                sx={{
+                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                  color: "text.primary",
+                }}
+              />
+            }
+            title="Statistika"
+            descriptions={[]}
+            onClick={() => router.push("/manager/stats")}
+            animationDelay="0.5s"
+          />
+
+          <DesktopActionCard
+            icon={
+              <CampaignIcon
+                sx={{
+                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                  color: "text.primary",
+                }}
+              />
+            }
+            title="Obavijesti"
+            descriptions={[]}
+            onClick={() => router.push("/manager/announcements")}
+            animationDelay="0.7s"
+          />
+        </Box>
       </Box>
     </Box>
   );

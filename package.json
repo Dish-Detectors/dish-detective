@@ -19,6 +19,7 @@
     "@fontsource/roboto": "^5.2.8",
     "@mui/icons-material": "^7.3.5",
     "@mui/material": "^7.3.4",
+    "@mui/x-charts": "^8.25.0",
     "@vercel/blob": "^2.0.0",
     "@vis.gl/react-google-maps": "^1.7.1",
     "firebase": "^12.8.0",

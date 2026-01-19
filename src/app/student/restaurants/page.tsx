@@ -22,7 +22,7 @@ export default async function StudentRestaurantsPage() {
       </Typography>
       <Box
         sx={{
-          maxWidth: 800,
+          maxWidth: 1200,
           mx: "auto",
           width: "100%",
         }}
