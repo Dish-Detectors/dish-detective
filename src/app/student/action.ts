@@ -82,7 +82,7 @@ export async function getRestaurantOffer(restaurantId: string) {
   ]);
 
   const ratingsMap = new Map(
-    ratingsData.map((r) => [r._id.toString(), r.avgRating])
+    ratingsData.map((r) => [r._id.toString(), r.avgRating]),
   );
 
   return menuItems.map((item) => {
@@ -104,7 +104,7 @@ export async function getRestaurantOffer(restaurantId: string) {
           })
         : "--:--",
       available: item.available,
-      rating: averageRating, 
+      rating: averageRating,
     };
   });
 }
