@@ -28,7 +28,7 @@ export async function sendAnnouncement(
     if (restaurantId) {
       const restaurant = await Restaurant.findById(restaurantId).lean();
       if (restaurant && (restaurant as any).name) {
-        notificationTitle = `Menza ${(restaurant as any).name}`;
+        notificationTitle = `${(restaurant as any).name}`;
       }
     }
   } catch (error) {
@@ -122,11 +122,11 @@ export async function getAnnouncements(type: "worker" | "student") {
           isAdmin: true,
           file: notif.attachment
             ? {
-                name: notif.attachment.name,
-                date: new Date(notif.createdAt).toLocaleDateString(), // Use creation date as file date
-                size: notif.attachment.size,
-                url: notif.attachment.url,
-              }
+              name: notif.attachment.name,
+              date: new Date(notif.createdAt).toLocaleDateString(), // Use creation date as file date
+              size: notif.attachment.size,
+              url: notif.attachment.url,
+            }
             : undefined,
         };
       }),

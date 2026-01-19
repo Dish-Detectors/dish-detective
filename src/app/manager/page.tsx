@@ -11,7 +11,8 @@ import {
 
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import GroupsIcon from "@mui/icons-material/Groups";
+import CampaignIcon from "@mui/icons-material/Campaign";
+import BarChartIcon from "@mui/icons-material/BarChart";
 
 import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -87,13 +88,14 @@ const DesktopActionCard = ({
     onClick={onClick}
     elevation={2}
     sx={{
-      flex: "1 1 360px",
+      width: "100%",
+      height: "100%",
       display: "flex",
       flexDirection: "column",
-      alignItems: "flex-start",
-      minWidth: { xs: 280, md: 360, lg: 400 },
-      maxWidth: { xs: "100%", sm: 460, md: 560, lg: 680 },
-      p: { xs: 3.5, sm: 4.5, md: 5.5 },
+      alignItems: "center",
+      justifyContent: "center",
+      minHeight: 200, // Ensure some height
+      p: { xs: 3.5, sm: 4.5 },
       borderRadius: 3,
       cursor: "pointer",
       transition: "all 0.2s ease-in-out",
@@ -121,19 +123,7 @@ const DesktopActionCard = ({
     >
       {title}
     </Typography>
-    {descriptions.map((desc, index) => (
-      <Typography
-        key={index}
-        sx={{
-          fontSize: "clamp(0.85rem, 1vw, 1.25rem)",
-          fontWeight: "550",
-          color: "text.secondary",
-          pt: index === 0 ? 1 : 0,
-        }}
-      >
-        {desc}
-      </Typography>
-    ))}
+
   </Paper>
 );
 
@@ -199,7 +189,7 @@ export default function ManagerPage() {
             icon={<MenuBookIcon sx={{ fontSize: 32, color: "text.primary" }} />}
             animationDelay="0.1s"
           >
-            Kreiraj dnevni meni
+            Dnevni meni
           </MobileActionCard>
           <MobileActionCard
             onClick={() => router.push("/manager/hours")}
@@ -213,10 +203,18 @@ export default function ManagerPage() {
 
           <MobileActionCard
             onClick={() => router.push("/manager/stats")}
-            icon={<GroupsIcon sx={{ fontSize: 32, color: "text.primary" }} />}
+            icon={<BarChartIcon sx={{ fontSize: 32, color: "text.primary" }} />}
             animationDelay="0.5s"
           >
             Statistika
+          </MobileActionCard>
+
+          <MobileActionCard
+            onClick={() => router.push("/manager/announcements")}
+            icon={<CampaignIcon sx={{ fontSize: 32, color: "text.primary" }} />}
+            animationDelay="0.7s"
+          >
+            Obavijesti
           </MobileActionCard>
         </Box>
       </Box>
@@ -257,10 +255,11 @@ export default function ManagerPage() {
         <Box
           sx={{
             width: "100%",
-            display: "flex",
+            maxWidth: 900, // Limit max width for 2x2 grid
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
             mt: -7,
             gap: 3.5,
-            flexWrap: "wrap",
             justifyContent: "center",
             alignContent: "center",
           }}
@@ -274,11 +273,8 @@ export default function ManagerPage() {
                 }}
               />
             }
-            title="Kreiraj dnevni meni"
-            descriptions={[
-              "• Dodavanje jela na dnevni meni",
-              "• Pregled i uklanjanje stavki",
-            ]}
+            title="Dnevni meni"
+            descriptions={[]}
             onClick={() => router.push("/manager/menu")}
             animationDelay="0.1s"
           />
@@ -293,17 +289,14 @@ export default function ManagerPage() {
               />
             }
             title="Radno vrijeme"
-            descriptions={[
-              "• Postavljanje radnog vremena",
-              "• Više smjena po danu",
-            ]}
+            descriptions={[]}
             onClick={() => router.push("/manager/hours")}
             animationDelay="0.3s"
           />
 
           <DesktopActionCard
             icon={
-              <GroupsIcon
+              <BarChartIcon
                 sx={{
                   fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
                   color: "text.primary",
@@ -311,9 +304,24 @@ export default function ManagerPage() {
               />
             }
             title="Statistika"
-            descriptions={["• Pregled zainteresiranih"]}
+            descriptions={[]}
             onClick={() => router.push("/manager/stats")}
             animationDelay="0.5s"
+          />
+
+          <DesktopActionCard
+            icon={
+              <CampaignIcon
+                sx={{
+                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                  color: "text.primary",
+                }}
+              />
+            }
+            title="Obavijesti"
+            descriptions={[]}
+            onClick={() => router.push("/manager/announcements")}
+            animationDelay="0.7s"
           />
         </Box>
       </Box>
