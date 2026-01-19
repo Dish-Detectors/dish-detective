@@ -44,7 +44,7 @@ export async function getAllStudentNotifications(): Promise<any[]> {
 
   const notifications = await Notification.find({
     type: "student",
-    targetUserId: userId,
+    $or: [{ targetUserId: userId }, { targetUserId: { $exists: false } }],
   })
     .sort({ createdAt: -1 })
     .lean();
@@ -220,6 +220,12 @@ export async function syncDeviceSubscriptions(token: string) {
     const syncPromises = subs.map((sub) =>
       messaging.subscribeToTopic(token, `dish_notify_${sub.menuItemId}`),
     );
+
+    // Also subscribe to general public announcements
+    // In a real app we might check role, but for now we subscribe everyone to students topic
+    // or distinct topics based on their role if available.
+    // The requirement says "student" notifications go to push.
+    syncPromises.push(messaging.subscribeToTopic(token, "topic_all_students"));
 
     await Promise.all(syncPromises);
     return { success: true, count: subs.length };

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, KeyboardEvent } from "react";
+import { useState, KeyboardEvent, useEffect } from "react";
+import { sendAnnouncement, getAnnouncements } from "./actions";
 import {
   Box,
   Typography,
@@ -11,15 +12,26 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import { uploadAttachment } from "./uploadAction";
+
+const formatTime = (date: Date) => {
+  return date.toLocaleTimeString("hr-HR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  });
+};
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import SendIcon from "@mui/icons-material/Send";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DownloadIcon from "@mui/icons-material/Download";
+import CloseIcon from "@mui/icons-material/Close";
 
 interface IFile {
   name: string;
   date: string;
   size: string;
+  url: string; // Added URL
 }
 
 interface IMessage {
@@ -31,21 +43,21 @@ interface IMessage {
 }
 
 interface IAudienceMessages {
-  workers: IMessage[];
-  students: IMessage[];
+  worker: IMessage[];
+  student: IMessage[];
 }
 
 const initialMessages: IAudienceMessages = {
-  workers: [],
-  students: [],
+  worker: [],
+  student: [],
 };
 
 interface AudienceCardProps {
-  type: "workers" | "students";
+  type: "worker" | "student";
   title: string;
   subtitle: string;
   selected: boolean;
-  onClick: (type: "workers" | "students") => void;
+  onClick: (type: "worker" | "student") => void;
 }
 
 const AudienceCard = ({
@@ -85,26 +97,77 @@ export default function AnnouncementChatPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [selectedAudience, setSelectedAudience] = useState<
-    "workers" | "students"
-  >("workers");
-  const [messages, setMessages] = useState<IAudienceMessages>(initialMessages);
+    "worker" | "student"
+  >("worker");
+  // const [messages, setMessages] = useState<IAudienceMessages>(initialMessages); // Removed mock
+  const [messages, setMessages] = useState<IMessage[]>([]);
   const [messageInput, setMessageInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const handleSendMessage = () => {
-    if (!messageInput.trim()) return;
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
 
+  // Fetch messages on mount and when audience changes
+  useEffect(() => {
+    const loadMessages = async () => {
+      setIsLoading(true);
+      const history = await getAnnouncements(selectedAudience);
+      setMessages(history);
+      setIsLoading(false);
+    };
+    loadMessages();
+
+    // Optional: Poll for new messages if multiple managers exist
+    const interval = setInterval(loadMessages, 10000);
+    return () => clearInterval(interval);
+  }, [selectedAudience]);
+
+  const handleSendMessage = async () => {
+    if ((!messageInput.trim() && !selectedFile)) return;
+
+    // 1. Upload file if exists
+    let attachmentData = undefined;
+    if (selectedFile) {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      const uploadRes = await uploadAttachment(formData);
+
+      if (!uploadRes.success || !uploadRes.attachment) {
+        alert("Failed to upload file");
+        setIsUploading(false);
+        return;
+      }
+      attachmentData = uploadRes.attachment;
+      setIsUploading(false);
+    }
+
+    // Optimistic update
+    const optimisticId = Date.now();
     const newMessage: IMessage = {
-      id: Date.now(),
+      id: optimisticId,
       text: messageInput,
-      time: "Just now",
+      time: formatTime(new Date()),
       isAdmin: true,
+      file: attachmentData ? { ...attachmentData, date: new Date().toLocaleDateString() } : undefined
     };
 
-    setMessages((prev: IAudienceMessages) => ({
-      ...prev,
-      [selectedAudience]: [...prev[selectedAudience], newMessage],
-    }));
+    setMessages(prev => [...prev, newMessage]);
     setMessageInput("");
+    setSelectedFile(null); // Clear file selection
+
+    const result = await sendAnnouncement(selectedAudience, newMessage.text, attachmentData);
+    if (!result.success) {
+      // Rollback on failure
+      setMessages(prev => prev.filter(m => m.id !== optimisticId));
+      console.error("Failed to send:", result.error);
+      alert("Neuspješno slanje obavijesti");
+    }
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -126,11 +189,11 @@ export default function AnnouncementChatPage() {
       {/* Header */}
       <Box sx={{ px: isMobile ? 3 : 5, mb: 4 }}>
         <Typography
-          variant="h3"
-          fontWeight={780}
+          variant="h4"
+          fontWeight="bold"
           sx={{ color: "#212222", mb: 2 }}
         >
-          Dobrodošli
+          Obavijesti
         </Typography>
         <Divider
           sx={{ borderBottomWidth: 1.5, borderColor: "rgba(0,0,0,0.1)" }}
@@ -144,23 +207,23 @@ export default function AnnouncementChatPage() {
           display: "flex",
           flexDirection: isMobile ? "column" : "row",
           gap: 4,
-          height: isMobile ? "auto" : `calc(100vh - 200px)`,
+          height: isMobile ? "auto" : `calc(100vh - 250px)`, // Increased offset to clear footer
         }}
       >
         {/* Sidebar */}
         <Box sx={{ width: isMobile ? "100%" : "300px", flexShrink: 0 }}>
           <AudienceCard
-            type="workers"
+            type="worker"
             title="Radnici"
             subtitle="Interna obavijest radnicima"
-            selected={selectedAudience === "workers"}
+            selected={selectedAudience === "worker"}
             onClick={setSelectedAudience}
           />
           <AudienceCard
-            type="students"
+            type="student"
             title="Studenti"
             subtitle="Javna obavijest studentima"
-            selected={selectedAudience === "students"}
+            selected={selectedAudience === "student"}
             onClick={setSelectedAudience}
           />
         </Box>
@@ -212,7 +275,7 @@ export default function AnnouncementChatPage() {
               </Typography>
             </Box>
 
-            {messages[selectedAudience].map((msg) => (
+            {messages.map((msg) => (
               <Box
                 key={msg.id}
                 sx={{
@@ -223,12 +286,7 @@ export default function AnnouncementChatPage() {
                   alignItems: "flex-end",
                 }}
               >
-                <Typography
-                  variant="caption"
-                  sx={{ color: "text.secondary", mb: 0.5, mr: 1 }}
-                >
-                  {msg.time}
-                </Typography>
+
                 <Box
                   sx={{
                     bgcolor: "#5faef4",
@@ -240,8 +298,13 @@ export default function AnnouncementChatPage() {
                 >
                   <Typography variant="body1">{msg.text}</Typography>
 
+                  {/* Attachment render */}
                   {msg.file && (
                     <Box
+                      component={msg.file.url ? "a" : "div"}
+                      href={msg.file.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       sx={{
                         mt: 1.5,
                         bgcolor: "white",
@@ -250,8 +313,13 @@ export default function AnnouncementChatPage() {
                         display: "flex",
                         alignItems: "center",
                         gap: 2,
+                        textDecoration: "none",
                         color: "text.primary",
                         minWidth: 240,
+                        cursor: msg.file.url ? 'pointer' : 'default',
+                        "&:hover": {
+                          bgcolor: "grey.100"
+                        }
                       }}
                     >
                       <PictureAsPdfIcon
@@ -271,12 +339,26 @@ export default function AnnouncementChatPage() {
                     </Box>
                   )}
                 </Box>
+                {/* Time Below */}
+                <Typography
+                  variant="caption"
+                  sx={{ color: "text.secondary", mt: 0.5, mr: 1, fontSize: '0.7rem' }}
+                >
+                  {msg.time}
+                </Typography>
               </Box>
             ))}
           </Box>
 
           {/* Input Bar */}
           <Box sx={{ p: 3, bgcolor: "white" }}>
+            {selectedFile && (
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, px: 2 }}>
+                <AttachFileIcon fontSize="small" color="action" />
+                <Typography variant="caption" sx={{ ml: 1 }}>{selectedFile.name}</Typography>
+                <IconButton size="small" onClick={() => setSelectedFile(null)}><CloseIcon fontSize="small" /></IconButton>
+              </Box>
+            )}
             <Box
               sx={{
                 display: "flex",
@@ -290,27 +372,38 @@ export default function AnnouncementChatPage() {
                 },
               }}
             >
-              <IconButton
-                size="small"
-                sx={{ color: "text.secondary", mr: 1 }}
-                aria-label="attach file"
-              >
-                <AttachFileIcon />
-              </IconButton>
+              <input
+                accept="*/*"
+                style={{ display: "none" }}
+                id="attachment-button-file"
+                type="file"
+                onChange={handleFileSelect}
+              />
+              <label htmlFor="attachment-button-file">
+                <IconButton
+                  size="small"
+                  sx={{ color: selectedFile ? "primary.main" : "text.secondary", mr: 1 }}
+                  aria-label="attach file"
+                  component="span"
+                >
+                  <AttachFileIcon />
+                </IconButton>
+              </label>
               <InputBase
                 fullWidth
-                placeholder="Enter your message"
+                placeholder="Unesite poruku..."
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
                 onKeyDown={handleKeyDown}
+                disabled={isUploading}
                 sx={{ flexGrow: 1, fontSize: "0.95rem" }}
               />
               <IconButton
                 onClick={handleSendMessage}
-                disabled={!messageInput.trim()}
+                disabled={(!messageInput.trim() && !selectedFile) || isUploading}
                 aria-label="send message"
                 sx={{
-                  bgcolor: messageInput.trim() ? "#5faef4" : "rgba(0,0,0,0.05)",
+                  bgcolor: (messageInput.trim() || selectedFile) ? "#5faef4" : "rgba(0,0,0,0.05)",
                   color: "white",
                   "&:hover": {
                     bgcolor: "#4a9ce6",

@@ -9,6 +9,12 @@ export interface INotification extends Document {
   targetUserId?: string; // Specific recipient (student)
   createdAt: Date;
   type: "worker" | "student";
+  attachment?: {
+    name: string;
+    url: string;
+    type: string;
+    size: string;
+  };
 }
 
 const notifSchema = new Schema<INotification>(
@@ -31,6 +37,12 @@ const notifSchema = new Schema<INotification>(
       type: String,
       enum: ["worker", "student"],
       required: [true, "Type is required"],
+    },
+    attachment: {
+      name: String,
+      url: String,
+      type: String,
+      size: String
     },
     postedBy: {
       type: String,
