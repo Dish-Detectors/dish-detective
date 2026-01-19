@@ -9,6 +9,7 @@ export interface INotification extends Document {
   targetUserId?: string; // Specific recipient (student)
   createdAt: Date;
   type: "worker" | "student";
+  read: boolean;
   attachment?: {
     name: string;
     url: string;
@@ -50,6 +51,10 @@ const notifSchema = new Schema<INotification>(
     },
     targetUserId: {
       type: String,
+    },
+    read: {
+      type: Boolean,
+      default: false,
     },
     createdAt: {
       type: Date,

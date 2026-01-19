@@ -14,13 +14,13 @@ notifikacije biti obaviješteni o promijeni jelovnika, odnosno dostupnosti nekog
 Samo sučelje aplikacije ovisiti će o vrsti korisnika.
 
 # Tehnologije
-Frontend: React.js, HTML5, TailwindCSS
+Frontend: React.js, HTML5
 
 Backend: Next.js
 
 Baza podataka: MongoDB
 
-Autentifikacije: NextAuth.js
+Autentifikacije: Clerk
 
 Servis za obavijesti: Firebase Cloud Messaging
 
