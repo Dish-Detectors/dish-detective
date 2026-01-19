@@ -2,6 +2,7 @@
 
 import Restaurant, { Location, IWorkingDay } from "../../../models/Restaurant";
 import dbConnect from "../../../utils/dbConnect";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { Types } from "mongoose";
 
 type RestaurantInput = {
@@ -210,6 +211,97 @@ export async function updateRestaurant(
     return {
       success: false,
       message: "Failed to update restaurant. Please try again.",
+    };
+  }
+}
+
+
+export async function getManagerForRestaurant(restaurantId: string): Promise<ActionResponse> {
+  try {
+    // Verify the current user is an admin
+    const { userId, sessionClaims } = await auth();
+    if (!userId) {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    if (sessionClaims?.metadata?.role !== "admin") {
+      return {
+        success: false,
+        message: "Only admins can view employee accounts",
+      };
+    }
+
+    const client = await clerkClient();
+
+    // Fetch all users from Clerk
+    // Note: In a large app, you'd use pagination or filter by metadata if Clerk supports it directly in listUsers
+    const clerkUsersResponse = await client.users.getUserList({
+      limit: 100, // Adjust as needed
+    });
+
+    const employees = clerkUsersResponse.data.filter(
+      (user) =>
+        user.publicMetadata.role === "manager" ||
+        user.publicMetadata.role === "worker",
+    );
+
+    if (employees.length === 0) {
+      return {
+        success: true,
+        message: "No employees found",
+        data: [],
+      };
+    }
+
+    await dbConnect();
+
+    // Fetch data for each employee
+    const employeeDataPromises = employees.map(async (clerkUser) => {
+      try {
+        const restaurantId = clerkUser.publicMetadata.restaurantId as string;
+        return {
+          id: clerkUser.id,
+          firstName: clerkUser.firstName || "",
+          lastName: clerkUser.lastName || "",
+          restaurantId,
+          role: clerkUser.publicMetadata.role as "manager" | "worker",
+        };
+      } catch (error) {
+        console.error(
+          `Error fetching data for employee ${clerkUser.id}:`,
+          error,
+        );
+        return {
+          id: clerkUser.id,
+          firstName: clerkUser.firstName || "Unknown",
+          lastName: clerkUser.lastName || "Unknown",
+          restaurantId: "Unknown",
+          role: clerkUser.publicMetadata.role as "manager" | "worker",
+        };
+      }
+    });
+
+    const employeeData = await Promise.all(employeeDataPromises);
+
+    let userid;
+    for (const employee of employeeData) {
+      if (employee.restaurantId && Types.ObjectId.isValid(employee.restaurantId) && employee.restaurantId === restaurantId) {
+        userid = employee.id;
+      } else {
+        userid = "Unknown";
+      }
+    }
+
+    return {
+      success: true,
+      message: `Retrieved ${userid} manager of restaurant ${restaurantId}`,
+      data: userid,
+    };
+  } catch (error: any) {
+    console.error("Error retrieving employees:", error);
+    return {
+      success: false,
+      message: "Failed to retrieve employee accounts",
     };
   }
 }
