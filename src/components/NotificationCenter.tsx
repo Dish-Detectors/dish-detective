@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Typography,
@@ -22,7 +22,6 @@ import {
   Stack,
 } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import CheckIcon from "@mui/icons-material/Check";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -55,10 +54,21 @@ export default function NotificationCenter({
   const [loading, setLoading] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const notificationsRef = useRef(notifications);
+
+  useEffect(() => {
+    notificationsRef.current = notifications;
+  }, [notifications]);
 
   useEffect(() => {
     if (open) {
       loadNotifications();
+    } else {
+      // When closing, check if there are unread notifications and mark them
+      // Using ref to access latest state without adding dependency
+      if (notificationsRef.current.some((n) => !n.read)) {
+        handleMarkAllRead();
+      }
     }
   }, [open]);
 
@@ -142,6 +152,9 @@ export default function NotificationCenter({
     }
     // Only close if dialog is not open
     if (!confirmDeleteOpen && !previewImage) {
+      if (hasUnread) {
+        handleMarkAllRead();
+      }
       onClose();
     }
   };
@@ -192,15 +205,6 @@ export default function NotificationCenter({
                 Obavijesti
               </Typography>
               <Box>
-                {hasUnread && (
-                  <Button
-                    size="small"
-                    onClick={handleMarkAllRead}
-                    sx={{ textTransform: "none", fontSize: "0.8rem", mr: 1 }}
-                  >
-                    Označi sve pročitano
-                  </Button>
-                )}
                 {notifications.length > 0 && (
                   <Tooltip title="Obriši sve">
                     <IconButton
@@ -379,20 +383,6 @@ export default function NotificationCenter({
                           gap: 0.5,
                         }}
                       >
-                        {!notif.read && (
-                          <Tooltip title="Označi kao pročitano">
-                            <IconButton
-                              size="small"
-                              onClick={(e) => handleMarkOneRead(notif._id, e)}
-                              sx={{
-                                color: "primary.main",
-                                "&:hover": { bgcolor: "primary.lighter" },
-                              }}
-                            >
-                              <CheckIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        )}
                         <Tooltip title="Obriši">
                           <IconButton
                             size="small"
