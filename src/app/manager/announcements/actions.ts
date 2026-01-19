@@ -28,7 +28,7 @@ export async function sendAnnouncement(
     if (restaurantId) {
       const restaurant = await Restaurant.findById(restaurantId).lean();
       if (restaurant && (restaurant as any).name) {
-        notificationTitle = `Menza ${(restaurant as any).name}`;
+        notificationTitle = `${(restaurant as any).name}`;
       }
     }
   } catch (error) {

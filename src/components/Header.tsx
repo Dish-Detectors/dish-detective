@@ -175,6 +175,23 @@ export default function Header() {
   const homeHref = userRole ? `/${userRole}` : "/";
   const isWorker = userRole === "worker" || pathname.startsWith("/worker");
 
+  // State for restaurant name
+  const [restaurantName, setRestaurantName] = React.useState<string | null>(
+    null,
+  );
+
+  React.useEffect(() => {
+    if (userRole === "worker" || userRole === "manager") {
+      import("@/app/admin/actions").then(({ getRestaurantName }) => {
+        getRestaurantName().then((result) => {
+          if (result.success && result.name) {
+            setRestaurantName(result.name);
+          }
+        });
+      });
+    }
+  }, [userRole]);
+
   // Non-homepage header (blue header)
   return (
     <AppBar position="static" sx={{ bgcolor: "#56aaf4" }}>
@@ -217,22 +234,21 @@ export default function Header() {
         </Box>
 
         <Box sx={{ display: "flex", gap: { xs: 2, md: 3 } }}>
-          {isWorker && (
-            <Typography
-              variant="body2"
-              sx={{
-                display: { xs: "none", sm: "flex" },
-                alignItems: "center",
-                color: "white",
-                fontWeight: 600,
-                whiteSpace: "nowrap",
-                textDecoration: "underline",
-                textUnderlineOffset: "4px",
-              }}
-            >
-              Ime menze u kojoj radi
-            </Typography>
-          )}
+          <Typography
+            variant="body1"
+            sx={{
+              display: { xs: "none", sm: "flex" },
+              alignItems: "center",
+              color: "white",
+              fontWeight: 700,
+              fontSize: "1.1rem",
+              whiteSpace: "nowrap",
+              textDecoration: "underline",
+              textUnderlineOffset: "4px",
+            }}
+          >
+            {restaurantName}
+          </Typography>
 
           <Button
             sx={{
