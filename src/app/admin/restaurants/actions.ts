@@ -215,8 +215,9 @@ export async function updateRestaurant(
   }
 }
 
-
-export async function getManagerForRestaurant(restaurantId: string): Promise<ActionResponse> {
+export async function getManagerForRestaurant(
+  restaurantId: string,
+): Promise<ActionResponse> {
   try {
     // Verify the current user is an admin
     const { userId, sessionClaims } = await auth();
@@ -283,19 +284,23 @@ export async function getManagerForRestaurant(restaurantId: string): Promise<Act
 
     const employeeData = await Promise.all(employeeDataPromises);
 
-    let userid;
+    let userids: string[] = [];
     for (const employee of employeeData) {
-      if (employee.restaurantId && Types.ObjectId.isValid(employee.restaurantId) && employee.restaurantId === restaurantId) {
-        userid = employee.id;
+      if (
+        employee.restaurantId &&
+        Types.ObjectId.isValid(employee.restaurantId) &&
+        employee.restaurantId === restaurantId
+      ) {
+        userids.push(employee.id);
       } else {
-        userid = "Unknown";
+        userids = ["Unknown"];
       }
     }
 
     return {
       success: true,
-      message: `Retrieved ${userid} manager of restaurant ${restaurantId}`,
-      data: userid,
+      message: `Retrieved ${userids} manager of restaurant ${restaurantId}`,
+      data: userids,
     };
   } catch (error: any) {
     console.error("Error retrieving employees:", error);
