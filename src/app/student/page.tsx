@@ -245,7 +245,14 @@ export default function Page() {
           }}
         >
           <DesktopActionCard
-            icon={<RestaurantIcon sx={{ fontSize: { xs: 44, sm: 52, md: 60, lg: 68 }, color: "text.primary" }} />}
+            icon={
+              <RestaurantIcon
+                sx={{
+                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                  color: "text.primary",
+                }}
+              />
+            }
             title="Popis restorana"
             descriptions={[]}
             onClick={() => router.push("/student/restaurants")}
@@ -253,7 +260,14 @@ export default function Page() {
           />
 
           <DesktopActionCard
-            icon={<MapIcon sx={{ fontSize: { xs: 44, sm: 52, md: 60, lg: 68 }, color: "text.primary" }} />}
+            icon={
+              <MapIcon
+                sx={{
+                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                  color: "text.primary",
+                }}
+              />
+            }
             title="Karta"
             descriptions={[]}
             onClick={() => router.push("/student/map")}

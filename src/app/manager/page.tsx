@@ -123,7 +123,6 @@ const DesktopActionCard = ({
     >
       {title}
     </Typography>
-
   </Paper>
 );
 

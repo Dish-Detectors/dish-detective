@@ -30,8 +30,6 @@ export async function getCurrentUserFirstName() {
   }
 }
 
-
-
 export async function getRestaurantName() {
   try {
     const { userId } = await auth();
