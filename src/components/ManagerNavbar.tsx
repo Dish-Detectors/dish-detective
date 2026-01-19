@@ -6,6 +6,7 @@ import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 
 export const navWidth = 80;
 export const headerHeight = 64;
@@ -97,6 +98,12 @@ export default function ManagerNavbar({
           sx={getIconButtonStyle("/manager/stats")}
         >
           <BarChartIcon />
+        </IconButton>
+        <IconButton
+          onClick={() => router.push("/manager/announcements")}
+          sx={getIconButtonStyle("/manager/announcements")}
+        >
+          <NotificationsIcon />
         </IconButton>
       </Stack>
     </Box>
