@@ -2,6 +2,7 @@
 
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import Notification from "@/models/Notification";
+import Restaurant from "@/models/Restaurant";
 import dbConnect from "@/utils/dbConnect";
 import { revalidatePath } from "next/cache";
 
@@ -18,9 +19,26 @@ export async function sendAnnouncement(
 
     await dbConnect();
 
+    let notificationTitle = "Obavijest";
+    try {
+        const client = await clerkClient();
+        const user = await client.users.getUser(userId);
+        const restaurantId = user.publicMetadata?.restaurantId as string;
+
+        if (restaurantId) {
+            const restaurant = await Restaurant.findById(restaurantId).lean();
+            if (restaurant && (restaurant as any).name) {
+                notificationTitle = `Menza ${(restaurant as any).name}`;
+            }
+        }
+    } catch (error) {
+        console.error("Failed to fetch restaurant name for title:", error);
+        // Fallback to default title
+    }
+
     try {
         const notification = await Notification.create({
-            title: "Obavijest", // Default title
+            title: notificationTitle,
             description: text,
             type: type,
             postedBy: userId,
@@ -34,8 +52,8 @@ export async function sendAnnouncement(
                 await messaging.send({
                     topic: "topic_all_students",
                     notification: {
-                        title: "Nova obavijest 📢",
-                        body: text,
+                        title: notificationTitle,
+                        body: text || "Nova datoteka", // Fallback if text is empty (attachment only)
                     },
                     data: {
                         type: "announcement",

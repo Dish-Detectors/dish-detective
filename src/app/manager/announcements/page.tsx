@@ -11,6 +11,8 @@ import {
   InputBase,
   useMediaQuery,
   useTheme,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { uploadAttachment } from "./uploadAction";
 
@@ -105,6 +107,11 @@ export default function AnnouncementChatPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({ open: false, message: "", severity: "success" });
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -139,7 +146,11 @@ export default function AnnouncementChatPage() {
       const uploadRes = await uploadAttachment(formData);
 
       if (!uploadRes.success || !uploadRes.attachment) {
-        alert("Failed to upload file");
+        setSnackbar({
+          open: true,
+          message: "Neuspješno učitavanje datoteke",
+          severity: "error",
+        });
         setIsUploading(false);
         return;
       }
@@ -166,7 +177,11 @@ export default function AnnouncementChatPage() {
       // Rollback on failure
       setMessages(prev => prev.filter(m => m.id !== optimisticId));
       console.error("Failed to send:", result.error);
-      alert("Neuspješno slanje obavijesti");
+      setSnackbar({
+        open: true,
+        message: "Neuspješno slanje obavijesti",
+        severity: "error",
+      });
     }
   };
 
@@ -417,6 +432,19 @@ export default function AnnouncementChatPage() {
           </Box>
         </Paper>
       </Box>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+      >
+        <Alert
+          severity={snackbar.severity}
+          sx={{ borderRadius: 3, fontWeight: 500 }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

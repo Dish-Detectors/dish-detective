@@ -28,8 +28,9 @@ const notifSchema = new Schema<INotification>(
     },
     description: {
       type: String,
-      required: [true, "Description is required"],
+      // required: [true, "Description is required"], // Removed requirement to allow attachment-only messages
       trim: true,
+      default: "",
     },
     imageUrl: {
       type: String,
@@ -40,10 +41,10 @@ const notifSchema = new Schema<INotification>(
       required: [true, "Type is required"],
     },
     attachment: {
-      name: String,
-      url: String,
-      type: String,
-      size: String
+      name: { type: String },
+      url: { type: String },
+      type: { type: String },
+      size: { type: String }
     },
     postedBy: {
       type: String,

@@ -3,7 +3,7 @@
 import { Box, Stack, IconButton } from "@mui/material";
 import { usePathname, useRouter } from "next/navigation";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
-import SmsIcon from "@mui/icons-material/Sms";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 import NotificationCenter from "./NotificationCenter";
 import React from "react";
 
@@ -47,21 +47,21 @@ export default function WorkerNavbar({ isMobile = false }: WorkerNavbarProps) {
         position: "fixed",
         ...(isMobile
           ? {
-              top: "auto",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              width: "100%",
-              height: "64px",
-              boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
-            }
+            top: "auto",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            width: "100%",
+            height: "64px",
+            boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
+          }
           : {
-              top: `${headerHeight}px`,
-              left: 0,
-              bottom: 0,
-              width: `${navWidth}px`,
-              boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
-            }),
+            top: `${headerHeight}px`,
+            left: 0,
+            bottom: 0,
+            width: `${navWidth}px`,
+            boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
+          }),
         bgcolor: "common.white",
         display: "flex",
         flexDirection: isMobile ? "row" : "column",
@@ -108,7 +108,7 @@ export default function WorkerNavbar({ isMobile = false }: WorkerNavbarProps) {
           aria-label="Notifications"
           disableRipple
         >
-          <SmsIcon />
+          <NotificationsIcon />
         </IconButton>
       </Stack>
 

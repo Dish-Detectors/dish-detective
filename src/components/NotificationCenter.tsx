@@ -18,11 +18,14 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  Skeleton,
+  Stack,
 } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import CheckIcon from "@mui/icons-material/Check";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import DownloadIcon from "@mui/icons-material/Download";
 import {
   getAllStudentNotifications,
   getAllWorkerNotifications,
@@ -51,6 +54,7 @@ export default function NotificationCenter({
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [loading, setLoading] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (open) {
@@ -137,7 +141,7 @@ export default function NotificationCenter({
       return;
     }
     // Only close if dialog is not open
-    if (!confirmDeleteOpen) {
+    if (!confirmDeleteOpen && !previewImage) {
       onClose();
     }
   };
@@ -220,16 +224,18 @@ export default function NotificationCenter({
               }}
             >
               {loading ? (
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: 200,
-                  }}
-                >
-                  <PancakeStackLoader />
-                </Box>
+                <Stack spacing={2} sx={{ p: 2 }}>
+                  {[1, 2, 3].map((i) => (
+                    <Box key={i} sx={{ display: "flex", width: "100%" }}>
+                      <Skeleton variant="rectangular" width={48} height={48} sx={{ mr: 2, borderRadius: 2 }} />
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Skeleton variant="text" width="60%" height={24} sx={{ mb: 0.5 }} />
+                        <Skeleton variant="text" width="90%" height={20} />
+                        <Skeleton variant="text" width="40%" height={16} />
+                      </Box>
+                    </Box>
+                  ))}
+                </Stack>
               ) : notifications.length === 0 ? (
                 <Box sx={{ p: 4, textAlign: "center", opacity: 0.6 }}>
                   <NotificationsNoneIcon
@@ -260,6 +266,10 @@ export default function NotificationCenter({
                         <Box
                           component="img"
                           src={notif.imageUrl}
+                          onClick={(e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            setPreviewImage(notif.imageUrl || null);
+                          }}
                           sx={{
                             width: 48,
                             height: 48,
@@ -268,8 +278,52 @@ export default function NotificationCenter({
                             mr: 2,
                             mt: 0.5,
                             boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                            cursor: "pointer",
+                            "&:hover": { opacity: 0.9 }
                           }}
                         />
+                      )}
+
+                      {/* Attachment Rendering */}
+                      {notif.attachment && (
+                        <Box sx={{ mr: 2, mt: 0.5 }}>
+                          {notif.attachment.type.startsWith("image/") ? (
+                            <Box
+                              component="img"
+                              src={notif.attachment.url}
+                              onClick={(e: React.MouseEvent) => {
+                                e.stopPropagation();
+                                setPreviewImage(notif.attachment?.url || null);
+                              }}
+                              sx={{
+                                width: 48,
+                                height: 48,
+                                borderRadius: 2,
+                                objectFit: "cover",
+                                boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                                cursor: "pointer",
+                                "&:hover": { opacity: 0.9 }
+                              }}
+                            />
+                          ) : (
+                            <IconButton
+                              component="a"
+                              href={notif.attachment.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              sx={{
+                                width: 48,
+                                height: 48,
+                                bgcolor: "grey.100",
+                                borderRadius: 2,
+                                "&:hover": { bgcolor: "grey.200" }
+                              }}
+                            >
+                              <DownloadIcon color="action" />
+                            </IconButton>
+                          )}
+                        </Box>
                       )}
                       <Box sx={{ flexGrow: 1 }}>
                         <Box
@@ -385,6 +439,32 @@ export default function NotificationCenter({
             Obriši sve
           </Button>
         </DialogActions>
+      </Dialog>
+
+      {/* Image Preview Dialog */}
+      <Dialog
+        open={Boolean(previewImage)}
+        onClose={() => {
+          // Delay closing to prevent ClickAwayListener from firing immediately
+          // and closing the entire notification center because previewImage became null too fast.
+          setTimeout(() => setPreviewImage(null), 0);
+        }}
+        maxWidth="md"
+        fullWidth
+        onClick={() => setTimeout(() => setPreviewImage(null), 0)}
+        sx={{ "& .MuiDialog-paper": { bgcolor: "transparent", boxShadow: "none", overflow: "hidden" } }}
+      >
+        <Box
+          component="img"
+          src={previewImage || undefined}
+          sx={{
+            width: "100%",
+            height: "auto",
+            maxHeight: "90vh",
+            objectFit: "contain",
+            cursor: "pointer"
+          }}
+        />
       </Dialog>
     </>
   );
