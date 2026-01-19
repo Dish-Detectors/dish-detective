@@ -81,7 +81,9 @@ export default function NotificationCenter({
     try {
       await markAllNotificationsAsRead();
       // Update local state to reflect read status
-      setNotifications(prev => prev.map(n => ({ ...n, read: true } as any)));
+      setNotifications((prev) =>
+        prev.map((n) => ({ ...n, read: true }) as any),
+      );
       if (onRead) onRead();
     } catch (error) {
       console.error("Failed to mark all as read", error);
@@ -93,7 +95,7 @@ export default function NotificationCenter({
     try {
       await markNotificationAsRead(id);
       setNotifications((prev) =>
-        prev.map((n) => (n._id === id ? { ...n, read: true } : n) as any)
+        prev.map((n) => (n._id === id ? { ...n, read: true } : n) as any),
       );
       if (onRead) onRead();
     } catch (error) {
@@ -140,7 +142,7 @@ export default function NotificationCenter({
     }
   };
 
-  const hasUnread = notifications.some(n => !n.read);
+  const hasUnread = notifications.some((n) => !n.read);
 
   return (
     <>
@@ -320,7 +322,7 @@ export default function NotificationCenter({
                           top: 8,
                           right: 8,
                           display: "flex",
-                          gap: 0.5
+                          gap: 0.5,
                         }}
                       >
                         {!notif.read && (
@@ -358,9 +360,9 @@ export default function NotificationCenter({
                 </List>
               )}
             </Box>
-          </Paper >
-        </Fade >
-      </ClickAwayListener >
+          </Paper>
+        </Fade>
+      </ClickAwayListener>
 
       <Dialog
         open={confirmDeleteOpen}
@@ -373,7 +375,8 @@ export default function NotificationCenter({
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Jeste li sigurni da želite obrisati sve obavijesti? Ova radnja se ne može poništiti.
+            Jeste li sigurni da želite obrisati sve obavijesti? Ova radnja se ne
+            može poništiti.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

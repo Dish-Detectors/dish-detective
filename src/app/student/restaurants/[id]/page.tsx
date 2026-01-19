@@ -37,7 +37,9 @@ export default async function RestaurantOfferPage({
   const { id } = await params;
   await dbConnect();
   // Cast to unknown first to avoid "neither type sufficiently overlaps" error
-  const restaurant = (await Restaurant.findById(id).lean()) as unknown as IRestaurant;
+  const restaurant = (await Restaurant.findById(
+    id,
+  ).lean()) as unknown as IRestaurant;
   const offer = await getRestaurantOffer(id);
   const subscriptions = await getUserSubscriptions();
 
@@ -86,7 +88,12 @@ export default async function RestaurantOfferPage({
             <Typography variant="h3" fontWeight="800" gutterBottom>
               {restaurant.name}
             </Typography>
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={1}
+              sx={{ mb: 3 }}
+            >
               <LocationOnIcon color="action" />
               <Typography variant="h6" color="text.secondary">
                 {restaurant.address}
@@ -158,7 +165,9 @@ export default async function RestaurantOfferPage({
                         new Date().getDay() === wh.day ? "bold" : "medium"
                       }
                       color={
-                        new Date().getDay() === wh.day ? "primary.main" : "text.primary"
+                        new Date().getDay() === wh.day
+                          ? "primary.main"
+                          : "text.primary"
                       }
                     >
                       {wh.shifts.map((s) => `${s.start} - ${s.end}`).join(", ")}
@@ -184,12 +193,12 @@ export default async function RestaurantOfferPage({
       {offer.length === 0 ? (
         <Box
           sx={{
-            textAlign: 'center',
+            textAlign: "center",
             py: 8,
-            bgcolor: 'grey.50',
+            bgcolor: "grey.50",
             borderRadius: 4,
-            border: '1px dashed',
-            borderColor: 'divider'
+            border: "1px dashed",
+            borderColor: "divider",
           }}
         >
           <Typography variant="h6" color="text.secondary">

@@ -237,7 +237,7 @@ export async function markNotificationAsRead(notificationId: string) {
   try {
     await Notification.findOneAndUpdate(
       { _id: notificationId, targetUserId: userId },
-      { read: true }
+      { read: true },
     );
     return { success: true };
   } catch (error: any) {
@@ -253,7 +253,7 @@ export async function markAllNotificationsAsRead() {
   try {
     await Notification.updateMany(
       { targetUserId: userId, read: false },
-      { read: true }
+      { read: true },
     );
     return { success: true };
   } catch (error: any) {

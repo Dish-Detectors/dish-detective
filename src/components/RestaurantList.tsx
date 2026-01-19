@@ -104,11 +104,27 @@ export default function RestaurantList({ restaurants }: RestaurantListProps) {
                 </Box>
 
                 {/* Info Section */}
-                <Box sx={{ ml: 2, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                  <Typography variant="h6" fontWeight="800" sx={{ lineHeight: 1.2, mb: 0.5 }}>
+                <Box
+                  sx={{
+                    ml: 2,
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Typography
+                    variant="h6"
+                    fontWeight="800"
+                    sx={{ lineHeight: 1.2, mb: 0.5 }}
+                  >
                     {restaurant.name}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.3 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ lineHeight: 1.3 }}
+                  >
                     {restaurant.address}
                   </Typography>
                 </Box>
@@ -126,28 +142,44 @@ export default function RestaurantList({ restaurants }: RestaurantListProps) {
                     gap: 1,
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                     <Chip
-                      label={status === 'open' ? 'Otvoreno' : status === 'closed' ? 'Zatvoreno' : status === 'closing_soon' ? 'Zatvara se uskoro' : 'Otvara se uskoro'}
+                      label={
+                        status === "open"
+                          ? "Otvoreno"
+                          : status === "closed"
+                            ? "Zatvoreno"
+                            : status === "closing_soon"
+                              ? "Zatvara se uskoro"
+                              : "Otvara se uskoro"
+                      }
                       color={statusColor}
                       size="small"
                       sx={{
                         fontWeight: 600,
-                        color: 'white',
-                        height: 24
+                        color: "white",
+                        height: 24,
                       }}
                     />
                     <Typography
                       variant="body2"
                       fontWeight="600"
-                      color={statusColor === 'default' ? 'text.primary' : `${statusColor}.main`}
+                      color={
+                        statusColor === "default"
+                          ? "text.primary"
+                          : `${statusColor}.main`
+                      }
                     >
                       {message}
                     </Typography>
                   </Box>
 
                   {isToday && (
-                    <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ ml: 0.5 }}
+                    >
                       Danas: {workingHoursString}
                     </Typography>
                   )}
