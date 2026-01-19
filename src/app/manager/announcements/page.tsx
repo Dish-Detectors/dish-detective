@@ -36,41 +36,9 @@ interface IAudienceMessages {
   students: IMessage[];
 }
 
-// Mock data based on the screenshot
 const initialMessages: IAudienceMessages = {
-  workers: [
-    {
-      id: 1,
-      text: "Dolor sit amet, consectetur adipiscing elit. Hendrerit",
-      time: "5min ago",
-      isAdmin: true,
-    },
-    {
-      id: 2,
-      text: "Dokumenti o otpustu Milice Radović.",
-      time: "5min ago",
-      isAdmin: true,
-      file: {
-        name: "Otpust",
-        date: "22 Jun, 2022",
-        size: "238 KB",
-      },
-    },
-    {
-      id: 3,
-      text: "Iz ponude trajno izbacujemo sarmu.",
-      time: "5min ago",
-      isAdmin: true,
-    },
-  ],
-  students: [
-    {
-      id: 4,
-      text: "Dragi studenti, obavještavamo vas o novom radnom vremenu menze.",
-      time: "1h ago",
-      isAdmin: true,
-    },
-  ],
+  workers: [],
+  students: [],
 };
 
 interface AudienceCardProps {
@@ -81,7 +49,13 @@ interface AudienceCardProps {
   onClick: (type: "workers" | "students") => void;
 }
 
-const AudienceCard = ({ type, title, subtitle, selected, onClick }: AudienceCardProps) => (
+const AudienceCard = ({
+  type,
+  title,
+  subtitle,
+  selected,
+  onClick,
+}: AudienceCardProps) => (
   <Paper
     onClick={() => onClick(type)}
     elevation={selected ? 1 : 0}
@@ -111,7 +85,9 @@ const AudienceCard = ({ type, title, subtitle, selected, onClick }: AudienceCard
 export default function AnnouncementChatPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [selectedAudience, setSelectedAudience] = useState<"workers" | "students">("workers");
+  const [selectedAudience, setSelectedAudience] = useState<
+    "workers" | "students"
+  >("workers");
   const [messages, setMessages] = useState<IAudienceMessages>(initialMessages);
   const [messageInput, setMessageInput] = useState("");
 
@@ -160,7 +136,9 @@ export default function AnnouncementChatPage() {
           >
             Dobrodošli
           </Typography>
-          <Divider sx={{ borderBottomWidth: 1.5, borderColor: "rgba(0,0,0,0.1)" }} />
+          <Divider
+            sx={{ borderBottomWidth: 1.5, borderColor: "rgba(0,0,0,0.1)" }}
+          />
         </Box>
 
         {/* Content Area */}
@@ -217,7 +195,23 @@ export default function AnnouncementChatPage() {
               }}
             >
               <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
-                <Typography variant="caption" sx={{ color: "text.secondary", position: 'relative', '&:before, &:after': { content: '""', position: 'absolute', top: '50%', width: '40px', height: '1px', bgcolor: 'rgba(0,0,0,0.1)' }, '&:before': { right: '100%', mr: 2 }, '&:after': { left: '100%', ml: 2 } }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "text.secondary",
+                    position: "relative",
+                    "&:before, &:after": {
+                      content: '""',
+                      position: "absolute",
+                      top: "50%",
+                      width: "40px",
+                      height: "1px",
+                      bgcolor: "rgba(0,0,0,0.1)",
+                    },
+                    "&:before": { right: "100%", mr: 2 },
+                    "&:after": { left: "100%", ml: 2 },
+                  }}
+                >
                   Today
                 </Typography>
               </Box>
@@ -233,7 +227,10 @@ export default function AnnouncementChatPage() {
                     alignItems: "flex-end",
                   }}
                 >
-                  <Typography variant="caption" sx={{ color: "text.secondary", mb: 0.5, mr: 1 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "text.secondary", mb: 0.5, mr: 1 }}
+                  >
                     {msg.time}
                   </Typography>
                   <Box
@@ -246,7 +243,7 @@ export default function AnnouncementChatPage() {
                     }}
                   >
                     <Typography variant="body1">{msg.text}</Typography>
-                    
+
                     {msg.file && (
                       <Box
                         sx={{
@@ -261,7 +258,9 @@ export default function AnnouncementChatPage() {
                           minWidth: 240,
                         }}
                       >
-                        <PictureAsPdfIcon sx={{ color: "#f44336", fontSize: 32 }} />
+                        <PictureAsPdfIcon
+                          sx={{ color: "#f44336", fontSize: 32 }}
+                        />
                         <Box sx={{ flexGrow: 1 }}>
                           <Typography variant="subtitle2" fontWeight={700}>
                             {msg.file.name}
@@ -295,7 +294,11 @@ export default function AnnouncementChatPage() {
                   },
                 }}
               >
-                <IconButton size="small" sx={{ color: "text.secondary", mr: 1 }} aria-label="attach file">
+                <IconButton
+                  size="small"
+                  sx={{ color: "text.secondary", mr: 1 }}
+                  aria-label="attach file"
+                >
                   <AttachFileIcon />
                 </IconButton>
                 <InputBase
@@ -311,7 +314,9 @@ export default function AnnouncementChatPage() {
                   disabled={!messageInput.trim()}
                   aria-label="send message"
                   sx={{
-                    bgcolor: messageInput.trim() ? "#5faef4" : "rgba(0,0,0,0.05)",
+                    bgcolor: messageInput.trim()
+                      ? "#5faef4"
+                      : "rgba(0,0,0,0.05)",
                     color: "white",
                     "&:hover": {
                       bgcolor: "#4a9ce6",
