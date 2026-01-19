@@ -124,7 +124,9 @@ export default function EditWorkerManagerAccountPage({
         setSuccess("Račun uspješno ažuriran!");
         setTimeout(() => router.push("/admin/accounts"), 2000);
       } else {
-        setError(result.error || "Došlo je do greške prilikom ažuriranja računa");
+        setError(
+          result.error || "Došlo je do greške prilikom ažuriranja računa",
+        );
       }
     } catch (err) {
       console.error("Error updating account:", err);

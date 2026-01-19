@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { UserButton, useUser } from "@clerk/nextjs"; // Import useUser
 import {
   Menu,
@@ -22,15 +22,8 @@ export default function Header() {
   const router = useRouter();
   const { user } = useUser(); // Get the user data from Clerk
 
-  const [isHomepage, setisHomepage] = useState(false);
-  const [isLoginRoute, setisLoginRoute] = useState(false);
-
-  useEffect(() => {
-    // This code runs only on the client, after hydration
-    setisHomepage(pathname === "/");
-    setisLoginRoute(pathname.startsWith("/login"));
-  }, []); // The empty dependency array ensures this runs only once on mount
-
+  const isHomepage = pathname === "/";
+  const isLoginRoute = pathname.startsWith("/login");
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -180,6 +173,7 @@ export default function Header() {
   const userRole = user?.publicMetadata?.role as string;
   // Create the dynamic link. Default to "/" if role isn't found.
   const homeHref = userRole ? `/${userRole}` : "/";
+  const isWorker = userRole === "worker" || pathname.startsWith("/worker");
 
   // Non-homepage header (blue header)
   return (
@@ -223,6 +217,23 @@ export default function Header() {
         </Box>
 
         <Box sx={{ display: "flex", gap: { xs: 2, md: 3 } }}>
+          {isWorker && (
+            <Typography
+              variant="body2"
+              sx={{
+                display: { xs: "none", sm: "flex" },
+                alignItems: "center",
+                color: "white",
+                fontWeight: 600,
+                whiteSpace: "nowrap",
+                textDecoration: "underline",
+                textUnderlineOffset: "4px",
+              }}
+            >
+              Ime menze u kojoj radi
+            </Typography>
+          )}
+
           <Button
             sx={{
               display: { xs: "none", sm: "flex" },

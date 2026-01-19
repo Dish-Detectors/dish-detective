@@ -1,5 +1,322 @@
 "use client";
 
+import {
+  Box,
+  Typography,
+  Paper,
+  Divider,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import GroupsIcon from "@mui/icons-material/Groups";
+
+import { ReactNode, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { getCurrentUserFirstName } from "@/app/admin/actions";
+import PancakeStackLoader from "@/components/PancakeStackLoader";
+import { headerHeight } from "@/components/ManagerNavbar";
+
+interface ActionButtonProps {
+  children: ReactNode;
+  onClick: () => void;
+  icon?: ReactNode;
+  animationDelay?: string;
+}
+
+const MobileActionCard = ({
+  children,
+  onClick,
+  icon,
+  animationDelay = "0.1s",
+}: ActionButtonProps) => (
+  <Paper
+    onClick={onClick}
+    elevation={2}
+    sx={{
+      textTransform: "none",
+      fontSize: "1.25rem",
+      fontWeight: "600",
+      padding: "20px 15px",
+      borderRadius: "8px",
+      border: "1px solid rgba(0, 0, 0, 0.23)",
+      color: "text.primary",
+      cursor: "pointer",
+      transition: "all 0.2s ease-in-out",
+      opacity: 0,
+      animation: `fadeInUp 0.6s ease-out ${animationDelay} forwards`,
+      "@keyframes fadeInUp": {
+        from: { opacity: 0, transform: "translateY(20px)" },
+        to: { opacity: 1, transform: "translateY(0)" },
+      },
+      "&:hover": {
+        borderColor: "primary.main",
+        boxShadow: 4,
+      },
+      mb: 3,
+      display: "flex",
+      alignItems: "center",
+      gap: 2,
+    }}
+  >
+    {icon && <Box sx={{ display: "flex", alignItems: "center" }}>{icon}</Box>}
+    <Typography sx={{ fontSize: "1.25rem", fontWeight: "600" }}>
+      {children}
+    </Typography>
+  </Paper>
+);
+
+interface DesktopActionCardProps {
+  icon: ReactNode;
+  title: string;
+  descriptions: string[];
+  onClick: () => void;
+  animationDelay?: string;
+}
+
+const DesktopActionCard = ({
+  icon,
+  title,
+  descriptions,
+  onClick,
+  animationDelay = "0.1s",
+}: DesktopActionCardProps) => (
+  <Paper
+    onClick={onClick}
+    elevation={2}
+    sx={{
+      flex: "1 1 360px",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "flex-start",
+      minWidth: { xs: 280, md: 360, lg: 400 },
+      maxWidth: { xs: "100%", sm: 460, md: 560, lg: 680 },
+      p: { xs: 3.5, sm: 4.5, md: 5.5 },
+      borderRadius: 3,
+      cursor: "pointer",
+      transition: "all 0.2s ease-in-out",
+      opacity: 0,
+      animation: `fadeInUp 0.6s ease-out ${animationDelay} forwards`,
+      "@keyframes fadeInUp": {
+        from: { opacity: 0, transform: "translateY(20px)" },
+        to: { opacity: 1, transform: "translateY(0)" },
+      },
+      "&:hover": {
+        bgcolor: "grey.100",
+        boxShadow: 4,
+        transform: "translateY(-2px)",
+      },
+    }}
+  >
+    {icon}
+    <Typography
+      sx={{
+        fontSize: "clamp(1.25rem, 1.8vw, 2.25rem)",
+        fontWeight: "600",
+        color: "text.primary",
+        pt: 1,
+      }}
+    >
+      {title}
+    </Typography>
+    {descriptions.map((desc, index) => (
+      <Typography
+        key={index}
+        sx={{
+          fontSize: "clamp(0.85rem, 1vw, 1.25rem)",
+          fontWeight: "550",
+          color: "text.secondary",
+          pt: index === 0 ? 1 : 0,
+        }}
+      >
+        {desc}
+      </Typography>
+    ))}
+  </Paper>
+);
+
 export default function ManagerPage() {
-  return <div> Manager page. Only the manager can access this page.</div>;
+  const router = useRouter();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [name, setName] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const result = await getCurrentUserFirstName();
+      if (result.success && result.firstName) {
+        setName(result.firstName);
+      }
+      setIsLoading(false);
+    })();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          bgcolor: "#f5f5f5",
+        }}
+      >
+        <PancakeStackLoader />
+      </Box>
+    );
+  }
+
+  if (isMobile) {
+    return (
+      <Box
+        sx={{
+          flexGrow: 1,
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          bgcolor: "#f5f5f5",
+          justifyContent: "flex-start",
+          p: 3,
+        }}
+      >
+        <Typography
+          variant="h4"
+          fontWeight={780}
+          sx={{ color: "#212222", mb: 2 }}
+        >
+          Dobrodošli{name ? `, ${name}` : ""}!
+        </Typography>
+
+        <Divider sx={{ mb: 4, borderBottomWidth: 2 }} />
+
+        <Box sx={{ flexGrow: 1, py: 4 }}>
+          <MobileActionCard
+            onClick={() => router.push("/manager/menu")}
+            icon={<MenuBookIcon sx={{ fontSize: 32, color: "text.primary" }} />}
+            animationDelay="0.1s"
+          >
+            Kreiraj dnevni meni
+          </MobileActionCard>
+          <MobileActionCard
+            onClick={() => router.push("/manager/hours")}
+            icon={
+              <AccessTimeIcon sx={{ fontSize: 32, color: "text.primary" }} />
+            }
+            animationDelay="0.3s"
+          >
+            Radno vrijeme
+          </MobileActionCard>
+
+          <MobileActionCard
+            onClick={() => router.push("/manager/stats")}
+            icon={<GroupsIcon sx={{ fontSize: 32, color: "text.primary" }} />}
+            animationDelay="0.5s"
+          >
+            Statistika
+          </MobileActionCard>
+        </Box>
+      </Box>
+    );
+  }
+
+  return (
+    <Box
+      sx={{
+        height: `calc(100vh - ${headerHeight}px)`,
+        bgcolor: "#f5f5f5",
+        p: 5,
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <Typography
+        variant="h4"
+        fontWeight={780}
+        sx={{ color: "#212222", mb: 4, ml: 0 }}
+      >
+        Dobrodošli{name ? `, ${name}` : ""}!
+      </Typography>
+
+      <Box sx={{ mt: -3 }}>
+        <Divider sx={{ borderBottomWidth: 2 }} />
+      </Box>
+
+      <Box
+        sx={{
+          flex: 1,
+          px: { xs: 2, sm: 5 },
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            mt: -7,
+            gap: 3.5,
+            flexWrap: "wrap",
+            justifyContent: "center",
+            alignContent: "center",
+          }}
+        >
+          <DesktopActionCard
+            icon={
+              <MenuBookIcon
+                sx={{
+                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                  color: "text.primary",
+                }}
+              />
+            }
+            title="Kreiraj dnevni meni"
+            descriptions={[
+              "• Dodavanje jela na dnevni meni",
+              "• Pregled i uklanjanje stavki",
+            ]}
+            onClick={() => router.push("/manager/menu")}
+            animationDelay="0.1s"
+          />
+
+          <DesktopActionCard
+            icon={
+              <AccessTimeIcon
+                sx={{
+                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                  color: "text.primary",
+                }}
+              />
+            }
+            title="Radno vrijeme"
+            descriptions={[
+              "• Postavljanje radnog vremena",
+              "• Više smjena po danu",
+            ]}
+            onClick={() => router.push("/manager/hours")}
+            animationDelay="0.3s"
+          />
+
+          <DesktopActionCard
+            icon={
+              <GroupsIcon
+                sx={{
+                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                  color: "text.primary",
+                }}
+              />
+            }
+            title="Statistika"
+            descriptions={["• Pregled zainteresiranih"]}
+            onClick={() => router.push("/manager/stats")}
+            animationDelay="0.5s"
+          />
+        </Box>
+      </Box>
+    </Box>
+  );
 }
