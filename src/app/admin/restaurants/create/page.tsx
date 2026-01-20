@@ -21,7 +21,7 @@ import WorkingHoursEditor, {
   WorkingHoursData,
 } from "@/components/WorkingHoursEditor";
 import MapLocationPicker from "@/components/MapLocationPicker";
-import { createRestaurant } from "../actions";
+import { createRestaurant } from "./actions";
 import { uploadAttachment } from "@/app/manager/announcements/uploadAction"; // Reusing generic upload
 import { IWorkingDay, IShift } from "@/models/Restaurant";
 import StaffAssignment, { StaffMember } from "@/components/StaffAssignment";

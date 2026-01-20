@@ -71,7 +71,7 @@ export default function AllergenManagementDialog({
       setNewAllergen("");
       fetchAllergens();
     } else {
-      setError(res.message);
+      setError(res.message || "Unknown error occurred");
     }
   };
 
@@ -81,7 +81,7 @@ export default function AllergenManagementDialog({
     if (res.success) {
       fetchAllergens();
     } else {
-      setError(res.message);
+      setError(res.message || "Unknown error occurred");
     }
   };
 
