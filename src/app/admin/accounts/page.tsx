@@ -253,7 +253,7 @@ export default function WorkerManagerAccountsPage() {
               },
               gap: 3,
               pt: 1,
-              pb: 2,
+              pb: 8,
             }}
           >
             {filteredEmployees.map((employee, index) => (

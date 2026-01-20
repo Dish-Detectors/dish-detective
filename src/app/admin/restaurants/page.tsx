@@ -141,7 +141,7 @@ export default function RestaurantsPage() {
             </Typography>
           </Box>
         ) : (
-          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(3, 1fr)", xl: "repeat(4, 1fr)" }, gap: 3, pt: 1, pb: 2 }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(3, 1fr)", xl: "repeat(4, 1fr)" }, gap: 3, pt: 1, pb: 8 }}>
             {filteredRestaurants.map((restaurant, index) => (
               <Box
                 key={restaurant._id}

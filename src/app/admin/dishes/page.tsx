@@ -235,7 +235,7 @@ export default function Page() {
               },
               gap: 3,
               pt: 1,
-              pb: 2,
+              pb: 8,
             }}
           >
             {filteredDishes.map((dish, index) => (
