@@ -65,19 +65,19 @@ export default function RestaurantsPage() {
   const confirmDelete = async () => {
     if (!restaurantToDelete) return;
     setDeleting(true);
-    
+
     try {
-        const response = await deleteRestaurant(restaurantToDelete);
-        if (response.success) {
-          setRestaurants((prev) => prev.filter((r) => r._id !== restaurantToDelete));
-          setDeleteDialogOpen(false);
-          setRestaurantToDelete(null);
-        } else {
-          alert("Failed to delete: " + response.message);
-        }
+      const response = await deleteRestaurant(restaurantToDelete);
+      if (response.success) {
+        setRestaurants((prev) => prev.filter((r) => r._id !== restaurantToDelete));
+        setDeleteDialogOpen(false);
+        setRestaurantToDelete(null);
+      } else {
+        alert("Failed to delete: " + response.message);
+      }
     } catch (err) {
-        console.error(err);
-        alert("An error occurred while deleting.");
+      console.error(err);
+      alert("An error occurred while deleting.");
     }
     setDeleting(false);
   };
@@ -99,7 +99,7 @@ export default function RestaurantsPage() {
   }
 
   return (
-    <Box sx={{ height: "100vh", bgcolor: "#f5f5f5", display: "flex", flexDirection: "column", px: { xs: 3, sm: 5 }, py: { xs: 3, sm: 5 }, pt: 0, pb: { xs: "100px", sm: 6 }, overflow: "hidden" }}>
+    <Box sx={{ height: "100vh", bgcolor: "#f5f5f5", display: "flex", flexDirection: "column", px: { xs: 3, sm: 5 }, py: { xs: 3, sm: 5 }, pt: 0, pb: { xs: 12, sm: 10 }, overflow: "hidden" }}>
       <Typography variant="h4" sx={{ fontWeight: 780, mb: 4, color: "#212222", flexShrink: 0 }}>
         Upravljaj restoranima
       </Typography>
@@ -141,7 +141,7 @@ export default function RestaurantsPage() {
             </Typography>
           </Box>
         ) : (
-          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(3, 1fr)", xl: "repeat(4, 1fr)" }, gap: 3, pb: 2 }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(3, 1fr)", xl: "repeat(4, 1fr)" }, gap: 3, pt: 1, pb: 2 }}>
             {filteredRestaurants.map((restaurant, index) => (
               <Box
                 key={restaurant._id}
@@ -157,7 +157,7 @@ export default function RestaurantsPage() {
                 <RestaurantCard
                   name={restaurant.name}
                   address={restaurant.address}
-                  workingHours={restaurant.workingHours}
+                  managerName={restaurant.manager}
                   imageUrl={restaurant.imageUrl}
                   onEdit={() => handleEdit(restaurant._id)}
                   onDelete={() => handleDelete(restaurant._id)}

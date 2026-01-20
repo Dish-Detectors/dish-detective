@@ -15,20 +15,16 @@ import {
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CloseIcon from "@mui/icons-material/Close";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import SuccessScreen from "@/components/SuccessScreen"; 
-
-
-const DAYS = ["PON", "UTO", "SRI", "ČET", "PET", "SUB", "NED"];
-
-type WorkingHours = {
-  start: string;
-  end: string;
-};
-
-type Schedule = {
-  [key: string]: WorkingHours;
-};
+import EditIcon from "@mui/icons-material/Edit";
+import SuccessScreen from "@/components/SuccessScreen";
+import WorkingHoursEditor, {
+  WorkingHoursData,
+} from "@/components/WorkingHoursEditor";
+import MapLocationPicker from "@/components/MapLocationPicker";
+import { createRestaurant } from "../actions";
+import { uploadAttachment } from "@/app/manager/announcements/uploadAction"; // Reusing generic upload
+import { IWorkingDay, IShift } from "@/models/Restaurant";
+import StaffAssignment, { StaffMember } from "@/components/StaffAssignment";
 
 export default function CreateRestaurantPage() {
   const router = useRouter();
@@ -37,15 +33,14 @@ export default function CreateRestaurantPage() {
 
   const [formData, setFormData] = useState({
     name: "",
-    manager: "",
     address: "",
   });
 
-  const [schedule, setSchedule] = useState<Schedule>(
-    DAYS.reduce((acc, day) => ({ ...acc, [day]: { start: "", end: "" } }), {})
+  const [workingHoursRaw, setWorkingHoursRaw] = useState<WorkingHoursData>({});
+  const [staff, setStaff] = useState<StaffMember[]>([]);
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
+    null,
   );
-  
-  const [selectedDay, setSelectedDay] = useState("PON");
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -74,16 +69,6 @@ export default function CreateRestaurantPage() {
     setImagePreview(null);
   };
 
-  const handleTimeChange = (field: "start" | "end", value: string) => {
-    setSchedule((prev) => ({
-      ...prev,
-      [selectedDay]: {
-        ...prev[selectedDay],
-        [field]: value,
-      },
-    }));
-  };
-
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
@@ -97,27 +82,62 @@ export default function CreateRestaurantPage() {
       setError("Naziv i adresa su obavezni");
       return;
     }
+    if (!location) {
+      setError("Molimo označite lokaciju restorana na karti");
+      return;
+    }
 
     setLoading(true);
     setError(null);
     setSuccess(null);
 
     try {
-      // TODO: Replace with actual Server Action
-      // const formDataToSend = new FormData();
-      // formDataToSend.append("name", formData.name);
-      // ... append other fields ...
+      // 1. Upload Image
+      const uploadFormData = new FormData();
+      uploadFormData.append("file", imageFile);
+      const uploadRes = await uploadAttachment(uploadFormData);
+      if (!uploadRes.success || !uploadRes.attachment) {
+        throw new Error(uploadRes.error || "Image upload failed");
+      }
+      const imageUrl = uploadRes.attachment.url;
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // 2. Format Working Hours
+      const formattedHours: IWorkingDay[] = [];
+      Object.entries(workingHoursRaw).forEach(([dayStr, shifts]) => {
+        const dayNum = parseInt(dayStr);
+        if (shifts.length > 0) {
+          formattedHours.push({
+            day: dayNum,
+            shifts: shifts.filter((s: IShift) => s.start && s.end), // Filter partials
+          });
+        }
+      });
+
+      // 3. Create Restaurant
+      const res = await createRestaurant({
+        name: formData.name,
+        address: formData.address,
+        imageUrl: imageUrl,
+        workingHours: formattedHours,
+        location: {
+          type: "Point",
+          coordinates: [location.lng, location.lat], // GeoJSON is [lng, lat]
+        },
+        initialStaff: staff.map((s) => ({ id: s.id, role: s.role })),
+      });
+
+      if (!res.success) {
+        throw new Error(res.message);
+      }
 
       setSuccess("Restoran uspješno kreiran!");
       setShowSuccessScreen(true);
       setTimeout(() => {
         router.push("/admin/restaurants");
       }, 2000);
-      
-    } catch (err) {
-      setError("Došlo je do greške. Pokušajte ponovo.");
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Došlo je do greške. Pokušajte ponovo.");
     } finally {
       setLoading(false);
     }
@@ -134,8 +154,8 @@ export default function CreateRestaurantPage() {
         borderColor: imageError
           ? "error.main"
           : imagePreview
-          ? "primary.main"
-          : "grey.300",
+            ? "primary.main"
+            : "grey.300",
         textAlign: "center",
         position: "relative",
       }}
@@ -215,98 +235,29 @@ export default function CreateRestaurantPage() {
         }}
       />
 
-      <TextField
-        fullWidth
-        label="Voditelj"
-        value={formData.manager}
-        onChange={(e) => setFormData({ ...formData, manager: e.target.value })}
-        sx={{
-          mb: 3,
-          bgcolor: "white",
-          "& .MuiOutlinedInput-root": { borderRadius: 2 },
-        }}
-      />
+      {/* Staff Management (Local Mode) */}
+      <Box sx={{ mb: 3 }}>
+        <StaffAssignment value={staff} onChange={setStaff} />
+      </Box>
 
-      <TextField
-        fullWidth
-        label="Adresa"
-        value={formData.address}
-        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-        required
-        sx={{
-          mb: 3,
-          bgcolor: "white",
-          "& .MuiOutlinedInput-root": { borderRadius: 2 },
-        }}
-      />
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5 }}>
+          Lokacija
+        </Typography>
+        <MapLocationPicker
+          initialAddress={formData.address}
+          onLocationChange={(loc, addr) => {
+            setLocation(loc);
+            setFormData((prev) => ({ ...prev, address: addr }));
+          }}
+        />
+      </Box>
 
       <Box sx={{ mb: 3 }}>
         <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5 }}>
           Radno vrijeme
         </Typography>
-        
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
-          {DAYS.map((day) => {
-            const isSelected = selectedDay === day;
-            const hasHours = schedule[day].start !== "" || schedule[day].end !== "";
-            
-            return (
-              <Button
-                key={day}
-                onClick={() => setSelectedDay(day)}
-                variant={isSelected ? "contained" : "outlined"}
-                size="small"
-                sx={{
-                  minWidth: "auto",
-                  borderRadius: 4,
-                  borderColor: isSelected ? "primary.main" : "grey.300",
-                  color: isSelected ? "white" : (hasHours ? "primary.main" : "text.secondary"),
-                  bgcolor: isSelected ? "primary.main" : "white",
-                  boxShadow: "none",
-                  "&:hover": {
-                     bgcolor: isSelected ? "primary.dark" : "grey.50",
-                     borderColor: isSelected ? "primary.dark" : "grey.400",
-                  }
-                }}
-              >
-                {day}
-              </Button>
-            );
-          })}
-        </Box>
-
-        <Box sx={{ 
-            bgcolor: "white", 
-            p: 2, 
-            borderRadius: 2, 
-            border: "1px solid", 
-            borderColor: "grey.200",
-            display: "flex", 
-            alignItems: "center", 
-            gap: 2 
-        }}>
-           <AccessTimeIcon color="action" fontSize="small" />
-           
-           <TextField
-             placeholder="08:00"
-             value={schedule[selectedDay].start}
-             onChange={(e) => handleTimeChange("start", e.target.value)}
-             size="small"
-             sx={{ width: 100 }}
-             inputProps={{ style: { textAlign: 'center' } }}
-           />
-           
-           <Typography variant="body2" color="text.secondary">do</Typography>
-           
-           <TextField
-             placeholder="22:00"
-             value={schedule[selectedDay].end}
-             onChange={(e) => handleTimeChange("end", e.target.value)}
-             size="small"
-             sx={{ width: 100 }}
-             inputProps={{ style: { textAlign: 'center' } }}
-           />
-        </Box>
+        <WorkingHoursEditor onChange={setWorkingHoursRaw} />
       </Box>
     </Box>
   );
@@ -318,14 +269,33 @@ export default function CreateRestaurantPage() {
   // Mobile Layout
   if (isMobile) {
     return (
-      <Box sx={{ height: "100vh", bgcolor: "#f5f5f5", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <Box sx={{ p: 3, flexGrow: 1, overflowY: "auto", pb: "200px" }}>
-          <Typography variant="h4" sx={{ fontWeight: 780, mb: 4, color: "#212222" }}>
+      <Box
+        sx={{
+          height: "100vh",
+          bgcolor: "#f5f5f5",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
+        <Box sx={{ p: 3, flexGrow: 1, overflowY: "auto", pb: "300px" }}>
+          <Typography
+            variant="h4"
+            sx={{ fontWeight: 780, mb: 4, color: "#212222" }}
+          >
             Unesite podatke
           </Typography>
 
-          {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
-          {success && <Alert severity="success" sx={{ mb: 3 }}>{success}</Alert>}
+          {error && (
+            <Alert severity="error" sx={{ mb: 3 }}>
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert severity="success" sx={{ mb: 3 }}>
+              {success}
+            </Alert>
+          )}
 
           {renderFormContent()}
         </Box>
@@ -350,13 +320,22 @@ export default function CreateRestaurantPage() {
             "&:active": { bgcolor: loading ? "grey.400" : "#3d8fd9" },
           }}
         >
-          <Typography sx={{ color: "white", fontSize: "1.1rem", fontWeight: 600, textTransform: "none" }}>
+          <Typography
+            sx={{
+              color: "white",
+              fontSize: "1.1rem",
+              fontWeight: 600,
+              textTransform: "none",
+            }}
+          >
             {loading ? (
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <CircularProgress size={24} color="inherit" />
                 Spremanje...
               </Box>
-            ) : "Spremi"}
+            ) : (
+              "Spremi"
+            )}
           </Typography>
         </Box>
       </Box>
@@ -365,46 +344,135 @@ export default function CreateRestaurantPage() {
 
   // Desktop Layout
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center", py: 5 }}>
-      <Box sx={{ maxWidth: 500, width: "100%", bgcolor: "white", borderRadius: 3, boxShadow: 2, maxHeight: "90vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        
-        <Box sx={{ p: 4, pb: 2, flexShrink: 0 }}>
-          <Typography variant="h4" sx={{ fontWeight: 780, mb: 4, textAlign: "center", color: "#212222" }}>
-            Unesite podatke
-          </Typography>
-          {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
-          {success && <Alert severity="success" sx={{ mb: 3 }}>{success}</Alert>}
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: "#f5f5f5",
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "center",
+        pt: 4, // Reduced from 12
+        pb: 4, // Reduced from 15
+      }}
+    >
+      <Box
+        sx={{
+          maxWidth: 1600, // Increased width to 1600
+          width: "100%",
+          bgcolor: "white",
+          borderRadius: 3,
+          boxShadow: 2,
+          maxHeight: "calc(100vh - 100px)", // Increased visible area
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
+        <Box sx={{ p: 4, pb: 0, flexShrink: 0 }}>
+          {/* Editable Title Header - No Icon */}
+          <Box
+            component="input"
+            value={formData.name}
+            onChange={(e) =>
+              setFormData({ ...formData, name: e.target.value })
+            }
+            placeholder="Naziv restorana"
+            sx={{
+              fontSize: "2.125rem", // h4 size
+              fontWeight: 780,
+              color: "#212222",
+              border: "none",
+              outline: "none",
+              bgcolor: "transparent",
+              width: "100%",
+              "&::placeholder": {
+                color: "text.disabled",
+              },
+              mb: 1, // Reduced margin
+            }}
+          />
+
+          {error && (
+            <Alert severity="error" sx={{ mb: 3 }}>
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert severity="success" sx={{ mb: 3 }}>
+              {success}
+            </Alert>
+          )}
         </Box>
 
         <Box sx={{ px: 4, pb: 4, flexGrow: 1, overflowY: "auto" }}>
-          {renderFormContent()}
+          <Box component="form" onSubmit={handleSubmit}>
+            <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3 }}>
+              {/* Left Column: Image, Location */}
+              <Box>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+                  Osnovne informacije
+                </Typography>
+                {renderImageUpload()}
 
-          <Button
-            type="submit"
-            onClick={handleSubmit}
-            fullWidth
-            variant="contained"
-            size="large"
-            disabled={loading}
-            sx={{
-              mt: 2,
-              py: 1.5,
-              textTransform: "none",
-              fontSize: "1.1rem",
-              fontWeight: 600,
-              borderRadius: 2,
-              boxShadow: 2,
-              bgcolor: "#57aaf4",
-              "&:hover": { bgcolor: "#3d8fd9", boxShadow: 4 },
-            }}
-          >
-            {loading ? (
-              <>
-                <CircularProgress size={24} sx={{ mr: 1 }} color="inherit" />
-                Spremanje...
-              </>
-            ) : "Spremi"}
-          </Button>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: 600, mt: 3 }}>
+                  Lokacija
+                </Typography>
+                <Box sx={{ mb: 2 }}>
+                  <MapLocationPicker
+                    initialAddress={formData.address}
+                    onLocationChange={(loc, addr) => {
+                      setLocation(loc);
+                      setFormData((prev) => ({ ...prev, address: addr }));
+                    }}
+                  />
+                </Box>
+              </Box>
+
+              {/* Right Column: Staff, Hours */}
+              <Box>
+                {/* Staff Assignment Component already has its own header */}
+                <Box sx={{ mb: 4, mt: 0 }}>
+                  <StaffAssignment value={staff} onChange={setStaff} />
+                </Box>
+
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+                  Radno vrijeme
+                </Typography>
+                <Box sx={{ mb: 2 }}>
+                  <WorkingHoursEditor onChange={setWorkingHoursRaw} />
+                </Box>
+              </Box>
+            </Box>
+
+            <Button
+              type="submit"
+              onClick={handleSubmit}
+              fullWidth
+              variant="contained"
+              size="large"
+              disabled={loading}
+              sx={{
+                mt: 3, // Reduced from 4
+                py: 1.5,
+                textTransform: "none",
+                fontSize: "1.1rem",
+                fontWeight: 600,
+                borderRadius: 2,
+                boxShadow: 2,
+                bgcolor: "#57aaf4",
+                "&:hover": { bgcolor: "#3d8fd9", boxShadow: 4 },
+              }}
+            >
+              {loading ? (
+                <>
+                  <CircularProgress size={24} sx={{ mr: 1 }} color="inherit" />
+                  Spremanje...
+                </>
+              ) : (
+                "Spremi"
+              )}
+            </Button>
+          </Box>
         </Box>
       </Box>
     </Box>

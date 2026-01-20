@@ -133,7 +133,7 @@ export default function Page() {
         px: { xs: 3, sm: 5 },
         py: { xs: 3, sm: 5 },
         pt: 0,
-        pb: { xs: "100px", sm: 6 },
+        pb: { xs: "100px", sm: 10 },
         overflow: "hidden",
       }}
     >
@@ -234,6 +234,7 @@ export default function Page() {
                 lg: "repeat(4, 1fr)",
               },
               gap: 3,
+              pt: 1,
               pb: 2,
             }}
           >

@@ -3,7 +3,7 @@
 import { Box, Stack, IconButton } from "@mui/material";
 import { useRouter, usePathname } from "next/navigation";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
-import TuneIcon from "@mui/icons-material/Tune";
+import FoodBankIcon from "@mui/icons-material/FoodBank";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import PeopleIcon from "@mui/icons-material/People";
 
@@ -40,21 +40,21 @@ export default function AdminNavbar({ isMobile = false }: AdminNavbarProps) {
         position: "fixed",
         ...(isMobile
           ? {
-              top: "auto",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              width: "100%",
-              height: "64px",
-              boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
-            }
+            top: "auto",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            width: "100%",
+            height: "64px",
+            boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
+          }
           : {
-              top: `${headerHeight}px`,
-              left: 0,
-              bottom: 0,
-              width: `${navWidth}px`,
-              boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
-            }),
+            top: `${headerHeight}px`,
+            left: 0,
+            bottom: 0,
+            width: `${navWidth}px`,
+            boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
+          }),
         bgcolor: "common.white",
         display: "flex",
         flexDirection: isMobile ? "row" : "column",
@@ -79,22 +79,22 @@ export default function AdminNavbar({ isMobile = false }: AdminNavbarProps) {
           <HomeFilledIcon />
         </IconButton>
         <IconButton
+          onClick={() => router.push("/admin/accounts")}
+          sx={getIconButtonStyle("/admin/accounts")}
+        >
+          <PeopleIcon />
+        </IconButton>
+        <IconButton
           onClick={() => router.push("/admin/restaurants")}
           sx={getIconButtonStyle("/admin/restaurants")}
         >
-          <TuneIcon />
+          <FoodBankIcon />
         </IconButton>
         <IconButton
           onClick={() => router.push("/admin/dishes")}
           sx={getIconButtonStyle("/admin/dishes")}
         >
           <RestaurantIcon />
-        </IconButton>
-        <IconButton
-          onClick={() => router.push("/admin/accounts")}
-          sx={getIconButtonStyle("/admin/accounts")}
-        >
-          <PeopleIcon />
         </IconButton>
       </Stack>
     </Box>

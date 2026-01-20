@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import {
   Box,
@@ -15,21 +15,23 @@ import {
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CloseIcon from "@mui/icons-material/Close";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import EditIcon from "@mui/icons-material/Edit";
 import SuccessScreen from "@/components/SuccessScreen";
+import WorkingHoursEditor, {
+  WorkingHoursData,
+} from "@/components/WorkingHoursEditor";
+import MapLocationPicker from "@/components/MapLocationPicker";
+import { getRestaurant, updateRestaurant } from "../../actions";
+import { uploadAttachment } from "@/app/manager/announcements/uploadAction";
+import { IWorkingDay, IShift } from "@/models/Restaurant";
+import StaffAssignment from "@/components/StaffAssignment";
 
-const DAYS = ["PON", "UTO", "SRI", "ČET", "PET", "SUB", "NED"];
-
-type WorkingHours = {
-  start: string;
-  end: string;
-};
-
-type Schedule = {
-  [key: string]: WorkingHours;
-};
-
-export default function EditRestaurantPage({ params }: { params: { id: string } }) {
+export default function EditRestaurantPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -38,55 +40,55 @@ export default function EditRestaurantPage({ params }: { params: { id: string } 
 
   const [formData, setFormData] = useState({
     name: "",
-    manager: "",
     address: "",
   });
 
-  const [schedule, setSchedule] = useState<Schedule>(
-    DAYS.reduce((acc, day) => ({ ...acc, [day]: { start: "", end: "" } }), {})
+  const [workingHoursRaw, setWorkingHoursRaw] = useState<WorkingHoursData>({});
+  const [initialHours, setInitialHours] = useState<IWorkingDay[]>([]);
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
+    null,
   );
-  
-  const [selectedDay, setSelectedDay] = useState("PON");
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  
+
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [showSuccessScreen, setShowSuccessScreen] = useState(false);
 
-  // --- EFFECT: SIMULATE FETCHING DATA ---
+  // --- FETCHING DATA ---
   useEffect(() => {
     const fetchRestaurantData = async () => {
       try {
         setFetchingData(true);
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const res = await getRestaurant(id);
 
-        // MOCK DATA
-        setFormData({
-          name: "Restoran Kod Marka",
-          manager: "Marko Marković",
-          address: "Ilica 24, Zagreb",
-        });
+        if (res.success && res.data) {
+          const rest = res.data;
+          setFormData({
+            name: rest.name,
+            address: rest.address,
+          });
 
-        // Mock Schedule (Mon-Fri 08-22)
-        const mockSchedule: Schedule = DAYS.reduce((acc, day) => {
-           const isWeekend = day === "SUB" || day === "NED";
-           return { 
-               ...acc, 
-               [day]: { 
-                   start: isWeekend ? "" : "08:00", 
-                   end: isWeekend ? "" : "22:00" 
-               } 
-           };
-        }, {});
-        setSchedule(mockSchedule);
+          if (rest.imageUrl) {
+            setImagePreview(rest.imageUrl);
+          }
 
-        setImagePreview("/placeholder-restaurant.jpg"); 
+          if (rest.location && rest.location.coordinates) {
+            setLocation({
+              lng: rest.location.coordinates[0],
+              lat: rest.location.coordinates[1],
+            });
+          }
 
+          if (rest.workingHours) {
+            setInitialHours(rest.workingHours);
+          }
+        } else {
+          setError("Restoran nije pronađen.");
+        }
       } catch (e) {
         setError("Neuspješno učitavanje podataka.");
       } finally {
@@ -95,7 +97,7 @@ export default function EditRestaurantPage({ params }: { params: { id: string } 
     };
 
     fetchRestaurantData();
-  }, []);
+  }, [id]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -115,22 +117,9 @@ export default function EditRestaurantPage({ params }: { params: { id: string } 
     setImagePreview(null);
   };
 
-  const handleTimeChange = (field: "start" | "end", value: string) => {
-    setSchedule((prev) => ({
-      ...prev,
-      [selectedDay]: {
-        ...prev[selectedDay],
-        [field]: value,
-      },
-    }));
-  };
-
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    // Validation
-    // Note: In Edit mode, imageFile can be null if they didn't change the image,
-    // but imagePreview should exist (either old URL or new blob).
     if (!imagePreview) {
       setImageError("Slika je obavezna");
       setError("Molimo odaberite sliku restorana");
@@ -140,22 +129,62 @@ export default function EditRestaurantPage({ params }: { params: { id: string } 
       setError("Naziv i adresa su obavezni");
       return;
     }
+    if (!location) {
+      setError("Molimo označite lokaciju restorana na karti");
+      return;
+    }
 
     setSaving(true);
     setError(null);
     setSuccess(null);
 
     try {
-      // Simulate API Update
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      let imageUrl = imagePreview; // Default to existing URL
+      // If file changed, upload new one
+      if (imageFile) {
+        const uploadFormData = new FormData();
+        uploadFormData.append("file", imageFile);
+        const uploadRes = await uploadAttachment(uploadFormData);
+        if (!uploadRes.success || !uploadRes.attachment) {
+          throw new Error(uploadRes.error || "Image upload failed");
+        }
+        imageUrl = uploadRes.attachment.url;
+      }
+
+      // Format Working Hours
+      const formattedHours: IWorkingDay[] = [];
+      Object.entries(workingHoursRaw).forEach(([dayStr, shifts]) => {
+        const dayNum = parseInt(dayStr);
+        if (shifts.length > 0) {
+          formattedHours.push({
+            day: dayNum,
+            shifts: shifts.filter((s: IShift) => s.start && s.end),
+          });
+        }
+      });
+
+      const res = await updateRestaurant(id, {
+        name: formData.name,
+        address: formData.address,
+        imageUrl: imageUrl,
+        workingHours: formattedHours,
+        location: {
+          type: "Point",
+          coordinates: [location.lng, location.lat],
+        },
+      });
+
+      if (!res.success) {
+        throw new Error(res.message);
+      }
 
       setSuccess("Podaci uspješno ažurirani!");
       setShowSuccessScreen(true);
       setTimeout(() => {
         router.push("/admin/restaurants");
       }, 2000);
-      
-    } catch (err) {
+    } catch (err: any) {
+      console.error(err);
       setError("Došlo je do greške. Pokušajte ponovo.");
     } finally {
       setSaving(false);
@@ -166,48 +195,91 @@ export default function EditRestaurantPage({ params }: { params: { id: string } 
     <Box
       sx={{
         mb: 3,
-        bgcolor: "white",
-        borderRadius: 2,
-        p: 2,
+        position: "relative",
+        width: "100%",
+        paddingTop: "56.25%", // 16:9 Aspect Ratio
+        borderRadius: 4,
+        overflow: "hidden",
         border: "2px dashed",
         borderColor: imageError
           ? "error.main"
           : imagePreview
-          ? "primary.main"
-          : "grey.300",
+            ? "transparent"
+            : "grey.300",
+        bgcolor: "grey.50",
         textAlign: "center",
-        position: "relative",
+        transition: "all 0.2s",
+        "&:hover": {
+          borderColor: imagePreview
+            ? "transparent"
+            : "primary.main",
+          bgcolor: "grey.100",
+        },
       }}
     >
       {imagePreview ? (
-        <Box sx={{ position: "relative" }}>
+        <>
           <Box
             component="img"
             src={imagePreview}
             alt="Preview"
             sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
               width: "100%",
-              height: 200,
+              height: "100%",
               objectFit: "cover",
-              borderRadius: 2,
             }}
           />
-          <IconButton
-            onClick={handleRemoveImage}
+          <Box
             sx={{
               position: "absolute",
-              top: 8,
-              right: 8,
-              bgcolor: "error.main",
-              color: "white",
-              "&:hover": { bgcolor: "error.dark" },
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              bgcolor: "rgba(0,0,0,0)",
+              transition: "0.2s",
+              "&:hover": {
+                bgcolor: "rgba(0,0,0,0.3)",
+                "& .remove-btn": { opacity: 1 },
+              },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <CloseIcon />
-          </IconButton>
-        </Box>
+            <IconButton
+              className="remove-btn"
+              onClick={handleRemoveImage}
+              sx={{
+                opacity: 0,
+                bgcolor: "white",
+                color: "error.main",
+                "&:hover": { bgcolor: "white" },
+                transform: "scale(1.2)",
+                transition: "0.2s",
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </>
       ) : (
-        <Box>
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <input
             accept="image/*"
             style={{ display: "none" }}
@@ -215,22 +287,28 @@ export default function EditRestaurantPage({ params }: { params: { id: string } 
             type="file"
             onChange={handleImageChange}
           />
-          <label htmlFor="restaurant-image-upload">
-            <Button
-              component="span"
-              startIcon={<CloudUploadIcon />}
-              sx={{ textTransform: "none" }}
-            >
-              Promijeni sliku
-            </Button>
-          </label>
-          <Typography
-            variant="caption"
-            display="block"
-            sx={{ mt: 1, color: imageError ? "error.main" : "text.secondary" }}
+          <label
+            htmlFor="restaurant-image-upload"
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
           >
-            {imageError || "PNG, JPG do 5MB"}
-          </Typography>
+            <CloudUploadIcon
+              sx={{ fontSize: 48, color: "text.secondary", mb: 2 }}
+            />
+            <Typography variant="h6" color="text.secondary">
+              Odaberi sliku
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {imageError || "PNG, JPG do 5MB"}
+            </Typography>
+          </label>
         </Box>
       )}
     </Box>
@@ -253,98 +331,33 @@ export default function EditRestaurantPage({ params }: { params: { id: string } 
         }}
       />
 
-      <TextField
-        fullWidth
-        label="Voditelj"
-        value={formData.manager}
-        onChange={(e) => setFormData({ ...formData, manager: e.target.value })}
-        sx={{
-          mb: 3,
-          bgcolor: "white",
-          "& .MuiOutlinedInput-root": { borderRadius: 2 },
-        }}
-      />
+      {/* Staff Management - Mobile/Shared View */}
+      <Box sx={{ mb: 3 }}>
+        <StaffAssignment restaurantId={id} />
+      </Box>
 
-      <TextField
-        fullWidth
-        label="Adresa"
-        value={formData.address}
-        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-        required
-        sx={{
-          mb: 3,
-          bgcolor: "white",
-          "& .MuiOutlinedInput-root": { borderRadius: 2 },
-        }}
-      />
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5 }}>
+          Lokacija
+        </Typography>
+        <MapLocationPicker
+          initialLocation={location || undefined}
+          initialAddress={formData.address}
+          onLocationChange={(loc, addr) => {
+            setLocation(loc);
+            setFormData((prev) => ({ ...prev, address: addr }));
+          }}
+        />
+      </Box>
 
       <Box sx={{ mb: 3 }}>
         <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5 }}>
           Radno vrijeme
         </Typography>
-        
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
-          {DAYS.map((day) => {
-            const isSelected = selectedDay === day;
-            const hasHours = schedule[day].start !== "" || schedule[day].end !== "";
-            
-            return (
-              <Button
-                key={day}
-                onClick={() => setSelectedDay(day)}
-                variant={isSelected ? "contained" : "outlined"}
-                size="small"
-                sx={{
-                  minWidth: "auto",
-                  borderRadius: 4,
-                  borderColor: isSelected ? "primary.main" : "grey.300",
-                  color: isSelected ? "white" : (hasHours ? "primary.main" : "text.secondary"),
-                  bgcolor: isSelected ? "primary.main" : "white",
-                  boxShadow: "none",
-                  "&:hover": {
-                     bgcolor: isSelected ? "primary.dark" : "grey.50",
-                     borderColor: isSelected ? "primary.dark" : "grey.400",
-                  }
-                }}
-              >
-                {day}
-              </Button>
-            );
-          })}
-        </Box>
-
-        <Box sx={{ 
-            bgcolor: "white", 
-            p: 2, 
-            borderRadius: 2, 
-            border: "1px solid", 
-            borderColor: "grey.200",
-            display: "flex", 
-            alignItems: "center", 
-            gap: 2 
-        }}>
-           <AccessTimeIcon color="action" fontSize="small" />
-           
-           <TextField
-             placeholder="08:00"
-             value={schedule[selectedDay].start}
-             onChange={(e) => handleTimeChange("start", e.target.value)}
-             size="small"
-             sx={{ width: 100 }}
-             inputProps={{ style: { textAlign: 'center' } }}
-           />
-           
-           <Typography variant="body2" color="text.secondary">do</Typography>
-           
-           <TextField
-             placeholder="22:00"
-             value={schedule[selectedDay].end}
-             onChange={(e) => handleTimeChange("end", e.target.value)}
-             size="small"
-             sx={{ width: 100 }}
-             inputProps={{ style: { textAlign: 'center' } }}
-           />
-        </Box>
+        <WorkingHoursEditor
+          initialData={initialHours}
+          onChange={setWorkingHoursRaw}
+        />
       </Box>
     </Box>
   );
@@ -355,7 +368,15 @@ export default function EditRestaurantPage({ params }: { params: { id: string } 
 
   if (fetchingData) {
     return (
-      <Box sx={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center", bgcolor: "#f5f5f5" }}>
+      <Box
+        sx={{
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          bgcolor: "#f5f5f5",
+        }}
+      >
         <CircularProgress />
       </Box>
     );
@@ -364,14 +385,33 @@ export default function EditRestaurantPage({ params }: { params: { id: string } 
   // Mobile Layout
   if (isMobile) {
     return (
-      <Box sx={{ height: "100vh", bgcolor: "#f5f5f5", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <Box sx={{ p: 3, flexGrow: 1, overflowY: "auto", pb: "200px" }}>
-          <Typography variant="h4" sx={{ fontWeight: 780, mb: 4, color: "#212222" }}>
+      <Box
+        sx={{
+          height: "100vh",
+          bgcolor: "#f5f5f5",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
+        <Box sx={{ p: 3, flexGrow: 1, overflowY: "auto", pb: "300px" }}>
+          <Typography
+            variant="h4"
+            sx={{ fontWeight: 780, mb: 4, color: "#212222" }}
+          >
             Uredi podatke
           </Typography>
 
-          {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
-          {success && <Alert severity="success" sx={{ mb: 3 }}>{success}</Alert>}
+          {error && (
+            <Alert severity="error" sx={{ mb: 3 }}>
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert severity="success" sx={{ mb: 3 }}>
+              {success}
+            </Alert>
+          )}
 
           {renderFormContent()}
         </Box>
@@ -395,13 +435,22 @@ export default function EditRestaurantPage({ params }: { params: { id: string } 
             "&:active": { bgcolor: saving ? "grey.400" : "#3d8fd9" },
           }}
         >
-          <Typography sx={{ color: "white", fontSize: "1.1rem", fontWeight: 600, textTransform: "none" }}>
+          <Typography
+            sx={{
+              color: "white",
+              fontSize: "1.1rem",
+              fontWeight: 600,
+              textTransform: "none",
+            }}
+          >
             {saving ? (
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <CircularProgress size={24} color="inherit" />
                 Spremanje...
               </Box>
-            ) : "Spremi promjene"}
+            ) : (
+              "Spremi promjene"
+            )}
           </Typography>
         </Box>
       </Box>
@@ -410,46 +459,138 @@ export default function EditRestaurantPage({ params }: { params: { id: string } 
 
   // Desktop Layout
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center", py: 5 }}>
-      <Box sx={{ maxWidth: 500, width: "100%", bgcolor: "white", borderRadius: 3, boxShadow: 2, maxHeight: "90vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        
-        <Box sx={{ p: 4, pb: 2, flexShrink: 0 }}>
-          <Typography variant="h4" sx={{ fontWeight: 780, mb: 4, textAlign: "center", color: "#212222" }}>
-            Uredi podatke
-          </Typography>
-          {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
-          {success && <Alert severity="success" sx={{ mb: 3 }}>{success}</Alert>}
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: "#f5f5f5",
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "center",
+        pt: 4, // Reduced from 12
+        pb: 4, // Reduced from 15
+      }}
+    >
+      <Box
+        sx={{
+          maxWidth: 1600, // Increased width to 1600
+          width: "100%",
+          bgcolor: "white",
+          borderRadius: 3,
+          boxShadow: 2,
+          maxHeight: "calc(100vh - 100px)",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
+        <Box sx={{ p: 4, pb: 0, flexShrink: 0 }}>
+          {/* Editable Title Header - No Icon */}
+          <Box
+            component="input"
+            value={formData.name}
+            onChange={(e) =>
+              setFormData({ ...formData, name: e.target.value })
+            }
+            placeholder="Naziv restorana"
+            sx={{
+              fontSize: "2.125rem", // h4 size
+              fontWeight: 780,
+              color: "#212222",
+              border: "none",
+              outline: "none",
+              bgcolor: "transparent",
+              width: "100%",
+              "&::placeholder": {
+                color: "text.disabled",
+              },
+              mb: 1,
+            }}
+          />
+
+          {error && (
+            <Alert severity="error" sx={{ mb: 3 }}>
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert severity="success" sx={{ mb: 3 }}>
+              {success}
+            </Alert>
+          )}
         </Box>
 
         <Box sx={{ px: 4, pb: 4, flexGrow: 1, overflowY: "auto" }}>
-          {renderFormContent()}
+          <Box component="form" onSubmit={handleSubmit}>
+            <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3, alignItems: "start" }}>
+              {/* Top Left: Basic Info & Image */}
+              <Box>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+                  Osnovne informacije
+                </Typography>
+                {renderImageUpload()}
+              </Box>
 
-          <Button
-            type="submit"
-            onClick={handleSubmit}
-            fullWidth
-            variant="contained"
-            size="large"
-            disabled={saving}
-            sx={{
-              mt: 2,
-              py: 1.5,
-              textTransform: "none",
-              fontSize: "1.1rem",
-              fontWeight: 600,
-              borderRadius: 2,
-              boxShadow: 2,
-              bgcolor: "#57aaf4",
-              "&:hover": { bgcolor: "#3d8fd9", boxShadow: 4 },
-            }}
-          >
-            {saving ? (
-              <>
-                <CircularProgress size={24} sx={{ mr: 1 }} color="inherit" />
-                Spremanje...
-              </>
-            ) : "Spremi promjene"}
-          </Button>
+              {/* Top Right: Staff */}
+              <Box>
+                <StaffAssignment restaurantId={id} />
+              </Box>
+
+              {/* Bottom Left: Location */}
+              <Box>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+                  Lokacija
+                </Typography>
+                <MapLocationPicker
+                  initialLocation={location || undefined}
+                  initialAddress={formData.address}
+                  onLocationChange={(loc, addr) => {
+                    setLocation(loc);
+                    setFormData((prev) => ({ ...prev, address: addr }));
+                  }}
+                />
+              </Box>
+
+              {/* Bottom Right: Working Hours */}
+              <Box>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+                  Radno vrijeme
+                </Typography>
+                <WorkingHoursEditor
+                  initialData={initialHours}
+                  onChange={setWorkingHoursRaw}
+                />
+              </Box>
+            </Box>
+
+            <Button
+              type="submit"
+              onClick={handleSubmit}
+              fullWidth
+              variant="contained"
+              size="large"
+              disabled={saving}
+              sx={{
+                mt: 3, // Reduced from 4
+                py: 1.5,
+                textTransform: "none",
+                fontSize: "1.1rem",
+                fontWeight: 600,
+                borderRadius: 2,
+                boxShadow: 2,
+                bgcolor: "#57aaf4",
+                "&:hover": { bgcolor: "#3d8fd9", boxShadow: 4 },
+              }}
+            >
+              {saving ? (
+                <>
+                  <CircularProgress size={24} sx={{ mr: 1 }} color="inherit" />
+                  Spremanje...
+                </>
+              ) : (
+                "Spremi"
+              )}
+            </Button>
+          </Box>
         </Box>
       </Box>
     </Box>

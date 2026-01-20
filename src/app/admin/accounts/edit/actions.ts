@@ -118,6 +118,7 @@ export async function getEmployeeAccount(clerkId: string) {
         username: clerkUser.username || "",
         role: clerkUser.publicMetadata.role as UserRole,
         restaurantId: (clerkUser.publicMetadata.restaurantId as string) || "",
+        imageUrl: clerkUser.imageUrl,
       },
     };
   } catch (error: any) {

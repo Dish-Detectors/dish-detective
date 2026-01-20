@@ -11,54 +11,26 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import PersonIcon from "@mui/icons-material/Person";
 import PlaceIcon from "@mui/icons-material/Place";
-
-interface WorkingDay {
-  day: number;
-  shifts: { start: string; end: string }[];
-  _id?: string;
-}
 
 interface RestaurantCardProps {
   name: string;
   address: string;
-  workingHours: string[];
+  managerName?: string;
   imageUrl: string;
   onEdit: () => void;
   onDelete: () => void;
 }
 
-const formatHours = (hours: string[] | WorkingDay[]): string[] => {
-  if (!hours || hours.length === 0) return [];
-
-  if (typeof hours[0] === "string") {
-    return hours as string[];
-  }
-
-  const daysMap = ["NED", "PON", "UTO", "SRI", "ČET", "PET", "SUB"];
-  const rawHours = hours as WorkingDay[];
-
-  return rawHours.map((item) => {
-    const dayName = daysMap[item.day];
-    if (item.shifts && item.shifts.length > 0) {
-      return `${dayName}: ${item.shifts[0].start} - ${item.shifts[0].end}`;
-    }
-    return `${dayName}: Zatvoreno`;
-  });
-};
-
 export default function RestaurantCard({
   name,
   address,
-  workingHours,
+  managerName,
   imageUrl,
   onEdit,
   onDelete,
 }: RestaurantCardProps) {
-
-  const displayHours = formatHours(workingHours);
-
   const buttonStyle = {
     flex: 1,
     borderRadius: 2.5,
@@ -108,33 +80,11 @@ export default function RestaurantCard({
           </Typography>
         </Box>
 
-        <Box sx={{ display: "flex", alignItems: "start", mb: 2, gap: 1 }}>
-          <AccessTimeIcon
-            sx={{ fontSize: 18, color: "text.secondary", mt: 0.5 }}
-          />
-          <Box>
-            {displayHours && displayHours.length > 0 ? (
-              displayHours.slice(0, 2).map((hour, index) => (
-                <Typography
-                  key={index}
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ display: "block", lineHeight: 1.4 }}
-                >
-                  {hour}
-                </Typography>
-              ))
-            ) : (
-              <Typography variant="body2" color="text.secondary">
-                Nije uneseno
-              </Typography>
-            )}
-            {displayHours && displayHours.length > 2 && (
-              <Typography variant="caption" color="primary" fontWeight="bold">
-                +{displayHours.length - 2} više...
-              </Typography>
-            )}
-          </Box>
+        <Box sx={{ display: "flex", alignItems: "center", mb: 2, gap: 1 }}>
+          <PersonIcon sx={{ fontSize: 18, color: "text.secondary" }} />
+          <Typography variant="body2" color="text.secondary" noWrap>
+            Voditelj: {managerName || "Nije dodijeljen"}
+          </Typography>
         </Box>
 
         <Box sx={{ mt: "auto", pt: 2, display: "flex", gap: 1.5 }}>

@@ -28,11 +28,34 @@ export default function Header() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
+  // Get the role from the public metadata we just set
+  const userRole = user?.publicMetadata?.role as string;
+  // Create the dynamic link. Default to "/" if role isn't found.
+  const homeHref = userRole ? `/${userRole}` : "/";
+
+  // State for restaurant name
+  const [restaurantName, setRestaurantName] = React.useState<string | null>(
+    null,
+  );
+
+  React.useEffect(() => {
+    if (userRole === "worker" || userRole === "manager") {
+      import("@/app/admin/actions").then(({ getRestaurantName }) => {
+        getRestaurantName().then((result) => {
+          if (result.success && result.name) {
+            setRestaurantName(result.name);
+          }
+        });
+      });
+    }
+  }, [userRole]);
 
   if (isHomepage) {
     // ... (Homepage header remains unchanged)
@@ -167,30 +190,7 @@ export default function Header() {
     );
   }
 
-  // --- CHANGES ARE IN THIS SECTION ---
 
-  // Get the role from the public metadata we just set
-  const userRole = user?.publicMetadata?.role as string;
-  // Create the dynamic link. Default to "/" if role isn't found.
-  const homeHref = userRole ? `/${userRole}` : "/";
-  const isWorker = userRole === "worker" || pathname.startsWith("/worker");
-
-  // State for restaurant name
-  const [restaurantName, setRestaurantName] = React.useState<string | null>(
-    null,
-  );
-
-  React.useEffect(() => {
-    if (userRole === "worker" || userRole === "manager") {
-      import("@/app/admin/actions").then(({ getRestaurantName }) => {
-        getRestaurantName().then((result) => {
-          if (result.success && result.name) {
-            setRestaurantName(result.name);
-          }
-        });
-      });
-    }
-  }, [userRole]);
 
   // Non-homepage header (blue header)
   return (
