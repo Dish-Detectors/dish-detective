@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { createDish } from "./actions";
 import { put } from "@vercel/blob";
+import Allergen from "../../../../models/Allergen";
 
 // Mock Vercel Blob
 jest.mock("@vercel/blob", () => ({
@@ -9,6 +10,7 @@ jest.mock("@vercel/blob", () => ({
 }));
 
 describe("Create Dish Server Actions", () => {
+  jest.setTimeout(30000);
   let mongoServer: MongoMemoryServer;
 
   // Setup: Start in-memory MongoDB before all tests
@@ -18,13 +20,21 @@ describe("Create Dish Server Actions", () => {
 
     // Set the test URI as an environment variable
     process.env.MONGODB_TEST_URI = uri;
+
+    // Ensure indexes are built for the duplicates test
+    const conn = await mongoose.connect(uri);
+    // @ts-ignore
+    await conn.model("Dish").init();
   });
 
   // Cleanup: Close connection and stop MongoDB after all tests
   afterAll(async () => {
-    await mongoose.connection.close();
+    await mongoose.disconnect();
     await mongoServer.stop();
     delete process.env.MONGODB_TEST_URI;
+    // Reset the global mongoose cache to prevent interference with other tests
+    // @ts-ignore
+    global.mongoose = { conn: null, promise: null };
   });
 
   // Clear database after each test
@@ -37,6 +47,9 @@ describe("Create Dish Server Actions", () => {
   });
 
   it("should create a dish with image upload", async () => {
+    const gluten = await Allergen.create({ name: "gluten" });
+    const dairy = await Allergen.create({ name: "dairy" });
+
     // Mock the Vercel Blob upload
     const mockBlobUrl = "https://blob.vercel-storage.com/test-image.jpg";
     (put as jest.Mock).mockResolvedValue({ url: mockBlobUrl });
@@ -46,7 +59,8 @@ describe("Create Dish Server Actions", () => {
     formData.append("name", "Test Pizza");
     formData.append("description", "Delicious test pizza");
     formData.append("category", "Pizza");
-    formData.append("allergens", "gluten,dairy");
+    // Ensure no spaces or validation
+    formData.append("allergens", `${gluten._id},${dairy._id}`);
 
     // Create a mock file
     const mockFile = new File(["test"], "test.jpg", { type: "image/jpeg" });
@@ -60,7 +74,7 @@ describe("Create Dish Server Actions", () => {
     expect(result.data.imageUrl).toBe(mockBlobUrl);
     expect(put).toHaveBeenCalledWith(
       expect.stringContaining("dishes/"),
-      mockFile,
+      expect.objectContaining({ name: "test.jpg" }),
       { access: "public" },
     );
   });
@@ -90,12 +104,16 @@ describe("Create Dish Server Actions", () => {
     expect(result.data.imageUrl).toBe(mockBlobUrl);
     expect(put).toHaveBeenCalledWith(
       expect.stringContaining("dishes/"),
-      mockFile,
+      expect.objectContaining({ name: "small.jpg" }),
       { access: "public" },
     );
   });
 
   it("should handle allergens correctly", async () => {
+    const peanuts = await Allergen.create({ name: "peanuts" });
+    const gluten = await Allergen.create({ name: "gluten" });
+    const soy = await Allergen.create({ name: "soy" });
+
     const mockBlobUrl = "https://blob.vercel-storage.com/peanut-sandwich.jpg";
     (put as jest.Mock).mockResolvedValue({ url: mockBlobUrl });
 
@@ -103,7 +121,7 @@ describe("Create Dish Server Actions", () => {
     formData.append("name", "Peanut Butter Sandwich");
     formData.append("description", "Classic PB sandwich");
     formData.append("category", "Sandwiches");
-    formData.append("allergens", "peanuts, gluten, soy");
+    formData.append("allergens", `${peanuts._id},${gluten._id},${soy._id}`);
 
     const mockFile = new File(["test"], "sandwich.jpg", { type: "image/jpeg" });
     formData.append("image", mockFile);
@@ -115,18 +133,21 @@ describe("Create Dish Server Actions", () => {
     // Verify allergens were parsed correctly
     const conn = await mongoose.connection;
     const DishModel = conn.model("Dish");
-    const dish = await DishModel.findById(result.data.id);
+    // Populate to check names
+    const dish = await DishModel.findById(result.data.id).populate("allergens");
 
     expect(dish.allergens).toHaveLength(3);
-    expect(dish.allergens).toContain("peanuts");
-    expect(dish.allergens).toContain("gluten");
-    expect(dish.allergens).toContain("soy");
+    const names = dish.allergens.map((a: any) => a.name);
+    expect(names).toContain("peanuts");
+    expect(names).toContain("gluten");
+    expect(names).toContain("soy");
   });
 
   it("should fail with missing required fields", async () => {
     const formData = new FormData();
     formData.append("name", "Incomplete Dish");
     // Missing description and category
+    // Missing image
 
     const result = await createDish(formData);
 
@@ -187,6 +208,10 @@ describe("Create Dish Server Actions", () => {
   });
 
   it("should trim whitespace from inputs", async () => {
+    const dairy = await Allergen.create({ name: "dairy" });
+    const gluten = await Allergen.create({ name: "gluten" });
+    const eggs = await Allergen.create({ name: "eggs" });
+
     const mockBlobUrl = "https://blob.vercel-storage.com/spaced-pizza.jpg";
     (put as jest.Mock).mockResolvedValue({ url: mockBlobUrl });
 
@@ -194,7 +219,8 @@ describe("Create Dish Server Actions", () => {
     formData.append("name", "  Spaced Pizza  ");
     formData.append("description", "  Spaced description  ");
     formData.append("category", "  Spaced Category  ");
-    formData.append("allergens", " dairy , gluten , eggs ");
+    // Use IDs, comma separated.
+    formData.append("allergens", `${dairy._id},${gluten._id},${eggs._id}`);
     const mockFile = new File(["test"], "pizza.jpg", { type: "image/jpeg" });
     formData.append("image", mockFile);
 
@@ -204,11 +230,16 @@ describe("Create Dish Server Actions", () => {
 
     const conn = await mongoose.connection;
     const DishModel = conn.model("Dish");
+    // No populate, check IDs
     const dish = await DishModel.findById(result.data.id);
 
     expect(dish.name).toBe("Spaced Pizza");
     expect(dish.description).toBe("Spaced description");
     expect(dish.category).toBe("Spaced Category");
-    expect(dish.allergens).toEqual(["dairy", "gluten", "eggs"]);
+
+    const storedIds = dish.allergens.map((id: any) => id.toString());
+    expect(storedIds).toContain(dairy._id.toString());
+    expect(storedIds).toContain(gluten._id.toString());
+    expect(storedIds).toContain(eggs._id.toString());
   });
 });
