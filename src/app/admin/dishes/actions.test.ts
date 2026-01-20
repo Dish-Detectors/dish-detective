@@ -105,7 +105,11 @@ describe("Dish Server Actions", () => {
         description: "Pasta with eggs, cheese, and bacon",
         category: "Pasta",
         imageUrl: "https://example.com/carbonara.jpg",
-        allergens: [gluten._id.toString(), dairy._id.toString(), eggs._id.toString()],
+        allergens: [
+          gluten._id.toString(),
+          dairy._id.toString(),
+          eggs._id.toString(),
+        ],
       },
       {
         name: "Grilled Chicken",
@@ -119,7 +123,11 @@ describe("Dish Server Actions", () => {
         description: "Italian coffee-flavored dessert",
         category: "Desserts",
         imageUrl: "https://example.com/tiramisu.jpg",
-        allergens: [gluten._id.toString(), dairy._id.toString(), eggs._id.toString()],
+        allergens: [
+          gluten._id.toString(),
+          dairy._id.toString(),
+          eggs._id.toString(),
+        ],
       },
     ];
 
@@ -141,7 +149,11 @@ describe("Dish Server Actions", () => {
     // Update first dish (Margherita Pizza)
     const updateResult1 = await updateDish(createdDishIds[0], {
       description: "Updated: Classic Italian pizza with fresh basil",
-      allergens: [gluten._id.toString(), dairy._id.toString(), basil._id.toString()],
+      allergens: [
+        gluten._id.toString(),
+        dairy._id.toString(),
+        basil._id.toString(),
+      ],
     });
     expect(updateResult1.success).toBe(true);
     console.log(`Updated dish: ${updateResult1.data.name}`);
