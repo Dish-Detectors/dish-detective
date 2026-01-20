@@ -19,6 +19,7 @@ export interface IRestaurant extends Document {
   name: string;
   address: string;
   imageUrl: string;
+  manager?: string;
   workingHours: IWorkingDay[];
   location: Location;
   createdAt: Date;
@@ -48,6 +49,10 @@ const restaurantSchema = new Schema<IRestaurant>(
     name: {
       type: String,
       required: [true, "Restaurant name is required"],
+      trim: true,
+    },
+    manager: {
+      type: String,
       trim: true,
     },
     address: {

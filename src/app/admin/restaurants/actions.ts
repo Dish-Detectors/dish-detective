@@ -1,78 +1,18 @@
 "use server";
 
-import Restaurant, { Location, IWorkingDay } from "../../../models/Restaurant";
+import Restaurant from "../../../models/Restaurant";
 import dbConnect from "../../../utils/dbConnect";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { Types } from "mongoose";
+import { clerkClient, auth } from "@clerk/nextjs/server";
 
-type RestaurantInput = {
-  name: string;
-  address: string;
-  imageUrl: string;
-  workingHours: IWorkingDay[];
-  location: Location;
-};
-
-type ActionResponse = {
+// Export types if needed elsewhere, though redundancy in create/edit is fine for now
+export type ActionResponse = {
   success: boolean;
   message: string;
   data?: any;
   errors?: Record<string, string>;
 };
-
-export async function createRestaurant(
-  input: RestaurantInput,
-): Promise<ActionResponse> {
-  try {
-    await dbConnect();
-
-    const restaurant = await Restaurant.create({
-      name: input.name.trim(),
-      address: input.address.trim(),
-      location: input.location,
-      imageUrl: input.imageUrl.trim(),
-      workingHours: input.workingHours || [],
-    });
-
-    return {
-      success: true,
-      message: "Restaurant created successfully",
-      data: {
-        id: (restaurant._id as Types.ObjectId).toString(),
-      },
-    };
-  } catch (error: any) {
-    console.error("Error creating restaurant:", error);
-
-    // Handle duplicate name error
-    if (error.code === 11000) {
-      return {
-        success: false,
-        message: "A restaurant with this name already exists",
-        errors: { name: "This name is already taken" },
-      };
-    }
-
-    // Mongoose validation
-    if (error.name === "ValidationError") {
-      const errors: Record<string, string> = {};
-      Object.keys(error.errors).forEach((key) => {
-        errors[key] = error.errors[key].message;
-      });
-
-      return {
-        success: false,
-        message: "Validation failed",
-        errors,
-      };
-    }
-
-    return {
-      success: false,
-      message: "Failed to create restaurant. Please try again.",
-    };
-  }
-}
 
 export async function deleteRestaurant(
   restaurantId: string,
@@ -140,78 +80,174 @@ export async function getAllRestaurants(): Promise<ActionResponse> {
   }
 }
 
-export async function updateRestaurant(
-  restId: string,
-  input: Partial<RestaurantInput>,
-): Promise<ActionResponse> {
+// --- Staff Management Actions ---
+
+export async function searchAvailableUsers(query: string) {
+  // Deprecated in favor of getAvailableUsers for local filtering, but kept for compatibility if needed
+  return getAvailableUsers();
+}
+
+export async function getAvailableUsers() {
   try {
-    await dbConnect();
+    const { userId } = await auth();
+    if (!userId) return { success: false, error: "Unauthorized" };
 
-    // Update only whats provided
-    const updateData: any = {};
-    if (input.name !== undefined) updateData.name = input.name.trim();
-    if (input.address !== undefined) updateData.address = input.address.trim();
-    if (input.workingHours !== undefined)
-      updateData.workingHours = input.workingHours;
-    if (input.imageUrl !== undefined)
-      updateData.imageUrl = input.imageUrl.trim();
-    if (input.location !== undefined) updateData.location = input.location;
-
-    const updatedRest = await Restaurant.findByIdAndUpdate(restId, updateData, {
-      new: true,
-      runValidators: true,
+    const client = await clerkClient();
+    // Fetch a larger batch of users to filter locally
+    const users = await client.users.getUserList({
+      limit: 499,
     });
 
-    if (!updatedRest) {
-      return {
-        success: false,
-        message: "Rest not found",
-      };
+    const availableUsers = users.data
+      .filter((user) => {
+        const metadata = user.publicMetadata as {
+          restaurantId?: string;
+          role?: string;
+        };
+        const restaurantId = metadata.restaurantId;
+        const role = metadata.role;
+
+        // Exclude if already assigned
+        if (restaurantId) return false;
+
+        // Exclude restricted roles
+        if (role === "admin") return false;
+        if (role === "student") return false;
+
+        // Include everyone else (null, undefined, "worker" if unassigned, etc)
+        return true;
+      })
+      .map((user) => ({
+        id: user.id,
+        name: user.firstName
+          ? `${user.firstName} ${user.lastName || ""}`
+          : user.username || "Unknown",
+        username: user.username,
+        email: user.emailAddresses[0]?.emailAddress,
+      }));
+
+    return { success: true, data: availableUsers };
+  } catch (error) {
+    console.error("Error searching users:", error);
+    return { success: false, error: "Failed to search users" };
+  }
+}
+
+export async function getRestaurantStaff(restaurantId: string) {
+  try {
+    const { userId } = await auth();
+    if (!userId) return { success: false, error: "Unauthorized" };
+
+    const client = await clerkClient();
+
+    const users = await client.users.getUserList({ limit: 499 });
+
+    const staff = users.data
+      .filter((user) => user.publicMetadata.restaurantId === restaurantId)
+      .map((user) => ({
+        id: user.id,
+        name: user.firstName
+          ? `${user.firstName} ${user.lastName || ""}`
+          : user.username || "Unknown",
+        role: user.publicMetadata.role as "manager" | "worker",
+        email: user.emailAddresses[0]?.emailAddress,
+      }));
+
+    return { success: true, data: staff };
+  } catch (error) {
+    console.error("Error fetching staff:", error);
+    return { success: false, error: "Failed to fetch staff" };
+  }
+}
+
+export async function assignEmployee(
+  userId: string,
+  restaurantId: string,
+  role: "manager" | "worker",
+) {
+  try {
+    const { userId: adminId, sessionClaims } = await auth();
+    if (!adminId || sessionClaims?.metadata?.role !== "admin") {
+      return { success: false, error: "Unauthorized" };
     }
 
-    return {
-      success: true,
-      message: "Rest updated successfully",
-      data: {
-        id: (updatedRest._id as Types.ObjectId).toString(),
+    const client = await clerkClient();
+
+    // 1. Update User Metadata
+    await client.users.updateUserMetadata(userId, {
+      publicMetadata: {
+        restaurantId,
+        role,
       },
-    };
-  } catch (error: any) {
-    console.error("Error updating restaurant:", error);
+    });
 
-    // Handle duplicate name error
-    if (error.code === 11000) {
-      return {
-        success: false,
-        message: "A restaurant with this name already exists",
-        errors: { name: "This name is already taken" },
-      };
-    }
+    // 2. If Manager, update Restaurant model string
+    if (role === "manager") {
+      await dbConnect();
+      const user = await client.users.getUser(userId);
+      const managerName = user.firstName
+        ? `${user.firstName} ${user.lastName || ""}`
+        : user.username || "Unknown";
 
-    if (error.name === "ValidationError") {
-      const errors: Record<string, string> = {};
-      Object.keys(error.errors).forEach((key) => {
-        errors[key] = error.errors[key].message;
+      await Restaurant.findByIdAndUpdate(restaurantId, {
+        manager: managerName,
       });
-
-      return {
-        success: false,
-        message: "Validation failed",
-        errors,
-      };
     }
 
-    if (error.name === "CastError") {
-      return {
-        success: false,
-        message: "Invalid restaurant ID format",
-      };
+    return { success: true, message: "User assigned successfully" };
+  } catch (error) {
+    console.error("Error assigning user:", error);
+    return { success: false, error: "Failed to assign user" };
+  }
+}
+
+export async function removeEmployee(userId: string, restaurantId: string) {
+  try {
+    const { userId: adminId, sessionClaims } = await auth();
+    if (!adminId || sessionClaims?.metadata?.role !== "admin") {
+      return { success: false, error: "Unauthorized" };
     }
 
-    return {
-      success: false,
-      message: "Failed to update restaurant. Please try again.",
-    };
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
+
+    // 1. Remove Metadata
+    await client.users.updateUserMetadata(userId, {
+      publicMetadata: {
+        restaurantId: null,
+        role: null,
+      },
+    });
+
+    if (user.publicMetadata.role === "manager") {
+      // Wait for propagation or just re-fetch lists
+      // Fetch remaining staff
+      const allUsers = await client.users.getUserList({ limit: 499 });
+      const managers = allUsers.data.filter(
+        (u) =>
+          u.publicMetadata.restaurantId === restaurantId &&
+          u.publicMetadata.role === "manager" &&
+          u.id !== userId,
+      );
+
+      let nextManagerName = "";
+      if (managers.length > 0) {
+        const m = managers[0];
+        nextManagerName = m.firstName
+          ? `${m.firstName} ${m.lastName || ""}`
+          : m.username || "";
+      }
+
+      await dbConnect();
+      await Restaurant.findByIdAndUpdate(restaurantId, {
+        manager: nextManagerName, // Will be empty string if no other manager
+      });
+    }
+
+    return { success: true, message: "User removed successfully" };
+  } catch (error) {
+    console.error("Error removing user:", error);
+    return { success: false, error: "Failed to remove user" };
   }
 }
 

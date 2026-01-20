@@ -69,7 +69,7 @@ describe("Edit Dish Server Actions", () => {
         description: "Original description",
         category: "Pizza",
         imageUrl: "https://example.com/original.jpg",
-        allergens: ["gluten"],
+        allergens: [new mongoose.Types.ObjectId().toString()],
       });
 
       const dishId = createResult.data.id;
@@ -139,11 +139,15 @@ describe("Edit Dish Server Actions", () => {
         description: "Description",
         category: "Test",
         imageUrl: "https://example.com/test.jpg",
-        allergens: ["gluten"],
+        allergens: [new mongoose.Types.ObjectId().toString()],
       });
 
       const updateResult = await updateDish(createResult.data.id, {
-        allergens: ["gluten", "dairy", "eggs"],
+        allergens: [
+          new mongoose.Types.ObjectId().toString(),
+          new mongoose.Types.ObjectId().toString(),
+          new mongoose.Types.ObjectId().toString(),
+        ],
       });
 
       expect(updateResult.success).toBe(true);
@@ -155,14 +159,18 @@ describe("Edit Dish Server Actions", () => {
         description: "Original description",
         category: "Original",
         imageUrl: "https://example.com/original.jpg",
-        allergens: ["gluten"],
+        allergens: [new mongoose.Types.ObjectId().toString()],
       });
 
       const updateResult = await updateDish(createResult.data.id, {
         name: "Completely Updated Dish",
         description: "Completely updated description",
         category: "Premium",
-        allergens: ["gluten", "dairy", "nuts"],
+        allergens: [
+          new mongoose.Types.ObjectId().toString(),
+          new mongoose.Types.ObjectId().toString(),
+          new mongoose.Types.ObjectId().toString(),
+        ],
       });
 
       expect(updateResult.success).toBe(true);
@@ -260,7 +268,10 @@ describe("Edit Dish Server Actions", () => {
         description: "Original Description",
         category: "Original Category",
         imageUrl: "https://example.com/original.jpg",
-        allergens: ["gluten", "dairy"],
+        allergens: [
+          new mongoose.Types.ObjectId().toString(),
+          new mongoose.Types.ObjectId().toString(),
+        ],
       });
 
       // Only update the description
@@ -294,7 +305,10 @@ describe("Edit Dish Server Actions", () => {
         description: "Description",
         category: "Test",
         imageUrl: "https://example.com/test.jpg",
-        allergens: ["gluten", "dairy"],
+        allergens: [
+          new mongoose.Types.ObjectId().toString(),
+          new mongoose.Types.ObjectId().toString(),
+        ],
       });
 
       const updateResult = await updateDish(createResult.data.id, {

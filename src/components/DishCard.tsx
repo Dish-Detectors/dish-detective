@@ -19,7 +19,7 @@ interface DishCardProps {
   restaurantName: string;
   position: string;
   imageUrl?: string;
-  allergens?: string[];
+  allergens?: (string | { name: string })[];
   onEdit?: () => void;
   onDelete?: () => void;
   actionMode?: "delete" | "add";
@@ -155,19 +155,23 @@ const DishCard = ({
                 minHeight: "18px",
               }}
             >
-              {allergens.slice(0, 2).map((allergen) => (
-                <Chip
-                  key={allergen}
-                  label={allergen}
-                  size="small"
-                  sx={{
-                    height: 18,
-                    fontSize: "0.65rem",
-                    bgcolor: "error.light",
-                    color: "white",
-                  }}
-                />
-              ))}
+              {allergens.slice(0, 2).map((allergen) => {
+                const label =
+                  typeof allergen === "string" ? allergen : allergen.name;
+                return (
+                  <Chip
+                    key={label}
+                    label={label}
+                    size="small"
+                    sx={{
+                      height: 18,
+                      fontSize: "0.65rem",
+                      bgcolor: "error.light",
+                      color: "white",
+                    }}
+                  />
+                );
+              })}
               {allergens.length > 2 && (
                 <Chip
                   label={`+${allergens.length - 2}`}
@@ -374,19 +378,23 @@ const DishCard = ({
               minHeight: "24px",
             }}
           >
-            {allergens.slice(0, 3).map((allergen) => (
-              <Chip
-                key={allergen}
-                label={allergen}
-                size="small"
-                sx={{
-                  height: 20,
-                  bgcolor: "error.light",
-                  color: "white",
-                  fontSize: "0.7rem",
-                }}
-              />
-            ))}
+            {allergens.slice(0, 3).map((allergen) => {
+              const label =
+                typeof allergen === "string" ? allergen : allergen.name;
+              return (
+                <Chip
+                  key={label}
+                  label={label}
+                  size="small"
+                  sx={{
+                    height: 20,
+                    bgcolor: "error.light",
+                    color: "white",
+                    fontSize: "0.7rem",
+                  }}
+                />
+              );
+            })}
             {allergens.length > 3 && (
               <Chip
                 label={`+${allergens.length - 3}`}

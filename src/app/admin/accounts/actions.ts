@@ -10,6 +10,8 @@ type EmployeeData = {
   lastName: string;
   restaurantName: string;
   role: "manager" | "worker";
+  imageUrl?: string;
+  restaurantImage?: string;
 };
 
 type ActionResponse = {
@@ -63,10 +65,12 @@ export async function getAllEmployees(): Promise<ActionResponse> {
       try {
         const restaurantId = clerkUser.publicMetadata.restaurantId as string;
         let restaurantName = "Unknown";
+        let restaurantImage: string | undefined;
 
         if (restaurantId) {
           const restaurant = await Restaurant.findById(restaurantId).lean();
           restaurantName = restaurant?.name || "Unknown";
+          restaurantImage = restaurant?.imageUrl;
         }
 
         return {
@@ -75,6 +79,8 @@ export async function getAllEmployees(): Promise<ActionResponse> {
           lastName: clerkUser.lastName || "",
           restaurantName,
           role: clerkUser.publicMetadata.role as "manager" | "worker",
+          imageUrl: clerkUser.imageUrl,
+          restaurantImage,
         };
       } catch (error) {
         console.error(

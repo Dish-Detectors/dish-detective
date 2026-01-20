@@ -9,7 +9,7 @@ type DishInput = {
   description: string;
   category: string;
   imageUrl: string;
-  allergens: string[];
+  allergens: string[]; // Array of Allergen IDs
 };
 
 type ActionResponse = {

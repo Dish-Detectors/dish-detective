@@ -7,8 +7,8 @@ interface CreateEmployeeAccountParams {
   lastName: string;
   username: string;
   password: string;
-  role: UserRole;
-  restaurantId: string;
+  role?: UserRole;
+  restaurantId?: string;
 }
 
 export async function createEmployeeAccount({
@@ -33,8 +33,8 @@ export async function createEmployeeAccount({
       };
     }
 
-    // Validate role is manager or worker
-    if (role !== "manager" && role !== "worker") {
+    // Validate role if provided
+    if (role && role !== "manager" && role !== "worker") {
       return { success: false, error: "Role must be either manager or worker" };
     }
 
@@ -47,14 +47,14 @@ export async function createEmployeeAccount({
       lastName: lastName,
       skipPasswordRequirement: false,
       publicMetadata: {
-        role,
-        restaurantId,
+        role: role || null,
+        restaurantId: restaurantId || null,
       },
     });
 
     return {
       success: true,
-      message: "Employee account created successfully",
+      message: "User account created successfully",
       user: {
         id: clerkUser.id, // Use Clerk ID as the primary ID
         clerkId: clerkUser.id,

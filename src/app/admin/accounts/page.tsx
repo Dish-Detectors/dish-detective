@@ -30,6 +30,8 @@ type EmployeeData = {
   lastName: string;
   restaurantName: string;
   role: "manager" | "worker";
+  imageUrl?: string;
+  restaurantImage?: string;
 };
 
 export default function WorkerManagerAccountsPage() {
@@ -149,7 +151,7 @@ export default function WorkerManagerAccountsPage() {
         px: { xs: 3, sm: 5 },
         py: { xs: 3, sm: 5 },
         pt: 0,
-        pb: { xs: "130px", sm: 6 }, // Extra padding for mobile navbar and desktop spacing
+        pb: { xs: "130px", sm: 10 }, // Extra padding for mobile navbar and desktop spacing
         overflow: "hidden",
       }}
     >
@@ -250,7 +252,8 @@ export default function WorkerManagerAccountsPage() {
                 lg: "repeat(4, 1fr)",
               },
               gap: 3,
-              pb: 2,
+              pt: 1,
+              pb: 8,
             }}
           >
             {filteredEmployees.map((employee, index) => (
@@ -271,6 +274,8 @@ export default function WorkerManagerAccountsPage() {
                   lastName={employee.lastName}
                   restaurantName={employee.restaurantName}
                   role={employee.role}
+                  imageUrl={employee.imageUrl}
+                  restaurantImage={employee.restaurantImage}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
                 />

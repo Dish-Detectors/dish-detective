@@ -6,7 +6,7 @@ export interface IDish extends Document {
   description: string;
   category: string;
   imageUrl: string;
-  allergens: string[];
+  allergens: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -33,10 +33,13 @@ const dishSchema = new Schema<IDish>(
       required: [true, "Image URL is required"],
       trim: true,
     },
-    allergens: {
-      type: [String],
-      default: [],
-    },
+    allergens: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Allergen",
+        default: [],
+      },
+    ],
   },
   {
     timestamps: true,

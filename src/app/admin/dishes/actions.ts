@@ -1,8 +1,10 @@
 "use server";
 
 import Dish from "../../../models/Dish";
+import Allergen from "../../../models/Allergen";
 import dbConnect from "../../../utils/dbConnect";
 import { Types } from "mongoose";
+import { revalidatePath } from "next/cache";
 
 type DishInput = {
   name: string;
@@ -32,6 +34,7 @@ export async function deleteDish(dishId: string): Promise<ActionResponse> {
       };
     }
 
+    revalidatePath("/admin/dishes");
     return {
       success: true,
       message: "Dish deleted successfully",
@@ -53,7 +56,11 @@ export async function getAllDishes(): Promise<ActionResponse> {
   try {
     await dbConnect();
 
-    const dishes = await Dish.find({}).sort({ name: 1 }).lean().exec();
+    const dishes = await Dish.find({})
+      .sort({ name: 1 })
+      .populate("allergens") // Populate allergen details
+      .lean()
+      .exec();
 
     // Sanitize to remove Mongoose special objects
     const serializedDishes = JSON.parse(JSON.stringify(dishes));
@@ -70,5 +77,48 @@ export async function getAllDishes(): Promise<ActionResponse> {
       success: false,
       message: "Failed to retrieve dishes. Please try again.",
     };
+  }
+}
+
+// Allergen Actions
+
+export async function getAllAllergens() {
+  await dbConnect();
+  try {
+    const allergens = await Allergen.find({}).sort({ name: 1 }).lean();
+    return { success: true, data: JSON.parse(JSON.stringify(allergens)) };
+  } catch (error) {
+    console.error("Error fetching allergens:", error);
+    return { success: false, message: "Failed to fetch allergens" };
+  }
+}
+
+export async function createAllergen(name: string) {
+  await dbConnect();
+  try {
+    const existing = await Allergen.findOne({
+      name: { $regex: new RegExp(`^${name}$`, "i") },
+    });
+    if (existing) {
+      return { success: false, message: "Allergen already exists" };
+    }
+    const allergen = await Allergen.create({ name });
+    revalidatePath("/admin/dishes");
+    return { success: true, data: JSON.parse(JSON.stringify(allergen)) };
+  } catch (error) {
+    console.error("Error creating allergen:", error);
+    return { success: false, message: "Failed to create allergen" };
+  }
+}
+
+export async function deleteAllergen(id: string) {
+  await dbConnect();
+  try {
+    await Allergen.findByIdAndDelete(id);
+    revalidatePath("/admin/dishes");
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting allergen:", error);
+    return { success: false, message: "Failed to delete allergen" };
   }
 }
