@@ -28,7 +28,6 @@ export default function Header() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -189,8 +188,6 @@ export default function Header() {
       </AppBar>
     );
   }
-
-
 
   // Non-homepage header (blue header)
   return (

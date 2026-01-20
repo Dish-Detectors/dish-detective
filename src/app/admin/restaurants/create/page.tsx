@@ -373,9 +373,7 @@ export default function CreateRestaurantPage() {
           <Box
             component="input"
             value={formData.name}
-            onChange={(e) =>
-              setFormData({ ...formData, name: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             placeholder="Naziv restorana"
             sx={{
               fontSize: "2.125rem", // h4 size
@@ -406,7 +404,9 @@ export default function CreateRestaurantPage() {
 
         <Box sx={{ px: 4, pb: 4, flexGrow: 1, overflowY: "auto" }}>
           <Box component="form" onSubmit={handleSubmit}>
-            <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3 }}>
+            <Box
+              sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3 }}
+            >
               {/* Left Column: Image, Location */}
               <Box>
                 <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>

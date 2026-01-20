@@ -278,7 +278,10 @@ export async function getAvailableUsers() {
     // This allows users with role=null or role=undefined (valid unassigned staff candidates).
     const availableUsers = users.data
       .filter((user) => {
-        const metadata = user.publicMetadata as { restaurantId?: string; role?: string };
+        const metadata = user.publicMetadata as {
+          restaurantId?: string;
+          role?: string;
+        };
         const restaurantId = metadata.restaurantId;
         const role = metadata.role;
 
@@ -294,7 +297,9 @@ export async function getAvailableUsers() {
       })
       .map((user) => ({
         id: user.id,
-        name: user.firstName ? `${user.firstName} ${user.lastName || ""}` : user.username || "Unknown",
+        name: user.firstName
+          ? `${user.firstName} ${user.lastName || ""}`
+          : user.username || "Unknown",
         username: user.username,
         email: user.emailAddresses[0]?.emailAddress,
       }));
@@ -334,7 +339,9 @@ export async function getRestaurantStaff(restaurantId: string) {
       .filter((user) => user.publicMetadata.restaurantId === restaurantId)
       .map((user) => ({
         id: user.id,
-        name: user.firstName ? `${user.firstName} ${user.lastName || ""}` : user.username || "Unknown",
+        name: user.firstName
+          ? `${user.firstName} ${user.lastName || ""}`
+          : user.username || "Unknown",
         role: user.publicMetadata.role as "manager" | "worker",
         email: user.emailAddresses[0]?.emailAddress,
       }));
@@ -346,7 +353,11 @@ export async function getRestaurantStaff(restaurantId: string) {
   }
 }
 
-export async function assignEmployee(userId: string, restaurantId: string, role: "manager" | "worker") {
+export async function assignEmployee(
+  userId: string,
+  restaurantId: string,
+  role: "manager" | "worker",
+) {
   try {
     const { userId: adminId, sessionClaims } = await auth();
     if (!adminId || sessionClaims?.metadata?.role !== "admin") {
@@ -372,7 +383,7 @@ export async function assignEmployee(userId: string, restaurantId: string, role:
         : user.username || "Unknown";
 
       await Restaurant.findByIdAndUpdate(restaurantId, {
-        manager: managerName
+        manager: managerName,
       });
     }
 
@@ -401,9 +412,9 @@ export async function removeEmployee(userId: string, restaurantId: string) {
       },
     });
 
-    // 2. If they were a manager, check if there are other managers. 
-    // If this was the only manager, clear the specific manager string? 
-    // Or just clear it? The card displays "managerName". 
+    // 2. If they were a manager, check if there are other managers.
+    // If this was the only manager, clear the specific manager string?
+    // Or just clear it? The card displays "managerName".
     // If we remove *this* manager, we should probably update, but we don't know if there are others easily without fetching all.
     // Let's simple check: fetch all users for this restaurant, if any is manager, use their name. Else clear.
 
@@ -412,20 +423,23 @@ export async function removeEmployee(userId: string, restaurantId: string) {
       // Fetch remaining staff
       const allUsers = await client.users.getUserList({ limit: 499 });
       const managers = allUsers.data.filter(
-        u => u.publicMetadata.restaurantId === restaurantId &&
+        (u) =>
+          u.publicMetadata.restaurantId === restaurantId &&
           u.publicMetadata.role === "manager" &&
-          u.id !== userId
+          u.id !== userId,
       );
 
       let nextManagerName = "";
       if (managers.length > 0) {
         const m = managers[0];
-        nextManagerName = m.firstName ? `${m.firstName} ${m.lastName || ""}` : m.username || "";
+        nextManagerName = m.firstName
+          ? `${m.firstName} ${m.lastName || ""}`
+          : m.username || "";
       }
 
       await dbConnect();
       await Restaurant.findByIdAndUpdate(restaurantId, {
-        manager: nextManagerName // Will be empty string if no other manager
+        manager: nextManagerName, // Will be empty string if no other manager
       });
     }
 

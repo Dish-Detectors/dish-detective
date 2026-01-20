@@ -30,7 +30,6 @@ import AdminNavbar, { navWidth, headerHeight } from "@/components/AdminNavbar";
 
 // ... rest of component until handleSubmit
 
-
 type Restaurant = {
   _id: string;
   name: string;
@@ -93,7 +92,9 @@ export default function EmployeeCreatePage() {
       setPasswordError(validatePassword(password));
       // Re-validate confirm password if it exists
       if (formData.confirmPassword) {
-        setConfirmPasswordError(validateConfirmPassword(formData.confirmPassword, password));
+        setConfirmPasswordError(
+          validateConfirmPassword(formData.confirmPassword, password),
+        );
       }
     } else {
       setPasswordError("");
@@ -103,7 +104,9 @@ export default function EmployeeCreatePage() {
   const handleConfirmPasswordChange = (confirmPassword: string) => {
     setFormData({ ...formData, confirmPassword });
     if (confirmPassword) {
-      setConfirmPasswordError(validateConfirmPassword(confirmPassword, formData.password));
+      setConfirmPasswordError(
+        validateConfirmPassword(confirmPassword, formData.password),
+      );
     } else {
       setConfirmPasswordError("");
     }
@@ -130,7 +133,11 @@ export default function EmployeeCreatePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordError || confirmPasswordError || formData.password !== formData.confirmPassword) {
+    if (
+      passwordError ||
+      confirmPasswordError ||
+      formData.password !== formData.confirmPassword
+    ) {
       setError("Molimo provjerite lozinke");
       return;
     }
@@ -229,7 +236,12 @@ export default function EmployeeCreatePage() {
                 {imagePreview ? (
                   <Avatar
                     src={imagePreview}
-                    sx={{ width: 100, height: 100, border: "4px solid white", boxShadow: 1 }}
+                    sx={{
+                      width: 100,
+                      height: 100,
+                      border: "4px solid white",
+                      boxShadow: 1,
+                    }}
                   />
                 ) : (
                   <Box
@@ -237,7 +249,8 @@ export default function EmployeeCreatePage() {
                       width: 100,
                       height: 100,
                       borderRadius: "50%",
-                      bgcolor: formData.role === "manager" ? "#64b5f6" : "#ba68c8",
+                      bgcolor:
+                        formData.role === "manager" ? "#64b5f6" : "#ba68c8",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -246,7 +259,9 @@ export default function EmployeeCreatePage() {
                     }}
                   >
                     {formData.role === "manager" ? (
-                      <AssignmentIndIcon sx={{ fontSize: 60, color: "white" }} />
+                      <AssignmentIndIcon
+                        sx={{ fontSize: 60, color: "white" }}
+                      />
                     ) : (
                       <PersonIcon sx={{ fontSize: 60, color: "white" }} />
                     )}
@@ -256,7 +271,9 @@ export default function EmployeeCreatePage() {
             </Box>
 
             {/* Editable Header for Name & Last Name (Mobile) */}
-            <Box sx={{ mb: 4, display: "flex", flexDirection: "column", gap: 0 }}>
+            <Box
+              sx={{ mb: 4, display: "flex", flexDirection: "column", gap: 0 }}
+            >
               <InputBase
                 placeholder="Ime"
                 value={formData.name}
@@ -304,8 +321,6 @@ export default function EmployeeCreatePage() {
             )}
 
             <Box component="form" onSubmit={handleSubmit}>
-
-
               <TextField
                 fullWidth
                 label="Korisničko ime"
@@ -352,7 +367,9 @@ export default function EmployeeCreatePage() {
                 value={formData.confirmPassword}
                 onChange={(e) => handleConfirmPasswordChange(e.target.value)}
                 required
-                error={!!confirmPasswordError && formData.confirmPassword.length > 0}
+                error={
+                  !!confirmPasswordError && formData.confirmPassword.length > 0
+                }
                 helperText={
                   confirmPasswordError && formData.confirmPassword.length > 0
                     ? confirmPasswordError
@@ -372,7 +389,10 @@ export default function EmployeeCreatePage() {
           {/* Fixed Button Area at Bottom */}
           <Box
             onClick={
-              loading || loadingRestaurants || !!passwordError || !!confirmPasswordError
+              loading ||
+              loadingRestaurants ||
+              !!passwordError ||
+              !!confirmPasswordError
                 ? undefined
                 : handleSubmit
             }
@@ -383,14 +403,20 @@ export default function EmployeeCreatePage() {
               right: 0,
               height: "70px",
               bgcolor:
-                loading || loadingRestaurants || !!passwordError || !!confirmPasswordError
+                loading ||
+                loadingRestaurants ||
+                !!passwordError ||
+                !!confirmPasswordError
                   ? "grey.400"
                   : "#57aaf4",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               cursor:
-                loading || loadingRestaurants || !!passwordError || !!confirmPasswordError
+                loading ||
+                loadingRestaurants ||
+                !!passwordError ||
+                !!confirmPasswordError
                   ? "not-allowed"
                   : "pointer",
               transition: "all 0.2s ease-in-out",
@@ -398,7 +424,10 @@ export default function EmployeeCreatePage() {
               boxShadow: "0 -2px 8px rgba(0,0,0,0.15)",
               "&:active": {
                 bgcolor:
-                  loading || loadingRestaurants || !!passwordError || !!confirmPasswordError
+                  loading ||
+                  loadingRestaurants ||
+                  !!passwordError ||
+                  !!confirmPasswordError
                     ? "grey.400"
                     : "#3d8fd9",
               },
@@ -486,7 +515,12 @@ export default function EmployeeCreatePage() {
             >
               <Avatar
                 src={imagePreview || "/placeholder-user.jpg"}
-                sx={{ width: 120, height: 120, border: "4px solid white", boxShadow: 1 }}
+                sx={{
+                  width: 120,
+                  height: 120,
+                  border: "4px solid white",
+                  boxShadow: 1,
+                }}
               />
             </Badge>
           </Box>
@@ -564,8 +598,6 @@ export default function EmployeeCreatePage() {
           )}
 
           <Box component="form" onSubmit={handleSubmit}>
-
-
             <TextField
               fullWidth
               label="Korisničko ime"
@@ -610,7 +642,9 @@ export default function EmployeeCreatePage() {
               value={formData.confirmPassword}
               onChange={(e) => handleConfirmPasswordChange(e.target.value)}
               required
-              error={!!confirmPasswordError && formData.confirmPassword.length > 0}
+              error={
+                !!confirmPasswordError && formData.confirmPassword.length > 0
+              }
               helperText={
                 confirmPasswordError && formData.confirmPassword.length > 0
                   ? confirmPasswordError

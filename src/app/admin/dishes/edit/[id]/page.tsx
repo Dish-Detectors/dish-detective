@@ -14,12 +14,14 @@ import {
   Chip,
   IconButton,
   InputBase,
+  Autocomplete,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CloseIcon from "@mui/icons-material/Close";
 import AdminNavbar, { navWidth, headerHeight } from "@/components/AdminNavbar";
-import { getAllDishes } from "../../actions";
+import SuccessScreen from "@/components/SuccessScreen";
+import { getAllDishes, getAllAllergens } from "../../actions";
 import { updateDish } from "../actions";
 import { put } from "@vercel/blob";
 
@@ -32,22 +34,29 @@ export default function DishEditPage({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  interface Allergen {
+    _id: string;
+    name: string;
+  }
+
   const [id, setId] = useState<string | null>(null);
+  const [allAllergens, setAllAllergens] = useState<Allergen[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     category: "",
-    allergens: [] as string[],
+    allergens: [] as Allergen[],
   });
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [currentImageUrl, setCurrentImageUrl] = useState<string>("");
-  const [allergenInput, setAllergenInput] = useState("");
+  // const [allergenInput, setAllergenInput] = useState(""); // Removed manual input state
   const [loading, setLoading] = useState(false);
   const [loadingDish, setLoadingDish] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [showSuccessScreen, setShowSuccessScreen] = useState(false);
 
   useEffect(() => {
     params.then((p) => setId(p.id));
@@ -56,13 +65,20 @@ export default function DishEditPage({
   useEffect(() => {
     if (!id) return;
 
-    const loadDish = async () => {
+    const loadData = async () => {
       try {
         setLoadingDish(true);
-        const result = await getAllDishes();
+        const [dishesRes, allergensRes] = await Promise.all([
+          getAllDishes(),
+          getAllAllergens(),
+        ]);
 
-        if (result.success && result.data) {
-          const dish = result.data.find((d: any) => d._id === id);
+        if (allergensRes.success && allergensRes.data) {
+          setAllAllergens(allergensRes.data);
+        }
+
+        if (dishesRes.success && dishesRes.data) {
+          const dish = dishesRes.data.find((d: any) => d._id === id);
 
           if (dish) {
             setFormData({
@@ -86,7 +102,7 @@ export default function DishEditPage({
       }
     };
 
-    loadDish();
+    loadData();
   }, [id]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,23 +122,7 @@ export default function DishEditPage({
     setImagePreview(null);
   };
 
-  const handleAddAllergen = () => {
-    const trimmed = allergenInput.trim();
-    if (trimmed && !formData.allergens.includes(trimmed)) {
-      setFormData({
-        ...formData,
-        allergens: [...formData.allergens, trimmed],
-      });
-      setAllergenInput("");
-    }
-  };
-
-  const handleRemoveAllergen = (allergenToRemove: string) => {
-    setFormData({
-      ...formData,
-      allergens: formData.allergens.filter((a) => a !== allergenToRemove),
-    });
-  };
+  // Handlers removed as Autocomplete manages state directly
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -158,11 +158,12 @@ export default function DishEditPage({
         description: formData.description,
         category: formData.category,
         imageUrl: imageUrl,
-        allergens: formData.allergens,
+        allergens: formData.allergens.map((a) => a._id),
       });
 
       if (result.success) {
         setSuccess("Jelo uspješno ažurirano!");
+        setShowSuccessScreen(true);
         setTimeout(() => router.push("/admin/dishes"), 2000);
       } else {
         setError(result.message || "Došlo je do greške. Pokušajte ponovo.");
@@ -174,6 +175,10 @@ export default function DishEditPage({
       setLoading(false);
     }
   };
+
+  if (showSuccessScreen) {
+    return <SuccessScreen message="Jelo uspješno ažurirano!" />;
+  }
 
   if (loadingDish) {
     return (
@@ -364,56 +369,44 @@ export default function DishEditPage({
                 />
 
                 <Box sx={{ mb: 3 }}>
-                  <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-                    <TextField
-                      fullWidth
-                      label="Dodaj alergen"
-                      value={allergenInput}
-                      onChange={(e) => setAllergenInput(e.target.value)}
-                      onKeyPress={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          handleAddAllergen();
-                        }
-                      }}
-                      sx={{
-                        bgcolor: "white",
-                        "& .MuiOutlinedInput-root": {
-                          borderRadius: 2,
-                        },
-                      }}
-                    />
-                    <IconButton
-                      onClick={handleAddAllergen}
-                      sx={{
-                        bgcolor: "white",
-                        border: "1px solid #e0e0e0",
-                        borderRadius: 2,
-                        "&:hover": {
-                          bgcolor: "#e0e0e0",
-                        },
-                      }}
-                    >
-                      <AddIcon />
-                    </IconButton>
-                  </Box>
-
-                  {formData.allergens.length > 0 && (
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                      {formData.allergens.map((allergen) => (
+                  <Autocomplete
+                    multiple
+                    options={allAllergens}
+                    getOptionLabel={(option) => option.name}
+                    value={formData.allergens}
+                    isOptionEqualToValue={(option, value) =>
+                      option._id === value._id
+                    }
+                    onChange={(event, newValue) => {
+                      setFormData({ ...formData, allergens: newValue });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Dodaj alergen"
+                        placeholder="Odaberi alergene"
+                        sx={{
+                          bgcolor: "white",
+                          "& .MuiOutlinedInput-root": {
+                            borderRadius: 2,
+                          },
+                        }}
+                      />
+                    )}
+                    renderTags={(value, getTagProps) =>
+                      value.map((option, index) => (
                         <Chip
-                          key={allergen}
-                          label={allergen}
-                          onDelete={() => handleRemoveAllergen(allergen)}
+                          label={option.name}
+                          {...getTagProps({ index })}
                           sx={{
                             bgcolor: "white",
                             border: "1px solid",
                             borderColor: "primary.main",
                           }}
                         />
-                      ))}
-                    </Box>
-                  )}
+                      ))
+                    }
+                  />
                 </Box>
               </Box>
             </Box>
@@ -469,7 +462,7 @@ export default function DishEditPage({
         sx={{
           height: `calc(100vh - ${headerHeight}px)`,
           bgcolor: "#f5f5f5",
-          pt: 4,
+          pt: 2,
           pb: 10,
           pl: `${navWidth}px`,
           overflowY: "auto",
@@ -500,9 +493,83 @@ export default function DishEditPage({
           )}
 
           <Box component="form" onSubmit={handleSubmit}>
-            <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 5 }}>
-              {/* Left Column: Image */}
-              <Box sx={{ width: { xs: "100%", md: "40%" } }}>
+            {/* ROW 1: Name/Category and Image */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column-reverse", md: "row" },
+                gap: 5,
+                mb: 3,
+                alignItems: "flex-start",
+              }}
+            >
+              {/* Left: Name and Category */}
+              <Box sx={{ flex: 1, pt: 1 }}>
+                <InputBase
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  placeholder="Naziv jela"
+                  fullWidth
+                  required
+                  sx={{
+                    fontSize: "3rem",
+                    fontWeight: 800,
+                    color: "#212222",
+                    mb: 1,
+                    lineHeight: 1.2,
+                    "& input": { p: 0 },
+                  }}
+                />
+                <InputBase
+                  value={formData.category}
+                  onChange={(e) =>
+                    setFormData({ ...formData, category: e.target.value })
+                  }
+                  placeholder="Kategorija (npr. Glavno jelo)"
+                  fullWidth
+                  required
+                  sx={{
+                    fontSize: "1.5rem",
+                    color: "text.secondary",
+                    fontWeight: 500,
+                    mb: 4,
+                    "& input": { p: 0 },
+                  }}
+                />
+
+                <Typography variant="h6" fontWeight="bold" gutterBottom>
+                  Opis
+                </Typography>
+                <TextField
+                  fullWidth
+                  placeholder="Unesite opis jela..."
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                  required
+                  multiline
+                  rows={4}
+                  variant="outlined"
+                  sx={{
+                    mb: 4,
+                    "& .MuiOutlinedInput-root": {
+                      bgcolor: "grey.50",
+                      borderRadius: 3,
+                      "& fieldset": { borderColor: "transparent" },
+                      "&:hover fieldset": { borderColor: "grey.300" },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "primary.main",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+
+              {/* Right: Image */}
+              <Box sx={{ width: { xs: "100%", md: "350px" }, flexShrink: 0 }}>
                 <Box
                   sx={{
                     position: "relative",
@@ -618,168 +685,88 @@ export default function DishEditPage({
                   )}
                 </Box>
               </Box>
+            </Box>
 
-              {/* Right Column: Key Details */}
-              <Box sx={{ width: { xs: "100%", md: "60%" } }}>
-                {/* Editable Title */}
-                <InputBase
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  placeholder="Naziv jela"
-                  fullWidth
-                  required
-                  sx={{
-                    fontSize: "2.5rem",
-                    fontWeight: 800,
-                    color: "#212222",
-                    mb: 1,
-                    "& input": { p: 0 },
-                  }}
-                />
-
-                <InputBase
-                  value={formData.category}
-                  onChange={(e) =>
-                    setFormData({ ...formData, category: e.target.value })
-                  }
-                  placeholder="Kategorija (npr. Glavno jelo)"
-                  fullWidth
-                  required
-                  sx={{
-                    fontSize: "1.25rem",
-                    color: "text.secondary",
-                    fontWeight: 500,
-                    mb: 4,
-                    "& input": { p: 0 },
-                  }}
-                />
-
-                <Typography
-                  variant="h6"
-                  fontWeight="bold"
-                  gutterBottom
-                  sx={{ mt: 2 }}
-                >
-                  Opis
-                </Typography>
-                <TextField
-                  fullWidth
-                  placeholder="Unesite opis jela..."
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  required
-                  multiline
-                  rows={4}
-                  variant="outlined"
-                  sx={{
-                    mb: 4,
-                    "& .MuiOutlinedInput-root": {
-                      bgcolor: "grey.50",
-                      borderRadius: 3,
-                      "& fieldset": { borderColor: "transparent" },
-                      "&:hover fieldset": { borderColor: "grey.300" },
-                      "&.Mui-focused fieldset": {
-                        borderColor: "primary.main",
+            {/* ROW 3: Allergens */}
+            <Typography
+              variant="h6"
+              fontWeight="bold"
+              gutterBottom
+              sx={{ mt: -2 }}
+            >
+              Alergeni
+            </Typography>
+            <Box sx={{ mb: 4 }}>
+              <Autocomplete
+                multiple
+                options={allAllergens}
+                getOptionLabel={(option) => option.name}
+                value={formData.allergens}
+                isOptionEqualToValue={(option, value) =>
+                  option._id === value._id
+                }
+                onChange={(event, newValue) => {
+                  setFormData({ ...formData, allergens: newValue });
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Odaberi alergene"
+                    variant="outlined"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        bgcolor: "grey.50",
+                        borderRadius: 3,
+                        "& fieldset": { borderColor: "transparent" },
+                        "&:hover fieldset": { borderColor: "grey.300" },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "primary.main",
+                        },
                       },
-                    },
-                  }}
-                />
-
-                <Typography variant="h6" fontWeight="bold" gutterBottom>
-                  Alergeni
-                </Typography>
-                <Box sx={{ mb: 4 }}>
-                  <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-                    <TextField
-                      size="small"
-                      placeholder="Dodaj alergen..."
-                      value={allergenInput}
-                      onChange={(e) => setAllergenInput(e.target.value)}
-                      onKeyPress={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          handleAddAllergen();
-                        }
-                      }}
+                    }}
+                  />
+                )}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip
+                      label={option.name}
+                      {...getTagProps({ index })}
                       sx={{
-                        minWidth: 200,
-                        "& .MuiOutlinedInput-root": { borderRadius: 2 },
+                        bgcolor: "primary.50",
+                        color: "primary.main",
+                        fontWeight: 600,
+                        borderRadius: 2,
                       }}
                     />
-                    <IconButton
-                      onClick={handleAddAllergen}
-                      sx={{
-                        bgcolor: "primary.main",
-                        color: "white",
-                        borderRadius: 2,
-                        "&:hover": { bgcolor: "primary.dark" },
-                      }}
-                    >
-                      <AddIcon />
-                    </IconButton>
-                  </Box>
+                  ))
+                }
+              />
+            </Box>
 
-                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                    {formData.allergens.map((allergen) => (
-                      <Chip
-                        key={allergen}
-                        label={allergen}
-                        onDelete={() => handleRemoveAllergen(allergen)}
-                        sx={{
-                          bgcolor: "primary.50",
-                          color: "primary.main",
-                          fontWeight: 600,
-                          borderRadius: 2,
-                          "& .MuiChip-deleteIcon": {
-                            color: "primary.main",
-                            opacity: 0.7,
-                            "&:hover": { opacity: 1 },
-                          },
-                        }}
-                      />
-                    ))}
-                    {formData.allergens.length === 0 && (
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        fontStyle="italic"
-                      >
-                        Nema dodanih alergena.
-                      </Typography>
-                    )}
-                  </Box>
-                </Box>
-
-                <Box
-                  sx={{ display: "flex", justifyContent: "flex-end", mt: 4 }}
-                >
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    size="large"
-                    disabled={loading}
-                    sx={{
-                      px: 5,
-                      py: 1.5,
-                      borderRadius: 3,
-                      textTransform: "none",
-                      fontSize: "1.1rem",
-                      fontWeight: 700,
-                      boxShadow: "0 8px 20px rgba(78, 167, 240, 0.3)",
-                    }}
-                  >
-                    {loading ? (
-                      <CircularProgress size={24} color="inherit" />
-                    ) : (
-                      "Spremi promjene"
-                    )}
-                  </Button>
-                </Box>
-              </Box>
+            {/* ROW 4: Save Button */}
+            <Box sx={{ mt: 4 }}>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                size="large"
+                disabled={loading}
+                sx={{
+                  px: 5,
+                  py: 1.5,
+                  borderRadius: 3,
+                  textTransform: "none",
+                  fontSize: "1.1rem",
+                  fontWeight: 700,
+                  boxShadow: "0 8px 20px rgba(78, 167, 240, 0.3)",
+                }}
+              >
+                {loading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  "Spremi promjene"
+                )}
+              </Button>
             </Box>
           </Box>
         </Box>

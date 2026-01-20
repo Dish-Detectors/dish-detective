@@ -28,7 +28,9 @@ export default function RestaurantsPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [restaurantToDelete, setRestaurantToDelete] = useState<string | null>(null);
+  const [restaurantToDelete, setRestaurantToDelete] = useState<string | null>(
+    null,
+  );
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
@@ -69,7 +71,9 @@ export default function RestaurantsPage() {
     try {
       const response = await deleteRestaurant(restaurantToDelete);
       if (response.success) {
-        setRestaurants((prev) => prev.filter((r) => r._id !== restaurantToDelete));
+        setRestaurants((prev) =>
+          prev.filter((r) => r._id !== restaurantToDelete),
+        );
         setDeleteDialogOpen(false);
         setRestaurantToDelete(null);
       } else {
@@ -92,19 +96,50 @@ export default function RestaurantsPage() {
 
   if (loading) {
     return (
-      <Box sx={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", bgcolor: "#f5f5f5" }}>
+      <Box
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          bgcolor: "#f5f5f5",
+        }}
+      >
         <PancakeStackLoader />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ height: "100vh", bgcolor: "#f5f5f5", display: "flex", flexDirection: "column", px: { xs: 3, sm: 5 }, py: { xs: 3, sm: 5 }, pt: 0, pb: { xs: 12, sm: 10 }, overflow: "hidden" }}>
-      <Typography variant="h4" sx={{ fontWeight: 780, mb: 4, color: "#212222", flexShrink: 0 }}>
+    <Box
+      sx={{
+        height: "100vh",
+        bgcolor: "#f5f5f5",
+        display: "flex",
+        flexDirection: "column",
+        px: { xs: 3, sm: 5 },
+        py: { xs: 3, sm: 5 },
+        pt: 0,
+        pb: { xs: 12, sm: 10 },
+        overflow: "hidden",
+      }}
+    >
+      <Typography
+        variant="h4"
+        sx={{ fontWeight: 780, mb: 4, color: "#212222", flexShrink: 0 }}
+      >
         Upravljaj restoranima
       </Typography>
 
-      <Box sx={{ display: "flex", gap: 2, mb: 4, maxWidth: { xs: "100%", sm: 600 }, flexShrink: 0 }}>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 2,
+          mb: 4,
+          maxWidth: { xs: "100%", sm: 600 },
+          flexShrink: 0,
+        }}
+      >
         <TextField
           fullWidth
           placeholder="Pretraži restorane..."
@@ -122,12 +157,22 @@ export default function RestaurantsPage() {
           sx={{
             bgcolor: "white",
             borderRadius: 10,
-            "& .MuiOutlinedInput-root": { borderRadius: 10, "& fieldset": { borderColor: "#e0e0e0" } },
+            "& .MuiOutlinedInput-root": {
+              borderRadius: 10,
+              "& fieldset": { borderColor: "#e0e0e0" },
+            },
           }}
         />
         <IconButton
           onClick={handleAddNew}
-          sx={{ bgcolor: "white", border: "1px solid #e0e0e0", width: 56, height: 56, borderRadius: "50%", "&:hover": { bgcolor: "#e0e0e0" } }}
+          sx={{
+            bgcolor: "white",
+            border: "1px solid #e0e0e0",
+            width: 56,
+            height: 56,
+            borderRadius: "50%",
+            "&:hover": { bgcolor: "#e0e0e0" },
+          }}
         >
           <AddIcon />
         </IconButton>
@@ -135,13 +180,36 @@ export default function RestaurantsPage() {
 
       <Box sx={{ flex: 1, overflowY: "auto", pr: 1 }}>
         {filteredRestaurants.length === 0 ? (
-          <Box sx={{ bgcolor: "white", p: 4, borderRadius: 3, textAlign: "center", maxWidth: 600 }}>
+          <Box
+            sx={{
+              bgcolor: "white",
+              p: 4,
+              borderRadius: 3,
+              textAlign: "center",
+              maxWidth: 600,
+            }}
+          >
             <Typography variant="body1" color="text.secondary">
-              {searchQuery ? "Nema rezultata pretrage" : "Nema unesenih restorana"}
+              {searchQuery
+                ? "Nema rezultata pretrage"
+                : "Nema unesenih restorana"}
             </Typography>
           </Box>
         ) : (
-          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(3, 1fr)", xl: "repeat(4, 1fr)" }, gap: 3, pt: 1, pb: 8 }}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "repeat(2, 1fr)",
+                lg: "repeat(3, 1fr)",
+                xl: "repeat(4, 1fr)",
+              },
+              gap: 3,
+              pt: 1,
+              pb: 8,
+            }}
+          >
             {filteredRestaurants.map((restaurant, index) => (
               <Box
                 key={restaurant._id}
@@ -168,18 +236,30 @@ export default function RestaurantsPage() {
         )}
       </Box>
 
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
         <DialogTitle>Potvrda brisanja</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Jeste li sigurni da želite obrisati ovaj restoran? Ova radnja se ne može poništiti.
+            Jeste li sigurni da želite obrisati ovaj restoran? Ova radnja se ne
+            može poništiti.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)} disabled={deleting}>
+          <Button
+            onClick={() => setDeleteDialogOpen(false)}
+            disabled={deleting}
+          >
             Odustani
           </Button>
-          <Button onClick={confirmDelete} color="error" variant="contained" disabled={deleting}>
+          <Button
+            onClick={confirmDelete}
+            color="error"
+            variant="contained"
+            disabled={deleting}
+          >
             {deleting ? "Brisanje..." : "Obriši"}
           </Button>
         </DialogActions>

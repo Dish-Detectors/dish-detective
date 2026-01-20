@@ -68,7 +68,14 @@ export default function EmployeeCard({
         },
       }}
     >
-      <Box sx={{ position: "relative", height: 160, overflow: "hidden", bgcolor: "#f5f5f5" }}>
+      <Box
+        sx={{
+          position: "relative",
+          height: 160,
+          overflow: "hidden",
+          bgcolor: "#f5f5f5",
+        }}
+      >
         {restaurantImage && (
           <Box
             sx={{

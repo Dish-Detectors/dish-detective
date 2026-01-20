@@ -210,9 +210,7 @@ export default function EditRestaurantPage({
         textAlign: "center",
         transition: "all 0.2s",
         "&:hover": {
-          borderColor: imagePreview
-            ? "transparent"
-            : "primary.main",
+          borderColor: imagePreview ? "transparent" : "primary.main",
           bgcolor: "grey.100",
         },
       }}
@@ -466,8 +464,8 @@ export default function EditRestaurantPage({
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "center",
-        pt: 4, // Reduced from 12
-        pb: 4, // Reduced from 15
+        pt: 4,
+        pb: 10,
       }}
     >
       <Box
@@ -488,9 +486,7 @@ export default function EditRestaurantPage({
           <Box
             component="input"
             value={formData.name}
-            onChange={(e) =>
-              setFormData({ ...formData, name: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             placeholder="Naziv restorana"
             sx={{
               fontSize: "2.125rem", // h4 size
@@ -521,7 +517,14 @@ export default function EditRestaurantPage({
 
         <Box sx={{ px: 4, pb: 4, flexGrow: 1, overflowY: "auto" }}>
           <Box component="form" onSubmit={handleSubmit}>
-            <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3, alignItems: "start" }}>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 3,
+                alignItems: "start",
+              }}
+            >
               {/* Top Left: Basic Info & Image */}
               <Box>
                 <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>

@@ -103,7 +103,9 @@ export default function EditWorkerManagerAccountPage({
     if (password) {
       setPasswordError(validatePassword(password));
       if (passwords.confirmPassword) {
-        setConfirmPasswordError(validateConfirmPassword(passwords.confirmPassword, password));
+        setConfirmPasswordError(
+          validateConfirmPassword(passwords.confirmPassword, password),
+        );
       }
     } else {
       setPasswordError("");
@@ -113,7 +115,9 @@ export default function EditWorkerManagerAccountPage({
   const handleConfirmPasswordChange = (confirm: string) => {
     setPasswords({ ...passwords, confirmPassword: confirm });
     if (confirm) {
-      setConfirmPasswordError(validateConfirmPassword(confirm, passwords.newPassword));
+      setConfirmPasswordError(
+        validateConfirmPassword(confirm, passwords.newPassword),
+      );
     } else {
       setConfirmPasswordError("");
     }
@@ -194,8 +198,6 @@ export default function EditWorkerManagerAccountPage({
         role: formData.role,
       });
 
-
-
       if (result.success) {
         // Upload image if selected
         if (imageFile) {
@@ -225,7 +227,12 @@ export default function EditWorkerManagerAccountPage({
   const handlePasswordSubmit = async () => {
     if (!id) return;
 
-    if (passwordError || confirmPasswordError || !passwords.newPassword || passwords.newPassword !== passwords.confirmPassword) {
+    if (
+      passwordError ||
+      confirmPasswordError ||
+      !passwords.newPassword ||
+      passwords.newPassword !== passwords.confirmPassword
+    ) {
       return; // Validation should be handled by UI state, but double check
     }
 
@@ -329,7 +336,12 @@ export default function EditWorkerManagerAccountPage({
                   {imagePreview ? (
                     <Avatar
                       src={imagePreview}
-                      sx={{ width: 100, height: 100, border: "4px solid white", boxShadow: 1 }}
+                      sx={{
+                        width: 100,
+                        height: 100,
+                        border: "4px solid white",
+                        boxShadow: 1,
+                      }}
                     />
                   ) : (
                     <Box
@@ -337,7 +349,8 @@ export default function EditWorkerManagerAccountPage({
                         width: 100,
                         height: 100,
                         borderRadius: "50%",
-                        bgcolor: formData.role === "manager" ? "#64b5f6" : "#ba68c8",
+                        bgcolor:
+                          formData.role === "manager" ? "#64b5f6" : "#ba68c8",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -346,7 +359,9 @@ export default function EditWorkerManagerAccountPage({
                       }}
                     >
                       {formData.role === "manager" ? (
-                        <AssignmentIndIcon sx={{ fontSize: 60, color: "white" }} />
+                        <AssignmentIndIcon
+                          sx={{ fontSize: 60, color: "white" }}
+                        />
                       ) : (
                         <PersonIcon sx={{ fontSize: 60, color: "white" }} />
                       )}
@@ -356,7 +371,9 @@ export default function EditWorkerManagerAccountPage({
               </Box>
 
               {/* Editable Header for Name & Last Name (Mobile) */}
-              <Box sx={{ mb: 4, display: "flex", flexDirection: "column", gap: 0 }}>
+              <Box
+                sx={{ mb: 4, display: "flex", flexDirection: "column", gap: 0 }}
+              >
                 <InputBase
                   placeholder="Ime"
                   value={formData.name}
@@ -422,10 +439,21 @@ export default function EditWorkerManagerAccountPage({
                 />
 
                 {/* Read-only info: Restaurant and Position */}
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 4 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 2,
+                    mb: 4,
+                  }}
+                >
                   <Box
                     component={formData.restaurantId ? "a" : "div"}
-                    href={formData.restaurantId ? `/admin/restaurants/edit/${formData.restaurantId}` : undefined}
+                    href={
+                      formData.restaurantId
+                        ? `/admin/restaurants/edit/${formData.restaurantId}`
+                        : undefined
+                    }
                     sx={{
                       p: 2,
                       bgcolor: "rgba(0, 0, 0, 0.02)",
@@ -435,26 +463,62 @@ export default function EditWorkerManagerAccountPage({
                       textAlign: "center",
                       cursor: formData.restaurantId ? "pointer" : "default",
                       transition: "all 0.2s",
-                      "&:hover": formData.restaurantId ? {
-                        bgcolor: "rgba(0, 0, 0, 0.05)",
-                        borderColor: "primary.main"
-                      } : {}
+                      "&:hover": formData.restaurantId
+                        ? {
+                            bgcolor: "rgba(0, 0, 0, 0.05)",
+                            borderColor: "primary.main",
+                          }
+                        : {},
                     }}
                   >
-                    <Typography variant="caption" color="text.secondary" fontWeight={600}>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={600}
+                    >
                       RESTORAN
                     </Typography>
-                    <Typography variant="body1" fontWeight={500} sx={{ mt: 0.5, color: formData.restaurantId ? "primary.main" : "text.primary" }}>
-                      {restaurants.find(r => r._id === formData.restaurantId)?.name || "Nije dodijeljen"}
+                    <Typography
+                      variant="body1"
+                      fontWeight={500}
+                      sx={{
+                        mt: 0.5,
+                        color: formData.restaurantId
+                          ? "primary.main"
+                          : "text.primary",
+                      }}
+                    >
+                      {restaurants.find((r) => r._id === formData.restaurantId)
+                        ?.name || "Nije dodijeljen"}
                     </Typography>
                   </Box>
 
-                  <Box sx={{ p: 2, bgcolor: "rgba(0, 0, 0, 0.02)", borderRadius: 2, border: "1px solid #e0e0e0", textAlign: "center" }}>
-                    <Typography variant="caption" color="text.secondary" fontWeight={600}>
+                  <Box
+                    sx={{
+                      p: 2,
+                      bgcolor: "rgba(0, 0, 0, 0.02)",
+                      borderRadius: 2,
+                      border: "1px solid #e0e0e0",
+                      textAlign: "center",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={600}
+                    >
                       POZICIJA
                     </Typography>
-                    <Typography variant="body1" fontWeight={500} sx={{ mt: 0.5 }}>
-                      {formData.role === "manager" ? "Voditelj" : formData.role === "worker" ? "Radnik" : "Nije dodijeljeno"}
+                    <Typography
+                      variant="body1"
+                      fontWeight={500}
+                      sx={{ mt: 0.5 }}
+                    >
+                      {formData.role === "manager"
+                        ? "Voditelj"
+                        : formData.role === "worker"
+                          ? "Radnik"
+                          : "Nije dodijeljeno"}
                     </Typography>
                   </Box>
                 </Box>
@@ -470,7 +534,7 @@ export default function EditWorkerManagerAccountPage({
                       fontSize: "1rem",
                       fontWeight: 600,
                       borderRadius: 2,
-                      bgcolor: "white"
+                      bgcolor: "white",
                     }}
                   >
                     Promijeni lozinku
@@ -582,7 +646,12 @@ export default function EditWorkerManagerAccountPage({
               {imagePreview ? (
                 <Avatar
                   src={imagePreview}
-                  sx={{ width: 120, height: 120, border: "4px solid white", boxShadow: 1 }}
+                  sx={{
+                    width: 120,
+                    height: 120,
+                    border: "4px solid white",
+                    boxShadow: 1,
+                  }}
                 />
               ) : (
                 <Box
@@ -590,7 +659,8 @@ export default function EditWorkerManagerAccountPage({
                     width: 120,
                     height: 120,
                     borderRadius: "50%",
-                    bgcolor: formData.role === "manager" ? "#64b5f6" : "#ba68c8",
+                    bgcolor:
+                      formData.role === "manager" ? "#64b5f6" : "#ba68c8",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -609,7 +679,15 @@ export default function EditWorkerManagerAccountPage({
           </Box>
 
           {/* Editable Header for Name & Last Name */}
-          <Box sx={{ mb: 4, display: "flex", flexDirection: "column", gap: 0 }}>
+          <Box
+            sx={{
+              mb: 4,
+              display: "flex",
+              flexDirection: "column",
+              gap: 0,
+              alignItems: "center",
+            }}
+          >
             <InputBase
               placeholder="Ime"
               value={formData.name}
@@ -631,6 +709,7 @@ export default function EditWorkerManagerAccountPage({
                 },
                 "& input": {
                   p: 0,
+                  textAlign: "center",
                   "&::placeholder": {
                     color: "#bdbdbd",
                     opacity: 1,
@@ -659,6 +738,7 @@ export default function EditWorkerManagerAccountPage({
                 },
                 "& input": {
                   p: 0,
+                  textAlign: "center",
                   "&::placeholder": {
                     color: "#bdbdbd",
                     opacity: 1,
@@ -698,10 +778,21 @@ export default function EditWorkerManagerAccountPage({
             />
 
             {/* Read-only info: Restaurant and Position */}
-            <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2, mb: 4 }}>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 2,
+                mb: 4,
+              }}
+            >
               <Box
                 component={formData.restaurantId ? "a" : "div"}
-                href={formData.restaurantId ? `/admin/restaurants/edit/${formData.restaurantId}` : undefined}
+                href={
+                  formData.restaurantId
+                    ? `/admin/restaurants/edit/${formData.restaurantId}`
+                    : undefined
+                }
                 sx={{
                   p: 2,
                   bgcolor: "rgba(0, 0, 0, 0.02)",
@@ -711,26 +802,58 @@ export default function EditWorkerManagerAccountPage({
                   textAlign: "center",
                   cursor: formData.restaurantId ? "pointer" : "default",
                   transition: "all 0.2s",
-                  "&:hover": formData.restaurantId ? {
-                    bgcolor: "rgba(0, 0, 0, 0.05)",
-                    borderColor: "primary.main"
-                  } : {}
+                  "&:hover": formData.restaurantId
+                    ? {
+                        bgcolor: "rgba(0, 0, 0, 0.05)",
+                        borderColor: "primary.main",
+                      }
+                    : {},
                 }}
               >
-                <Typography variant="caption" color="text.secondary" fontWeight={600}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  fontWeight={600}
+                >
                   RESTORAN
                 </Typography>
-                <Typography variant="body1" fontWeight={500} sx={{ mt: 0.5, color: formData.restaurantId ? "primary.main" : "text.primary" }}>
-                  {restaurants.find(r => r._id === formData.restaurantId)?.name || "Nije dodijeljen"}
+                <Typography
+                  variant="body1"
+                  fontWeight={500}
+                  sx={{
+                    mt: 0.5,
+                    color: formData.restaurantId
+                      ? "primary.main"
+                      : "text.primary",
+                  }}
+                >
+                  {restaurants.find((r) => r._id === formData.restaurantId)
+                    ?.name || "Nije dodijeljen"}
                 </Typography>
               </Box>
 
-              <Box sx={{ p: 2, bgcolor: "rgba(0, 0, 0, 0.02)", borderRadius: 2, border: "1px solid #e0e0e0", textAlign: "center" }}>
-                <Typography variant="caption" color="text.secondary" fontWeight={600}>
+              <Box
+                sx={{
+                  p: 2,
+                  bgcolor: "rgba(0, 0, 0, 0.02)",
+                  borderRadius: 2,
+                  border: "1px solid #e0e0e0",
+                  textAlign: "center",
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  fontWeight={600}
+                >
                   POZICIJA
                 </Typography>
                 <Typography variant="body1" fontWeight={500} sx={{ mt: 0.5 }}>
-                  {formData.role === "manager" ? "Voditelj" : formData.role === "worker" ? "Radnik" : "Nije dodijeljeno"}
+                  {formData.role === "manager"
+                    ? "Voditelj"
+                    : formData.role === "worker"
+                      ? "Radnik"
+                      : "Nije dodijeljeno"}
                 </Typography>
               </Box>
             </Box>
@@ -787,7 +910,7 @@ export default function EditWorkerManagerAccountPage({
         open={openPasswordDialog}
         onClose={() => setOpenPasswordDialog(false)}
         PaperProps={{
-          sx: { borderRadius: 3, width: "100%", maxWidth: 400 }
+          sx: { borderRadius: 3, width: "100%", maxWidth: 400 },
         }}
       >
         <DialogTitle sx={{ fontWeight: 700 }}>Promjena lozinke</DialogTitle>
@@ -813,18 +936,28 @@ export default function EditWorkerManagerAccountPage({
             variant="outlined"
             value={passwords.confirmPassword}
             onChange={(e) => handleConfirmPasswordChange(e.target.value)}
-            error={!!confirmPasswordError && passwords.confirmPassword.length > 0}
+            error={
+              !!confirmPasswordError && passwords.confirmPassword.length > 0
+            }
             helperText={confirmPasswordError}
           />
         </DialogContent>
         <DialogActions sx={{ p: 3 }}>
-          <Button onClick={() => setOpenPasswordDialog(false)} sx={{ textTransform: "none", color: "text.secondary" }}>
+          <Button
+            onClick={() => setOpenPasswordDialog(false)}
+            sx={{ textTransform: "none", color: "text.secondary" }}
+          >
             Odustani
           </Button>
           <Button
             onClick={handlePasswordSubmit}
             variant="contained"
-            disabled={loading || !!passwordError || !!confirmPasswordError || !passwords.newPassword}
+            disabled={
+              loading ||
+              !!passwordError ||
+              !!confirmPasswordError ||
+              !passwords.newPassword
+            }
             sx={{ textTransform: "none", boxShadow: 0, borderRadius: 2 }}
           >
             Promijeni
