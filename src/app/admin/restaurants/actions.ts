@@ -218,7 +218,6 @@ export async function removeEmployee(userId: string, restaurantId: string) {
       },
     });
 
-
     if (user.publicMetadata.role === "manager") {
       // Wait for propagation or just re-fetch lists
       // Fetch remaining staff
