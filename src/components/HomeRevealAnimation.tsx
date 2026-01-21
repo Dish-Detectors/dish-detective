@@ -67,30 +67,62 @@ export default function HomeRevealAnimation({
       }
     }
 
-    setVisible(true);
+    let cancelled = false;
 
-    if (typeof document !== "undefined") {
-      document.documentElement.setAttribute(REVEAL_ACTIVE_ATTR, "1");
-    }
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new Event(REVEAL_START_EVENT));
-    }
+    const preloadImage = (src: string) =>
+      new Promise<void>((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+        img.src = src;
+      });
 
-    // For reduced motion, skip animation and ask for language immediately.
-    if (prefersReducedMotion) {
-      setPaused(true);
-      setShowLanguageChoice(true);
-      return;
-    }
+    const startReveal = async () => {
+      // In dev on first load, the reveal can start before images are cached;
+      // if they load late, they can miss the visible part of the animation.
+      // Preload briefly so the utensil animation always has pixels to render.
+      try {
+        const fallback = new Promise<void>((r) => window.setTimeout(r, 900));
+        await Promise.race([
+          Promise.all([preloadImage("/fork.png"), preloadImage("/knife.png")]).then(
+            () => undefined,
+          ),
+          fallback,
+        ]);
+      } catch {
+        // Ignore preload failures; we still start the reveal.
+      }
 
-    // Pause shortly after the fly-in reaches center (≈42% of 1650ms).
-    const pauseMs = 700;
-    pauseTimerRef.current = window.setTimeout(() => {
-      setPaused(true);
-      setShowLanguageChoice(true);
-    }, pauseMs);
+      if (cancelled) return;
+
+      setVisible(true);
+
+      if (typeof document !== "undefined") {
+        document.documentElement.setAttribute(REVEAL_ACTIVE_ATTR, "1");
+      }
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event(REVEAL_START_EVENT));
+      }
+
+      // For reduced motion, skip animation and ask for language immediately.
+      if (prefersReducedMotion) {
+        setPaused(true);
+        setShowLanguageChoice(true);
+        return;
+      }
+
+      // Pause shortly after the fly-in reaches center (≈42% of 1650ms).
+      const pauseMs = 700;
+      pauseTimerRef.current = window.setTimeout(() => {
+        setPaused(true);
+        setShowLanguageChoice(true);
+      }, pauseMs);
+    };
+
+    startReveal();
 
     return () => {
+      cancelled = true;
       if (pauseTimerRef.current != null) {
         window.clearTimeout(pauseTimerRef.current);
         pauseTimerRef.current = null;
