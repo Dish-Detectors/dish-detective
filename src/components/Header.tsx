@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { UserButton, useUser } from "@clerk/nextjs"; // Import useUser
+import { getRestaurantName } from "@/app/admin/actions";
 import {
   Menu,
   MenuItem,
@@ -37,6 +38,16 @@ export default function Header() {
   };
 
   const [showHomepageHeader, setShowHomepageHeader] = useState(false);
+
+  // Get the role from the public metadata we just set
+  const userRole = user?.publicMetadata?.role as string | undefined;
+  // Create the dynamic link. Default to "/" if role isn't found.
+  const homeHref = userRole ? `/${userRole}` : "/";
+
+  // State for restaurant name
+  const [restaurantName, setRestaurantName] = React.useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     if (isHomepage) {
@@ -74,6 +85,30 @@ export default function Header() {
       setShowHomepageHeader(false);
     }
   }, [isHomepage, isMobile]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+
+    async function loadRestaurantName() {
+      if (userRole === "worker" || userRole === "manager") {
+        try {
+          const result = await getRestaurantName();
+          if (!cancelled && result.success && result.name) {
+            setRestaurantName(result.name);
+          }
+        } catch {
+          if (!cancelled) setRestaurantName(null);
+        }
+      } else {
+        setRestaurantName(null);
+      }
+    }
+
+    loadRestaurantName();
+    return () => {
+      cancelled = true;
+    };
+  }, [userRole]);
 
   if (isHomepage) {
     // ... (Homepage header remains unchanged)
@@ -226,12 +261,6 @@ export default function Header() {
     );
   }
 
-  // Get the role from the public metadata we just set
-  const userRole = user?.publicMetadata?.role as string;
-  // Create the dynamic link. Default to "/" if role isn't found.
-  const homeHref = userRole ? `/${userRole}` : "/";
-  const isWorker = userRole === "worker" || pathname.startsWith("/worker");
-
   // Non-homepage header (blue header)
   return (
     <AppBar position="static" sx={{ bgcolor: "#56aaf4" }}>
@@ -274,22 +303,21 @@ export default function Header() {
         </Box>
 
         <Box sx={{ display: "flex", gap: { xs: 2, md: 3 } }}>
-          {isWorker && (
-            <Typography
-              variant="body2"
-              sx={{
-                display: { xs: "none", sm: "flex" },
-                alignItems: "center",
-                color: "white",
-                fontWeight: 600,
-                whiteSpace: "nowrap",
-                textDecoration: "underline",
-                textUnderlineOffset: "4px",
-              }}
-            >
-              Ime menze u kojoj radi
-            </Typography>
-          )}
+          <Typography
+            variant="body1"
+            sx={{
+              display: { xs: "none", sm: "flex" },
+              alignItems: "center",
+              color: "white",
+              fontWeight: 700,
+              fontSize: "1.1rem",
+              whiteSpace: "nowrap",
+              textDecoration: "underline",
+              textUnderlineOffset: "4px",
+            }}
+          >
+            {restaurantName}
+          </Typography>
 
           <Button
             sx={{
