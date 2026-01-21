@@ -320,7 +320,10 @@ export default function HomeRevealAnimation({
           font-weight: 600;
           letter-spacing: 0.08em;
           font-size: clamp(20px, 2.2vw, 26px);
-          text-shadow: 0 2px 14px rgba(0, 0, 0, 0.65);
+          text-shadow:
+            0 2px 2px rgba(0, 0, 0, 0.9),
+            0 6px 18px rgba(0, 0, 0, 0.85),
+            0 10px 34px rgba(0, 0, 0, 0.7);
           opacity: 0;
           transition: opacity 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
           will-change: opacity;
