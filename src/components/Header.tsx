@@ -37,6 +37,12 @@ export default function Header() {
     setAnchorEl(event.currentTarget);
   };
 
+  // Header persists across route changes (in the root layout), so ensure any
+  // open menus are closed when navigating.
+  useEffect(() => {
+    setAnchorEl(null);
+  }, [pathname]);
+
   const [showHomepageHeader, setShowHomepageHeader] = useState(false);
 
   // Get the role from the public metadata we just set
@@ -246,12 +252,22 @@ export default function Header() {
                 },
               }}
             >
-              <MenuItem onClick={() => router.push("/login/employee")}>
+              <MenuItem
+                onClick={() => {
+                  setAnchorEl(null);
+                  router.push("/login/employee");
+                }}
+              >
                 <RestaurantIcon fontSize="small" sx={{ mr: 1 }} /> Radnik u
                 menzi
               </MenuItem>
               <Box sx={{ borderBottom: "1px solid #e0e0e0", my: 0 }} />
-              <MenuItem onClick={() => router.push("/login/student")}>
+              <MenuItem
+                onClick={() => {
+                  setAnchorEl(null);
+                  router.push("/login/student");
+                }}
+              >
                 <SchoolIcon fontSize="small" sx={{ mr: 1 }} /> Student
               </MenuItem>
             </Menu>
