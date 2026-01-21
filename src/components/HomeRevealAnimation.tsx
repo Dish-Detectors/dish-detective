@@ -206,7 +206,11 @@ export default function HomeRevealAnimation({
       />
 
       {showLanguageChoice ? (
-        <div className="ddLang" role="group" aria-label="Choose language">
+        <div
+          className="ddLang ddLang--choice"
+          role="group"
+          aria-label="Choose language"
+        >
           <button
             type="button"
             className="ddLang__btn"
@@ -314,6 +318,24 @@ export default function HomeRevealAnimation({
           pointer-events: none;
         }
 
+        .ddLang--choice .ddLang__btn,
+        .ddLang--choice .ddLang__sep {
+          opacity: 0;
+          animation: ddLangFadeIn 320ms ease-out forwards;
+        }
+
+        .ddLang--choice .ddLang__btn:first-of-type {
+          animation-delay: 0ms;
+        }
+
+        .ddLang--choice .ddLang__sep {
+          animation-delay: 100ms;
+        }
+
+        .ddLang--choice .ddLang__btn:last-of-type {
+          animation-delay: 220ms;
+        }
+
         .ddLang__msg {
           font-family: inherit;
           color: rgba(255, 255, 255, 0.95);
@@ -374,6 +396,15 @@ export default function HomeRevealAnimation({
 
         .ddLang__btn:active {
           transform: translateY(1px);
+        }
+
+        @keyframes ddLangFadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
         }
 
         @keyframes ddForkMove {
@@ -443,6 +474,12 @@ export default function HomeRevealAnimation({
 
           .ddUtensil--fork,
           .ddUtensil--knife {
+            animation: none;
+            opacity: 1;
+          }
+
+          .ddLang--choice .ddLang__btn,
+          .ddLang--choice .ddLang__sep {
             animation: none;
             opacity: 1;
           }
