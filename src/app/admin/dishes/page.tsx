@@ -23,6 +23,7 @@ import DishCard from "@/components/DishCard";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
 import { navWidth } from "@/components/AdminNavbar";
 import { getAllDishes, deleteDish } from "./actions";
+import AllergenManagementDialog from "@/components/AllergenManagementDialog";
 
 interface Dish {
   _id: string;
@@ -43,6 +44,7 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [allergenDialogOpen, setAllergenDialogOpen] = useState(false);
   const [dishToDelete, setDishToDelete] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -133,7 +135,7 @@ export default function Page() {
         px: { xs: 3, sm: 5 },
         py: { xs: 3, sm: 5 },
         pt: 0,
-        pb: { xs: "100px", sm: 6 },
+        pb: { xs: "100px", sm: 10 },
         overflow: "hidden",
       }}
     >
@@ -200,6 +202,27 @@ export default function Page() {
         >
           <AddIcon />
         </IconButton>
+
+        <Button
+          variant="outlined"
+          onClick={() => setAllergenDialogOpen(true)}
+          sx={{
+            flexShrink: 0,
+            textTransform: "none",
+            borderRadius: 10,
+            border: "1px solid #e0e0e0",
+            color: "text.secondary",
+            fontWeight: 600,
+            px: 3,
+            bgcolor: "white",
+            "&:hover": {
+              bgcolor: "grey.100",
+              border: "1px solid #bdbdbd",
+            },
+          }}
+        >
+          Upravljaj alergenima
+        </Button>
       </Box>
 
       <Box
@@ -234,7 +257,8 @@ export default function Page() {
                 lg: "repeat(4, 1fr)",
               },
               gap: 3,
-              pb: 2,
+              pt: 1,
+              pb: 8,
             }}
           >
             {filteredDishes.map((dish, index) => (
@@ -290,6 +314,10 @@ export default function Page() {
           </Button>
         </DialogActions>
       </Dialog>
+      <AllergenManagementDialog
+        open={allergenDialogOpen}
+        onClose={() => setAllergenDialogOpen(false)}
+      />
     </Box>
   );
 }

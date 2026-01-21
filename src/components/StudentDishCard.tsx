@@ -18,9 +18,11 @@ import {
   unsubscribeFromDishTopic,
 } from "@/utils/fcmClient";
 import { toggleSubscription } from "@/actions/notification";
+import { rateDish } from "@/app/student/action";
 
 interface StudentDishCardProps {
   menuItemId: string;
+  dishId: string;
   name: string;
   description: string;
   imageUrl: string;
@@ -32,6 +34,7 @@ interface StudentDishCardProps {
 
 export default function StudentDishCard({
   menuItemId,
+  dishId,
   name,
   description,
   imageUrl,
@@ -40,6 +43,7 @@ export default function StudentDishCard({
   rating = 0,
   isInitiallySubscribed = false,
 }: StudentDishCardProps) {
+  const [currentRating, setCurrentRating] = useState(rating);
   const [isSubscribed, setIsSubscribed] = useState(isInitiallySubscribed);
   const [loading, setLoading] = useState(false);
 
@@ -73,6 +77,25 @@ export default function StudentDishCard({
       console.error("Subscription toggle failed", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRate = async (
+    event: React.SyntheticEvent,
+    newValue: number | null,
+  ) => {
+    if (newValue === null) return;
+    setCurrentRating(newValue);
+
+    try {
+      const result = await rateDish({ dishId, rating: newValue });
+      if (!result.success) {
+        console.error(result.message);
+        setCurrentRating(rating);
+      }
+    } catch (error) {
+      console.error("Failed to rate dish:", error);
+      setCurrentRating(rating);
     }
   };
 
@@ -132,7 +155,11 @@ export default function StudentDishCard({
             mt: 2,
           }}
         >
-          <Rating value={rating} readOnly size="small" />
+          <Rating
+            value={currentRating}
+            onChange={handleRate} // Enables clicking
+            size="small"
+          />
 
           <Button
             onClick={handleToggleSubscription}

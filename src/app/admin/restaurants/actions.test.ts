@@ -1,11 +1,8 @@
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import {
-  createRestaurant,
-  updateRestaurant,
-  getAllRestaurants,
-  deleteRestaurant,
-} from "./actions";
+import { getAllRestaurants, deleteRestaurant } from "./actions";
+import { createRestaurant } from "./create/actions";
+import { updateRestaurant } from "./edit/actions";
 
 describe("Restaurant Server Actions", () => {
   let mongoServer: MongoMemoryServer;

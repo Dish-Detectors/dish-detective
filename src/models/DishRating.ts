@@ -1,10 +1,9 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-// Dish document interface
 export interface IDishRating extends Document {
   dishId: string;
   userId: string;
-  rating: number; // e.g., 1 to 5
+  rating: number;
 }
 
 const dishRatingSchema = new Schema<IDishRating>(
@@ -28,11 +27,7 @@ const dishRatingSchema = new Schema<IDishRating>(
   },
 );
 
-dishRatingSchema.index({ dishId: 1 }, { unique: true });
-
-if (process.env.NODE_ENV === "development") {
-  delete mongoose.models.DishRating;
-}
+dishRatingSchema.index({ dishId: 1, userId: 1 }, { unique: true });
 
 const DishRating: Model<IDishRating> =
   (mongoose.models.DishRating as Model<IDishRating>) ||

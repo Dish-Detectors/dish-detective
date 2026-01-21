@@ -12,11 +12,24 @@ import {
   CircularProgress,
   useMediaQuery,
   useTheme,
+  InputBase,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Avatar,
+  Badge,
+  IconButton,
 } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
+import PersonIcon from "@mui/icons-material/Person";
 
 import AdminNavbar, { navWidth, headerHeight } from "@/components/AdminNavbar";
 import { getEmployeeAccount, updateEmployeeAccount } from "../actions";
+import { uploadProfileImage } from "../../upload-image";
 import { getAllRestaurants } from "../../../restaurants/actions";
+import SuccessScreen from "@/components/SuccessScreen";
 
 type Restaurant = {
   _id: string;
@@ -39,6 +52,22 @@ export default function EditWorkerManagerAccountPage({
   const [loadingRestaurants, setLoadingRestaurants] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [showSuccessScreen, setShowSuccessScreen] = useState(false);
+  const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const [formData, setFormData] = useState({
     name: "",
@@ -47,6 +76,52 @@ export default function EditWorkerManagerAccountPage({
     restaurantId: "",
     role: "worker" as "worker" | "manager",
   });
+
+  const [passwords, setPasswords] = useState({
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
+
+  const validatePassword = (password: string): string => {
+    if (password.length < 8) {
+      return "Lozinka mora imati minimalno 8 znakova";
+    }
+    return "";
+  };
+
+  const validateConfirmPassword = (confirm: string, pass: string): string => {
+    if (confirm !== pass) {
+      return "Lozinke se moraju podudarati";
+    }
+    return "";
+  };
+
+  const handlePasswordChange = (password: string) => {
+    setPasswords({ ...passwords, newPassword: password });
+    if (password) {
+      setPasswordError(validatePassword(password));
+      if (passwords.confirmPassword) {
+        setConfirmPasswordError(
+          validateConfirmPassword(passwords.confirmPassword, password),
+        );
+      }
+    } else {
+      setPasswordError("");
+    }
+  };
+
+  const handleConfirmPasswordChange = (confirm: string) => {
+    setPasswords({ ...passwords, confirmPassword: confirm });
+    if (confirm) {
+      setConfirmPasswordError(
+        validateConfirmPassword(confirm, passwords.newPassword),
+      );
+    } else {
+      setConfirmPasswordError("");
+    }
+  };
 
   useEffect(() => {
     params.then((p) => setId(p.id));
@@ -89,6 +164,9 @@ export default function EditWorkerManagerAccountPage({
             restaurantId: result.user.restaurantId,
             role: result.user.role as "worker" | "manager",
           });
+          if ((result.user as any).imageUrl) {
+            setImagePreview((result.user as any).imageUrl);
+          }
         } else {
           setError(result.error || "Greška pri učitavanju podataka");
         }
@@ -121,7 +199,17 @@ export default function EditWorkerManagerAccountPage({
       });
 
       if (result.success) {
+        // Upload image if selected
+        if (imageFile) {
+          const formData = new FormData();
+          formData.append("file", imageFile);
+          formData.append("userId", id);
+
+          await uploadProfileImage(formData);
+        }
+
         setSuccess("Račun uspješno ažuriran!");
+        setShowSuccessScreen(true);
         setTimeout(() => router.push("/admin/accounts"), 2000);
       } else {
         setError(
@@ -135,6 +223,43 @@ export default function EditWorkerManagerAccountPage({
       setLoading(false);
     }
   };
+
+  const handlePasswordSubmit = async () => {
+    if (!id) return;
+
+    if (
+      passwordError ||
+      confirmPasswordError ||
+      !passwords.newPassword ||
+      passwords.newPassword !== passwords.confirmPassword
+    ) {
+      return; // Validation should be handled by UI state, but double check
+    }
+
+    setLoading(true); // Reuse loading state or create specific one
+    try {
+      const result = await updateEmployeeAccount({
+        userId: id,
+        password: passwords.newPassword,
+      });
+
+      if (result.success) {
+        setSuccess("Lozinka uspješno promijenjena!");
+        setOpenPasswordDialog(false);
+        setPasswords({ newPassword: "", confirmPassword: "" });
+      } else {
+        setError(result.error || "Greška pri promjeni lozinke");
+      }
+    } catch (err) {
+      setError("Greška pri promjeni lozinke");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (showSuccessScreen) {
+    return <SuccessScreen message="Račun uspješno ažuriran!" />;
+  }
 
   if (loadingData || loadingRestaurants) {
     return (
@@ -177,16 +302,111 @@ export default function EditWorkerManagerAccountPage({
             }}
           >
             <Box>
-              <Typography
-                variant="h4"
-                sx={{
-                  fontWeight: 780,
-                  mb: 4,
-                  color: "#212222",
-                }}
+              {/* Image Upload (Mobile) */}
+              <Box sx={{ display: "flex", justifyContent: "center", mb: 4 }}>
+                <Badge
+                  overlap="circular"
+                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                  badgeContent={
+                    <Box
+                      component="label"
+                      sx={{
+                        bgcolor: "primary.main",
+                        color: "white",
+                        width: 32,
+                        height: 32,
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        border: "2px solid white",
+                      }}
+                    >
+                      <EditIcon sx={{ fontSize: 18 }} />
+                      <input
+                        type="file"
+                        hidden
+                        accept="image/*"
+                        onChange={handleImageChange}
+                      />
+                    </Box>
+                  }
+                >
+                  {imagePreview ? (
+                    <Avatar
+                      src={imagePreview}
+                      sx={{
+                        width: 100,
+                        height: 100,
+                        border: "4px solid white",
+                        boxShadow: 1,
+                      }}
+                    />
+                  ) : (
+                    <Box
+                      sx={{
+                        width: 100,
+                        height: 100,
+                        borderRadius: "50%",
+                        bgcolor:
+                          formData.role === "manager" ? "#64b5f6" : "#ba68c8",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        border: "4px solid white",
+                        boxShadow: 1,
+                      }}
+                    >
+                      {formData.role === "manager" ? (
+                        <AssignmentIndIcon
+                          sx={{ fontSize: 60, color: "white" }}
+                        />
+                      ) : (
+                        <PersonIcon sx={{ fontSize: 60, color: "white" }} />
+                      )}
+                    </Box>
+                  )}
+                </Badge>
+              </Box>
+
+              {/* Editable Header for Name & Last Name (Mobile) */}
+              <Box
+                sx={{ mb: 4, display: "flex", flexDirection: "column", gap: 0 }}
               >
-                Uredi podatke
-              </Typography>
+                <InputBase
+                  placeholder="Ime"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  required
+                  sx={{
+                    fontSize: "2rem",
+                    fontWeight: 800,
+                    color: "#212222",
+                    borderBottom: "2px solid transparent",
+                    "&:hover": { borderBottom: "2px solid #e0e0e0" },
+                    "&.Mui-focused": { borderBottom: "2px solid #1976d2" },
+                  }}
+                />
+                <InputBase
+                  placeholder="Prezime"
+                  value={formData.lastName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, lastName: e.target.value })
+                  }
+                  required
+                  sx={{
+                    fontSize: "2rem",
+                    fontWeight: 800,
+                    color: "#212222",
+                    borderBottom: "2px solid transparent",
+                    "&:hover": { borderBottom: "2px solid #e0e0e0" },
+                    "&.Mui-focused": { borderBottom: "2px solid #1976d2" },
+                  }}
+                />
+              </Box>
 
               {error && (
                 <Alert severity="error" sx={{ mb: 3 }}>
@@ -203,40 +423,6 @@ export default function EditWorkerManagerAccountPage({
               <Box component="form" onSubmit={handleSubmit}>
                 <TextField
                   fullWidth
-                  label="Ime"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  required
-                  sx={{
-                    mb: 3,
-                    bgcolor: "white",
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 2,
-                    },
-                  }}
-                />
-
-                <TextField
-                  fullWidth
-                  label="Prezime"
-                  value={formData.lastName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, lastName: e.target.value })
-                  }
-                  required
-                  sx={{
-                    mb: 3,
-                    bgcolor: "white",
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 2,
-                    },
-                  }}
-                />
-
-                <TextField
-                  fullWidth
                   label="Korisničko ime"
                   value={formData.username}
                   onChange={(e) =>
@@ -244,7 +430,7 @@ export default function EditWorkerManagerAccountPage({
                   }
                   required
                   sx={{
-                    mb: 3,
+                    mb: 4,
                     bgcolor: "white",
                     "& .MuiOutlinedInput-root": {
                       borderRadius: 2,
@@ -252,57 +438,108 @@ export default function EditWorkerManagerAccountPage({
                   }}
                 />
 
-                <TextField
-                  fullWidth
-                  select
-                  label="Ime restorana"
-                  value={formData.restaurantId}
-                  onChange={(e) =>
-                    setFormData({ ...formData, restaurantId: e.target.value })
-                  }
-                  required
+                {/* Read-only info: Restaurant and Position */}
+                <Box
                   sx={{
-                    mb: 3,
-                    bgcolor: "white",
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 2,
-                    },
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 2,
+                    mb: 4,
                   }}
                 >
-                  {restaurants.length === 0 ? (
-                    <MenuItem disabled>Nema dostupnih restorana</MenuItem>
-                  ) : (
-                    restaurants.map((restaurant) => (
-                      <MenuItem key={restaurant._id} value={restaurant._id}>
-                        {restaurant.name}
-                      </MenuItem>
-                    ))
-                  )}
-                </TextField>
+                  <Box
+                    component={formData.restaurantId ? "a" : "div"}
+                    href={
+                      formData.restaurantId
+                        ? `/admin/restaurants/edit/${formData.restaurantId}`
+                        : undefined
+                    }
+                    sx={{
+                      p: 2,
+                      bgcolor: "rgba(0, 0, 0, 0.02)",
+                      borderRadius: 2,
+                      border: "1px solid #e0e0e0",
+                      textDecoration: "none",
+                      textAlign: "center",
+                      cursor: formData.restaurantId ? "pointer" : "default",
+                      transition: "all 0.2s",
+                      "&:hover": formData.restaurantId
+                        ? {
+                            bgcolor: "rgba(0, 0, 0, 0.05)",
+                            borderColor: "primary.main",
+                          }
+                        : {},
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={600}
+                    >
+                      RESTORAN
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      fontWeight={500}
+                      sx={{
+                        mt: 0.5,
+                        color: formData.restaurantId
+                          ? "primary.main"
+                          : "text.primary",
+                      }}
+                    >
+                      {restaurants.find((r) => r._id === formData.restaurantId)
+                        ?.name || "Nije dodijeljen"}
+                    </Typography>
+                  </Box>
 
-                <TextField
-                  fullWidth
-                  select
-                  label="Odaberite poziciju"
-                  value={formData.role}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      role: e.target.value as "worker" | "manager",
-                    })
-                  }
-                  required
-                  sx={{
-                    mb: 3,
-                    bgcolor: "white",
-                    "& .MuiOutlinedInput-root": {
+                  <Box
+                    sx={{
+                      p: 2,
+                      bgcolor: "rgba(0, 0, 0, 0.02)",
                       borderRadius: 2,
-                    },
-                  }}
-                >
-                  <MenuItem value="worker">Radnik</MenuItem>
-                  <MenuItem value="manager">Voditelj</MenuItem>
-                </TextField>
+                      border: "1px solid #e0e0e0",
+                      textAlign: "center",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={600}
+                    >
+                      POZICIJA
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      fontWeight={500}
+                      sx={{ mt: 0.5 }}
+                    >
+                      {formData.role === "manager"
+                        ? "Voditelj"
+                        : formData.role === "worker"
+                          ? "Radnik"
+                          : "Nije dodijeljeno"}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                {/* Password Change Button (Mobile) */}
+                <Box sx={{ mb: 4 }}>
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    onClick={() => setOpenPasswordDialog(true)}
+                    sx={{
+                      textTransform: "none",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                      borderRadius: 2,
+                      bgcolor: "white",
+                    }}
+                  >
+                    Promijeni lozinku
+                  </Button>
+                </Box>
               </Box>
             </Box>
           </Box>
@@ -374,17 +611,142 @@ export default function EditWorkerManagerAccountPage({
             mx: "auto",
           }}
         >
-          <Typography
-            variant="h4"
+          {/* Image Upload (Desktop) */}
+          <Box sx={{ display: "flex", justifyContent: "center", mb: 4 }}>
+            <Badge
+              overlap="circular"
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              badgeContent={
+                <Box
+                  component="label"
+                  sx={{
+                    bgcolor: "primary.main",
+                    color: "white",
+                    width: 32,
+                    height: 32,
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    border: "2px solid white",
+                    "&:hover": { bgcolor: "primary.dark" },
+                  }}
+                >
+                  <EditIcon sx={{ fontSize: 18 }} />
+                  <input
+                    type="file"
+                    hidden
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                </Box>
+              }
+            >
+              {imagePreview ? (
+                <Avatar
+                  src={imagePreview}
+                  sx={{
+                    width: 120,
+                    height: 120,
+                    border: "4px solid white",
+                    boxShadow: 1,
+                  }}
+                />
+              ) : (
+                <Box
+                  sx={{
+                    width: 120,
+                    height: 120,
+                    borderRadius: "50%",
+                    bgcolor:
+                      formData.role === "manager" ? "#64b5f6" : "#ba68c8",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "4px solid white",
+                    boxShadow: 1,
+                  }}
+                >
+                  {formData.role === "manager" ? (
+                    <AssignmentIndIcon sx={{ fontSize: 70, color: "white" }} />
+                  ) : (
+                    <PersonIcon sx={{ fontSize: 70, color: "white" }} />
+                  )}
+                </Box>
+              )}
+            </Badge>
+          </Box>
+
+          {/* Editable Header for Name & Last Name */}
+          <Box
             sx={{
-              fontWeight: 780,
               mb: 4,
-              textAlign: "center",
-              color: "#212222",
+              display: "flex",
+              flexDirection: "column",
+              gap: 0,
+              alignItems: "center",
             }}
           >
-            Uredi podatke
-          </Typography>
+            <InputBase
+              placeholder="Ime"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+              required
+              sx={{
+                fontSize: "2.5rem",
+                fontWeight: 800,
+                color: "#212222",
+                maxWidth: "fit-content",
+                borderBottom: "2px solid transparent",
+                "&:hover": {
+                  borderBottom: "2px solid #e0e0e0",
+                },
+                "&.Mui-focused": {
+                  borderBottom: "2px solid #1976d2",
+                },
+                "& input": {
+                  p: 0,
+                  textAlign: "center",
+                  "&::placeholder": {
+                    color: "#bdbdbd",
+                    opacity: 1,
+                  },
+                },
+              }}
+            />
+            <InputBase
+              placeholder="Prezime"
+              value={formData.lastName}
+              onChange={(e) =>
+                setFormData({ ...formData, lastName: e.target.value })
+              }
+              required
+              sx={{
+                fontSize: "2.5rem",
+                fontWeight: 800,
+                color: "#212222",
+                maxWidth: "fit-content",
+                borderBottom: "2px solid transparent",
+                "&:hover": {
+                  borderBottom: "2px solid #e0e0e0",
+                },
+                "&.Mui-focused": {
+                  borderBottom: "2px solid #1976d2",
+                },
+                "& input": {
+                  p: 0,
+                  textAlign: "center",
+                  "&::placeholder": {
+                    color: "#bdbdbd",
+                    opacity: 1,
+                  },
+                },
+              }}
+            />
+          </Box>
 
           {error && (
             <Alert severity="error" sx={{ mb: 3 }}>
@@ -401,89 +763,10 @@ export default function EditWorkerManagerAccountPage({
           <Box component="form" onSubmit={handleSubmit}>
             <TextField
               fullWidth
-              label="Ime"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              required
-              sx={{
-                mb: 3,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                },
-              }}
-            />
-
-            <TextField
-              fullWidth
-              label="Prezime"
-              value={formData.lastName}
-              onChange={(e) =>
-                setFormData({ ...formData, lastName: e.target.value })
-              }
-              required
-              sx={{
-                mb: 3,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                },
-              }}
-            />
-
-            <TextField
-              fullWidth
               label="Korisničko ime"
               value={formData.username}
               onChange={(e) =>
                 setFormData({ ...formData, username: e.target.value })
-              }
-              required
-              sx={{
-                mb: 3,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                },
-              }}
-            />
-
-            <TextField
-              fullWidth
-              select
-              label="Ime restorana"
-              value={formData.restaurantId}
-              onChange={(e) =>
-                setFormData({ ...formData, restaurantId: e.target.value })
-              }
-              required
-              sx={{
-                mb: 3,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                },
-              }}
-            >
-              {restaurants.length === 0 ? (
-                <MenuItem disabled>Nema dostupnih restorana</MenuItem>
-              ) : (
-                restaurants.map((restaurant) => (
-                  <MenuItem key={restaurant._id} value={restaurant._id}>
-                    {restaurant.name}
-                  </MenuItem>
-                ))
-              )}
-            </TextField>
-
-            <TextField
-              fullWidth
-              select
-              label="Odaberite poziciju"
-              value={formData.role}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  role: e.target.value as "worker" | "manager",
-                })
               }
               required
               sx={{
@@ -492,10 +775,105 @@ export default function EditWorkerManagerAccountPage({
                   borderRadius: 2,
                 },
               }}
+            />
+
+            {/* Read-only info: Restaurant and Position */}
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 2,
+                mb: 4,
+              }}
             >
-              <MenuItem value="worker">Radnik</MenuItem>
-              <MenuItem value="manager">Voditelj</MenuItem>
-            </TextField>
+              <Box
+                component={formData.restaurantId ? "a" : "div"}
+                href={
+                  formData.restaurantId
+                    ? `/admin/restaurants/edit/${formData.restaurantId}`
+                    : undefined
+                }
+                sx={{
+                  p: 2,
+                  bgcolor: "rgba(0, 0, 0, 0.02)",
+                  borderRadius: 2,
+                  border: "1px solid #e0e0e0",
+                  textDecoration: "none",
+                  textAlign: "center",
+                  cursor: formData.restaurantId ? "pointer" : "default",
+                  transition: "all 0.2s",
+                  "&:hover": formData.restaurantId
+                    ? {
+                        bgcolor: "rgba(0, 0, 0, 0.05)",
+                        borderColor: "primary.main",
+                      }
+                    : {},
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  fontWeight={600}
+                >
+                  RESTORAN
+                </Typography>
+                <Typography
+                  variant="body1"
+                  fontWeight={500}
+                  sx={{
+                    mt: 0.5,
+                    color: formData.restaurantId
+                      ? "primary.main"
+                      : "text.primary",
+                  }}
+                >
+                  {restaurants.find((r) => r._id === formData.restaurantId)
+                    ?.name || "Nije dodijeljen"}
+                </Typography>
+              </Box>
+
+              <Box
+                sx={{
+                  p: 2,
+                  bgcolor: "rgba(0, 0, 0, 0.02)",
+                  borderRadius: 2,
+                  border: "1px solid #e0e0e0",
+                  textAlign: "center",
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  fontWeight={600}
+                >
+                  POZICIJA
+                </Typography>
+                <Typography variant="body1" fontWeight={500} sx={{ mt: 0.5 }}>
+                  {formData.role === "manager"
+                    ? "Voditelj"
+                    : formData.role === "worker"
+                      ? "Radnik"
+                      : "Nije dodijeljeno"}
+                </Typography>
+              </Box>
+            </Box>
+
+            {/* Password Change Button (Desktop) */}
+            <Box sx={{ mb: 4 }}>
+              <Button
+                variant="outlined"
+                fullWidth
+                onClick={() => setOpenPasswordDialog(true)}
+                sx={{
+                  textTransform: "none",
+                  fontSize: "1rem",
+                  fontWeight: 600,
+                  borderRadius: 2,
+                }}
+              >
+                Promijeni lozinku
+              </Button>
+            </Box>
 
             <Button
               type="submit"
@@ -527,6 +905,65 @@ export default function EditWorkerManagerAccountPage({
           </Box>
         </Box>
       </Box>
+      {/* Password Change Dialog */}
+      <Dialog
+        open={openPasswordDialog}
+        onClose={() => setOpenPasswordDialog(false)}
+        PaperProps={{
+          sx: { borderRadius: 3, width: "100%", maxWidth: 400 },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 700 }}>Promjena lozinke</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Nova lozinka"
+            type="password"
+            fullWidth
+            variant="outlined"
+            value={passwords.newPassword}
+            onChange={(e) => handlePasswordChange(e.target.value)}
+            error={!!passwordError && passwords.newPassword.length > 0}
+            helperText={passwordError}
+            sx={{ mb: 2, mt: 1 }}
+          />
+          <TextField
+            margin="dense"
+            label="Potvrdi novu lozinku"
+            type="password"
+            fullWidth
+            variant="outlined"
+            value={passwords.confirmPassword}
+            onChange={(e) => handleConfirmPasswordChange(e.target.value)}
+            error={
+              !!confirmPasswordError && passwords.confirmPassword.length > 0
+            }
+            helperText={confirmPasswordError}
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 3 }}>
+          <Button
+            onClick={() => setOpenPasswordDialog(false)}
+            sx={{ textTransform: "none", color: "text.secondary" }}
+          >
+            Odustani
+          </Button>
+          <Button
+            onClick={handlePasswordSubmit}
+            variant="contained"
+            disabled={
+              loading ||
+              !!passwordError ||
+              !!confirmPasswordError ||
+              !passwords.newPassword
+            }
+            sx={{ textTransform: "none", boxShadow: 0, borderRadius: 2 }}
+          >
+            Promijeni
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

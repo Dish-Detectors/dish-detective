@@ -3,6 +3,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import ThemeRegistry from "@/components/ThemeRegistry";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Dish Detective",
@@ -25,6 +26,7 @@ export default function RootLayout({
           <ThemeRegistry>
             <Header />
             {children}
+            <Footer />
           </ThemeRegistry>
         </body>
       </html>

@@ -12,6 +12,7 @@ import {
 import TuneIcon from "@mui/icons-material/Tune";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import PeopleIcon from "@mui/icons-material/People";
+import FoodBankIcon from "@mui/icons-material/FoodBank";
 
 import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -37,11 +38,11 @@ const MobileActionCard = ({
     elevation={2}
     sx={{
       textTransform: "none",
-      fontSize: "1.25rem",
+      fontSize: "1.1rem",
       fontWeight: "600",
-      padding: "20px 15px",
-      borderRadius: "8px",
-      border: "1px solid rgba(0, 0, 0, 0.23)",
+      padding: 2,
+      borderRadius: "16px",
+      border: "1px solid rgba(0, 0, 0, 0.08)",
       color: "text.primary",
       cursor: "pointer",
       transition: "all 0.2s ease-in-out",
@@ -53,16 +54,20 @@ const MobileActionCard = ({
       },
       "&:hover": {
         borderColor: "primary.main",
-        boxShadow: 4,
+        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+        transform: "translateY(-2px)",
       },
-      mb: 3,
       display: "flex",
+      flexDirection: "column",
       alignItems: "center",
-      gap: 2,
+      justifyContent: "center",
+      aspectRatio: "1/1",
+      textAlign: "center",
+      gap: 1.5,
     }}
   >
     {icon && <Box sx={{ display: "flex", alignItems: "center" }}>{icon}</Box>}
-    <Typography sx={{ fontSize: "1.25rem", fontWeight: "600" }}>
+    <Typography sx={{ fontSize: "0.95rem", fontWeight: "600" }}>
       {children}
     </Typography>
   </Paper>
@@ -71,7 +76,6 @@ const MobileActionCard = ({
 interface DesktopActionCardProps {
   icon: ReactNode;
   title: string;
-  descriptions: string[];
   onClick: () => void;
   animationDelay?: string;
 }
@@ -79,7 +83,6 @@ interface DesktopActionCardProps {
 const DesktopActionCard = ({
   icon,
   title,
-  descriptions,
   onClick,
   animationDelay = "0.1s",
 }: DesktopActionCardProps) => (
@@ -87,13 +90,14 @@ const DesktopActionCard = ({
     onClick={onClick}
     elevation={2}
     sx={{
-      flex: 1,
+      width: "100%",
+      height: "100%",
       display: "flex",
       flexDirection: "column",
-      alignItems: "flex-start",
-      minWidth: 150,
-      maxWidth: 350,
-      p: 3,
+      alignItems: "center",
+      justifyContent: "center",
+      minHeight: 200, // Ensure some height
+      p: { xs: 3.5, sm: 4.5 },
       borderRadius: 3,
       cursor: "pointer",
       transition: "all 0.2s ease-in-out",
@@ -113,7 +117,7 @@ const DesktopActionCard = ({
     {icon}
     <Typography
       sx={{
-        fontSize: "clamp(1rem, 1.7vw, 2rem)",
+        fontSize: "clamp(1.25rem, 1.8vw, 2.25rem)",
         fontWeight: "600",
         color: "text.primary",
         pt: 1,
@@ -121,19 +125,6 @@ const DesktopActionCard = ({
     >
       {title}
     </Typography>
-    {descriptions.map((desc, index) => (
-      <Typography
-        key={index}
-        sx={{
-          fontSize: "clamp(0.75rem, 0.9vw, 1.2rem)",
-          fontWeight: "550",
-          color: "text.secondary",
-          pt: index === 0 ? 1 : 0,
-        }}
-      >
-        {desc}
-      </Typography>
-    ))}
   </Paper>
 );
 
@@ -195,13 +186,22 @@ export default function Page() {
           <Divider sx={{ borderBottomWidth: 2 }} />
         </Box>
 
-        <Box sx={{ flexGrow: 1, py: 4 }}>
+        <Box
+          sx={{
+            flexGrow: 1,
+            py: 4,
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gap: 2,
+            alignContent: "start",
+          }}
+        >
           <MobileActionCard
             onClick={() => router.push("/admin/restaurants")}
             icon={<TuneIcon sx={{ fontSize: 32, color: "text.primary" }} />}
             animationDelay="0.1s"
           >
-            Upravljaj restoranima
+            Restorani
           </MobileActionCard>
           <MobileActionCard
             onClick={() => router.push("/admin/dishes")}
@@ -210,14 +210,14 @@ export default function Page() {
             }
             animationDelay="0.3s"
           >
-            Upravljaj jelima
+            Jela
           </MobileActionCard>
           <MobileActionCard
             onClick={() => router.push("/admin/accounts")}
             icon={<PeopleIcon sx={{ fontSize: 32, color: "text.primary" }} />}
             animationDelay="0.5s"
           >
-            Upravljaj računima
+            Računi
           </MobileActionCard>
         </Box>
       </Box>
@@ -246,43 +246,73 @@ export default function Page() {
 
       <Box
         sx={{
-          px: 5,
-          py: 6,
+          flex: 1,
+          px: { xs: 2, sm: 5 },
           display: "flex",
-          gap: 3,
-          flexWrap: "wrap",
+          alignItems: "center",
           justifyContent: "center",
         }}
       >
-        <DesktopActionCard
-          icon={<TuneIcon sx={{ fontSize: 40, color: "text.primary" }} />}
-          title="Upravljaj restoranima"
-          descriptions={[
-            "• Dodavanje i brisanje restorana",
-            "• Postavljanje voditelja menze",
-          ]}
-          onClick={() => router.push("/admin/restaurants")}
-          animationDelay="0.1s"
-        />
+        <Box
+          sx={{
+            width: "100%",
+            maxWidth: 900, // Limit max width for 2x2 grid
+            display: "flex",
+            flexWrap: "wrap",
+            mt: 4,
+            gap: 3.5,
+            justifyContent: "center",
+            alignContent: "center",
+          }}
+        >
+          <Box sx={{ width: "calc(50% - 14px)" }}>
+            <DesktopActionCard
+              icon={
+                <FoodBankIcon
+                  sx={{
+                    fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                    color: "text.primary",
+                  }}
+                />
+              }
+              title="Restorani"
+              onClick={() => router.push("/admin/restaurants")}
+              animationDelay="0.1s"
+            />
+          </Box>
 
-        <DesktopActionCard
-          icon={<RestaurantIcon sx={{ fontSize: 40, color: "text.primary" }} />}
-          title="Upravljaj jelima"
-          descriptions={[
-            "• Dodavanje i brisanje jela",
-            "• Naglašavanje sastojaka i alergena",
-          ]}
-          onClick={() => router.push("/admin/dishes")}
-          animationDelay="0.3s"
-        />
+          <Box sx={{ width: "calc(50% - 14px)" }}>
+            <DesktopActionCard
+              icon={
+                <RestaurantIcon
+                  sx={{
+                    fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                    color: "text.primary",
+                  }}
+                />
+              }
+              title="Jela"
+              onClick={() => router.push("/admin/dishes")}
+              animationDelay="0.3s"
+            />
+          </Box>
 
-        <DesktopActionCard
-          icon={<PeopleIcon sx={{ fontSize: 40, color: "text.primary" }} />}
-          title="Upravljaj računima"
-          descriptions={["• Dodavanje i brisanje računa radnika"]}
-          onClick={() => router.push("/admin/accounts")}
-          animationDelay="0.5s"
-        />
+          <Box sx={{ width: "calc(50% - 14px)" }}>
+            <DesktopActionCard
+              icon={
+                <PeopleIcon
+                  sx={{
+                    fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                    color: "text.primary",
+                  }}
+                />
+              }
+              title="Računi"
+              onClick={() => router.push("/admin/accounts")}
+              animationDelay="0.5s"
+            />
+          </Box>
+        </Box>
       </Box>
     </Box>
   );

@@ -4,10 +4,15 @@ import { getAllDishes, deleteDish } from "./actions";
 import { updateDish } from "./edit/actions";
 import { createDish as createDishAPI } from "./create/actions";
 import { put } from "@vercel/blob";
+import Allergen from "../../../models/Allergen";
 
 // Mock Vercel Blob
 jest.mock("@vercel/blob", () => ({
   put: jest.fn(),
+}));
+
+jest.mock("next/cache", () => ({
+  revalidatePath: jest.fn(),
 }));
 
 // Helper function to convert old createDish format to new FormData format
@@ -36,22 +41,30 @@ async function createDish(dishData: {
 
 // Ovaj kod je bio napisan uz pomoć UI alata
 describe("Dish Server Actions", () => {
+  jest.setTimeout(30000);
   let mongoServer: MongoMemoryServer;
 
   // Setup: Start in-memory MongoDB before all tests
   beforeAll(async () => {
+    jest.setTimeout(30000);
     mongoServer = await MongoMemoryServer.create();
     const uri = mongoServer.getUri();
 
     // Set the test URI as an environment variable
     process.env.MONGODB_TEST_URI = uri;
+
+    // Connect to the in-memory database
+    await mongoose.connect(uri);
   });
 
   // Cleanup: Close connection and stop MongoDB after all tests
   afterAll(async () => {
-    await mongoose.connection.close();
+    await mongoose.disconnect();
     await mongoServer.stop();
     delete process.env.MONGODB_TEST_URI;
+    // Reset the global mongoose cache to prevent interference with other tests
+    // @ts-ignore
+    global.mongoose = { conn: null, promise: null };
   });
 
   // Clear database after each test
@@ -63,6 +76,12 @@ describe("Dish Server Actions", () => {
   });
 
   it("should create, modify, retrieve, and delete dishes", async () => {
+    // Step 0: Create real allergens
+    const gluten = await Allergen.create({ name: "gluten" });
+    const dairy = await Allergen.create({ name: "dairy" });
+    const eggs = await Allergen.create({ name: "eggs" });
+    const basil = await Allergen.create({ name: "basil" });
+
     // Step 1: Create multiple dishes
     console.log("Step 1: Creating dishes...");
 
@@ -72,21 +91,25 @@ describe("Dish Server Actions", () => {
         description: "Classic Italian pizza",
         category: "Pizza",
         imageUrl: "https://example.com/margherita.jpg",
-        allergens: ["gluten", "dairy"],
+        allergens: [gluten._id.toString(), dairy._id.toString()],
       },
       {
         name: "Caesar Salad",
         description: "Fresh romaine lettuce with Caesar dressing",
         category: "Salads",
         imageUrl: "https://example.com/caesar.jpg",
-        allergens: ["dairy", "eggs"],
+        allergens: [dairy._id.toString(), eggs._id.toString()],
       },
       {
         name: "Spaghetti Carbonara",
         description: "Pasta with eggs, cheese, and bacon",
         category: "Pasta",
         imageUrl: "https://example.com/carbonara.jpg",
-        allergens: ["gluten", "dairy", "eggs"],
+        allergens: [
+          gluten._id.toString(),
+          dairy._id.toString(),
+          eggs._id.toString(),
+        ],
       },
       {
         name: "Grilled Chicken",
@@ -100,7 +123,11 @@ describe("Dish Server Actions", () => {
         description: "Italian coffee-flavored dessert",
         category: "Desserts",
         imageUrl: "https://example.com/tiramisu.jpg",
-        allergens: ["gluten", "dairy", "eggs"],
+        allergens: [
+          gluten._id.toString(),
+          dairy._id.toString(),
+          eggs._id.toString(),
+        ],
       },
     ];
 
@@ -122,7 +149,11 @@ describe("Dish Server Actions", () => {
     // Update first dish (Margherita Pizza)
     const updateResult1 = await updateDish(createdDishIds[0], {
       description: "Updated: Classic Italian pizza with fresh basil",
-      allergens: ["gluten", "dairy", "basil"],
+      allergens: [
+        gluten._id.toString(),
+        dairy._id.toString(),
+        basil._id.toString(),
+      ],
     });
     expect(updateResult1.success).toBe(true);
     console.log(`Updated dish: ${updateResult1.data.name}`);
@@ -167,7 +198,13 @@ describe("Dish Server Actions", () => {
       (d: any) => d.name === "Margherita Pizza",
     );
     expect(margherita.description).toContain("Updated:");
-    expect(margherita.allergens).toContain("basil");
+
+    // Expect length 3 now (gluten, dairy, basil)
+    expect(margherita.allergens).toHaveLength(3);
+
+    // Check if checks for 'basil' by name
+    const allergenNames = margherita.allergens.map((a: any) => a.name);
+    expect(allergenNames).toContain("basil");
 
     const carbonara = getAllResult.data.find(
       (d: any) => d.name === "Spaghetti Carbonara Deluxe",

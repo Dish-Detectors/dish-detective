@@ -35,11 +35,12 @@ export async function createDish(formData: FormData): Promise<ActionResponse> {
     }
 
     // Parse allergens
+    // Parse allergens
     const allergens = allergensString
       ? allergensString
           .split(",")
           .map((a) => a.trim())
-          .filter(Boolean)
+          .filter((id) => Types.ObjectId.isValid(id))
       : [];
 
     let imageUrl = "";

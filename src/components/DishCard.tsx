@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import {
   Paper,
   Box,
@@ -18,11 +19,13 @@ interface DishCardProps {
   restaurantName: string;
   position: string;
   imageUrl?: string;
-  allergens?: string[];
+  allergens?: (string | { name: string })[];
   onEdit?: () => void;
-  onDelete: () => void;
+  onDelete?: () => void;
   actionMode?: "delete" | "add";
   actionDisabled?: boolean;
+  showActions?: boolean;
+  extraInfo?: ReactNode;
 }
 
 const DishCard = ({
@@ -35,6 +38,8 @@ const DishCard = ({
   onDelete,
   actionMode = "delete",
   actionDisabled = false,
+  showActions = true,
+  extraInfo,
 }: DishCardProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -93,13 +98,21 @@ const DishCard = ({
             flexGrow: 1,
             display: "flex",
             flexDirection: "row",
-            alignItems: "center",
+            alignItems: "stretch",
             gap: 1.5,
             overflow: "hidden",
             minWidth: 0,
           }}
         >
-          <Box sx={{ flexGrow: 1, minWidth: 0, overflow: "hidden" }}>
+          <Box
+            sx={{
+              flexGrow: 1,
+              minWidth: 0,
+              overflow: "hidden",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
             <Typography
               variant="subtitle1"
               component="div"
@@ -133,14 +146,22 @@ const DishCard = ({
             >
               {restaurantName}
             </Typography>
-            {allergens.length > 0 && (
-              <Box
-                sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 0.5 }}
-              >
-                {allergens.slice(0, 2).map((allergen) => (
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 0.5,
+                mt: 0.5,
+                minHeight: "18px",
+              }}
+            >
+              {allergens.slice(0, 2).map((allergen) => {
+                const label =
+                  typeof allergen === "string" ? allergen : allergen.name;
+                return (
                   <Chip
-                    key={allergen}
-                    label={allergen}
+                    key={label}
+                    label={label}
                     size="small"
                     sx={{
                       height: 18,
@@ -149,78 +170,94 @@ const DishCard = ({
                       color: "white",
                     }}
                   />
-                ))}
-                {allergens.length > 2 && (
-                  <Chip
-                    label={`+${allergens.length - 2}`}
-                    size="small"
-                    sx={{
-                      height: 18,
-                      fontSize: "0.65rem",
-                      bgcolor: "grey.400",
-                      color: "white",
-                    }}
-                  />
-                )}
-              </Box>
+                );
+              })}
+              {allergens.length > 2 && (
+                <Chip
+                  label={`+${allergens.length - 2}`}
+                  size="small"
+                  sx={{
+                    height: 18,
+                    fontSize: "0.65rem",
+                    bgcolor: "grey.400",
+                    color: "white",
+                  }}
+                />
+              )}
+            </Box>
+
+            {!showActions && extraInfo && (
+              <Typography
+                variant="body2"
+                sx={{
+                  mt: "auto",
+                  pt: 1,
+                  fontWeight: 700,
+                  color: "text.secondary",
+                }}
+              >
+                {extraInfo}
+              </Typography>
             )}
           </Box>
 
           {/* Action Buttons */}
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 0.5,
-              flexShrink: 0,
-            }}
-          >
-            {onEdit && (
+          {showActions && onDelete && (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 0.5,
+                flexShrink: 0,
+              }}
+            >
+              {onEdit && (
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit();
+                  }}
+                  size="small"
+                  sx={{
+                    bgcolor: "primary.main",
+                    color: "white",
+                    width: 32,
+                    height: 32,
+                    "&:hover": {
+                      bgcolor: "primary.dark",
+                    },
+                  }}
+                >
+                  <EditIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              )}
               <IconButton
                 onClick={(e) => {
                   e.stopPropagation();
-                  onEdit();
+                  onDelete();
                 }}
                 size="small"
+                disabled={actionDisabled}
                 sx={{
-                  bgcolor: "primary.main",
+                  bgcolor: actionBg,
                   color: "white",
                   width: 32,
                   height: 32,
                   "&:hover": {
-                    bgcolor: "primary.dark",
+                    bgcolor: actionHoverBg,
+                  },
+                  "&.Mui-disabled": {
+                    bgcolor: "grey.400",
+                    color: "white",
+                    opacity: 1,
+                    cursor: "not-allowed",
                   },
                 }}
               >
-                <EditIcon sx={{ fontSize: 18 }} />
+                {actionIcon}
               </IconButton>
-            )}
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete();
-              }}
-              size="small"
-              disabled={actionDisabled}
-              sx={{
-                bgcolor: actionBg,
-                color: "white",
-                width: 32,
-                height: 32,
-                "&:hover": {
-                  bgcolor: actionHoverBg,
-                },
-                "&.Mui-disabled": {
-                  bgcolor: "grey.400",
-                  color: "white",
-                  opacity: 1,
-                  cursor: "not-allowed",
-                },
-              }}
-            >
-              {actionIcon}
-            </IconButton>
-          </Box>
+            </Box>
+          )}
         </Box>
       </Paper>
     );
@@ -278,60 +315,60 @@ const DishCard = ({
           minHeight: 0,
         }}
       >
-        <Typography
-          variant="h6"
-          component="div"
-          sx={{
-            fontWeight: 600,
-            mb: 0.5,
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            display: "-webkit-box",
-            WebkitLineClamp: 1,
-            WebkitBoxOrient: "vertical",
-            maxWidth: "100%",
-            wordBreak: "break-all",
-          }}
-        >
-          {name}
-        </Typography>
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{
-            mb: 0.5,
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            display: "-webkit-box",
-            WebkitLineClamp: 1,
-            WebkitBoxOrient: "vertical",
-            maxWidth: "100%",
-            wordBreak: "break-all",
-          }}
-        >
-          {restaurantName}
-        </Typography>
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            mb: 1,
-            minHeight: "2.5em",
-            maxHeight: "2.5em",
-            lineHeight: "1.25em",
-            wordBreak: "break-word",
-          }}
-        >
-          {position}
-        </Typography>
+        <Box sx={{ flexShrink: 0 }}>
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{
+              fontWeight: 600,
+              mb: 0.5,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: 1,
+              WebkitBoxOrient: "vertical",
+              maxWidth: "100%",
+              wordBreak: "break-all",
+            }}
+          >
+            {name}
+          </Typography>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              mb: 0.5,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: 1,
+              WebkitBoxOrient: "vertical",
+              maxWidth: "100%",
+              wordBreak: "break-all",
+            }}
+          >
+            {restaurantName}
+          </Typography>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              mb: 1,
+              minHeight: "2.5em",
+              maxHeight: "2.5em",
+              lineHeight: "1.25em",
+              wordBreak: "break-word",
+            }}
+          >
+            {position}
+          </Typography>
 
-        {/* Allergens */}
-        {allergens.length > 0 && (
+          {/* Allergens (reserve space even when empty) */}
           <Box
             sx={{
               display: "flex",
@@ -341,19 +378,23 @@ const DishCard = ({
               minHeight: "24px",
             }}
           >
-            {allergens.slice(0, 3).map((allergen) => (
-              <Chip
-                key={allergen}
-                label={allergen}
-                size="small"
-                sx={{
-                  height: 20,
-                  bgcolor: "error.light",
-                  color: "white",
-                  fontSize: "0.7rem",
-                }}
-              />
-            ))}
+            {allergens.slice(0, 3).map((allergen) => {
+              const label =
+                typeof allergen === "string" ? allergen : allergen.name;
+              return (
+                <Chip
+                  key={label}
+                  label={label}
+                  size="small"
+                  sx={{
+                    height: 20,
+                    bgcolor: "error.light",
+                    color: "white",
+                    fontSize: "0.7rem",
+                  }}
+                />
+              );
+            })}
             {allergens.length > 3 && (
               <Chip
                 label={`+${allergens.length - 3}`}
@@ -367,59 +408,82 @@ const DishCard = ({
               />
             )}
           </Box>
-        )}
+        </Box>
 
-        {/* Action Buttons */}
-        <Box
-          sx={{
-            display: "flex",
-            gap: 1,
-            mt: "auto",
-          }}
-        >
-          {onEdit && (
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit();
-              }}
+        <Box sx={{ mt: "auto" }}>
+          {!showActions && extraInfo && (
+            <Typography
+              variant="body2"
               sx={{
-                flex: 1,
-                bgcolor: "primary.main",
-                color: "white",
-                borderRadius: 2,
-                "&:hover": {
-                  bgcolor: "primary.dark",
-                },
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                maxWidth: "100%",
+                wordBreak: "break-word",
+                fontWeight: 700,
+                color: "text.secondary",
               }}
             >
-              <EditIcon />
-            </IconButton>
+              {extraInfo}
+            </Typography>
           )}
-          <IconButton
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete();
-            }}
-            disabled={actionDisabled}
-            sx={{
-              flex: 1,
-              bgcolor: actionBg,
-              color: "white",
-              borderRadius: 2,
-              "&:hover": {
-                bgcolor: actionHoverBg,
-              },
-              "&.Mui-disabled": {
-                bgcolor: "grey.400",
-                color: "white",
-                opacity: 1,
-                cursor: "not-allowed",
-              },
-            }}
-          >
-            {actionMode === "add" ? <AddIcon /> : <DeleteIcon />}
-          </IconButton>
+
+          {/* Action Buttons */}
+          {showActions && onDelete && (
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                mt: 1.5,
+              }}
+            >
+              {onEdit && (
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit();
+                  }}
+                  sx={{
+                    flex: 1,
+                    bgcolor: "primary.main",
+                    color: "white",
+                    borderRadius: 2,
+                    "&:hover": {
+                      bgcolor: "primary.dark",
+                    },
+                  }}
+                >
+                  <EditIcon />
+                </IconButton>
+              )}
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete();
+                }}
+                disabled={actionDisabled}
+                sx={{
+                  flex: 1,
+                  bgcolor: actionBg,
+                  color: "white",
+                  borderRadius: 2,
+                  "&:hover": {
+                    bgcolor: actionHoverBg,
+                  },
+                  "&.Mui-disabled": {
+                    bgcolor: "grey.400",
+                    color: "white",
+                    opacity: 1,
+                    cursor: "not-allowed",
+                  },
+                }}
+              >
+                {actionMode === "add" ? <AddIcon /> : <DeleteIcon />}
+              </IconButton>
+            </Box>
+          )}
         </Box>
       </Box>
     </Paper>
