@@ -45,9 +45,31 @@ export default function Header() {
         setShowHomepageHeader(true);
         return;
       }
-      setShowHomepageHeader(false); // Reset to hidden when navigating to homepage
-      const timeout = setTimeout(() => setShowHomepageHeader(true), 1850);
-      return () => clearTimeout(timeout);
+
+      // Default hidden on desktop to avoid a brief flash before the reveal animation
+      // sets up (and before MUI styles hydrate).
+      setShowHomepageHeader(false);
+
+      const onRevealStart = () => setShowHomepageHeader(false);
+      const onRevealDone = () => setShowHomepageHeader(true);
+
+      window.addEventListener("dd:homeRevealStart", onRevealStart);
+      window.addEventListener("dd:homeRevealDone", onRevealDone);
+
+      // Grace period: if the reveal never starts (e.g. animation not mounted), allow header to appear.
+      // If the reveal is active (paused waiting for language), keep hidden until dd:homeRevealDone.
+      const grace = window.setTimeout(() => {
+        const isRevealActive =
+          typeof document !== "undefined" &&
+          document.documentElement.getAttribute("data-dd-home-reveal") === "1";
+        if (!isRevealActive) setShowHomepageHeader(true);
+      }, 300);
+
+      return () => {
+        window.removeEventListener("dd:homeRevealStart", onRevealStart);
+        window.removeEventListener("dd:homeRevealDone", onRevealDone);
+        window.clearTimeout(grace);
+      };
     } else {
       setShowHomepageHeader(false);
     }
@@ -59,11 +81,19 @@ export default function Header() {
       <AppBar
         position="absolute"
         elevation={0}
+        style={{
+          opacity: isMobile ? 1 : showHomepageHeader ? 1 : 0,
+          visibility: isMobile
+            ? "visible"
+            : showHomepageHeader
+              ? "visible"
+              : "hidden",
+          pointerEvents: isMobile || showHomepageHeader ? "auto" : "none",
+          transition: "opacity 600ms cubic-bezier(.4,1,.4,1)",
+        }}
         sx={{
           background: "transparent",
           zIndex: 50,
-          opacity: isMobile ? 1 : showHomepageHeader ? 1 : 0,
-          transition: "opacity 600ms cubic-bezier(.4,1,.4,1)",
         }}
       >
         <Toolbar
@@ -196,8 +226,6 @@ export default function Header() {
     );
   }
 
-  // --- CHANGES ARE IN THIS SECTION ---
-
   // Get the role from the public metadata we just set
   const userRole = user?.publicMetadata?.role as string;
   // Create the dynamic link. Default to "/" if role isn't found.
@@ -217,7 +245,7 @@ export default function Header() {
       >
         <Box
           component={Link}
-          href={homeHref} // Use the dynamic homeHref here
+          href={homeHref}
           sx={{
             display: "flex",
             alignItems: "center",

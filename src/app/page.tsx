@@ -105,21 +105,53 @@ export default function Home() {
 
   const typingFinished = subtitleText.length >= fullSubtitle.length;
 
+  const [homeRevealDone, setHomeRevealDone] = useState(false);
+
+  useEffect(() => {
+    if (isMobile) {
+      setHomeRevealDone(true);
+      return;
+    }
+
+    const onStart = () => {
+      setHomeRevealDone(false);
+      setSubtitleText("");
+    };
+    const onDone = () => setHomeRevealDone(true);
+
+    window.addEventListener("dd:homeRevealStart", onStart);
+    window.addEventListener("dd:homeRevealDone", onDone);
+    return () => {
+      window.removeEventListener("dd:homeRevealStart", onStart);
+      window.removeEventListener("dd:homeRevealDone", onDone);
+    };
+  }, [isMobile]);
+
   // Typewriter effect
   useEffect(() => {
-    const startDelay = isMobile ? 0 : 1850; // Start immediately on mobile
+    if (!homeRevealDone) {
+      setSubtitleText("");
+      return;
+    }
+
+    const startDelay = 0;
+    let intervalId: number | null = null;
     const timer = setTimeout(() => {
       let index = 0;
-      const interval = setInterval(() => {
+      intervalId = window.setInterval(() => {
         setSubtitleText(fullSubtitle.slice(0, index + 1));
         index++;
         if (index >= fullSubtitle.length) {
-          clearInterval(interval);
+          if (intervalId != null) window.clearInterval(intervalId);
+          intervalId = null;
         }
       }, 50); // Typing speed
     }, startDelay);
-    return () => clearTimeout(timer);
-  }, [fullSubtitle, isMobile]);
+    return () => {
+      clearTimeout(timer);
+      if (intervalId != null) window.clearInterval(intervalId);
+    };
+  }, [fullSubtitle, homeRevealDone]);
 
   // Redirect logged-in users to their dashboard
   useEffect(() => {
@@ -354,7 +386,6 @@ export default function Home() {
         opacity: 0.95,
       }}
     >
-      <HomeRevealAnimation />
       <HomeRevealGate>
         {/* This overlay box makes the background a bit darker */}
         <Box
@@ -486,7 +517,7 @@ export default function Home() {
             aria-hidden="true"
           >
             <CardSwap
-              appearDelayMs={2500}
+              appearDelayMs={250}
               width={cardSwapLayout.cardWidth}
               height={cardSwapLayout.cardHeight}
               cardDistance={cardSwapLayout.cardDistance}
@@ -494,8 +525,8 @@ export default function Home() {
               delay={5200}
               pauseOnHover
               staggerFadeIn
-              staggerFadeInDelayMs={150}
-              staggerFadeInEachMs={160}
+              staggerFadeInDelayMs={60}
+              staggerFadeInEachMs={120}
               staggerFadeInDurationSec={0.55}
             >
               <Card
