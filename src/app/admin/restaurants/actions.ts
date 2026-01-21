@@ -4,7 +4,6 @@ import Restaurant from "../../../models/Restaurant";
 import dbConnect from "../../../utils/dbConnect";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { Types } from "mongoose";
-import { clerkClient, auth } from "@clerk/nextjs/server";
 
 // Export types if needed elsewhere, though redundancy in create/edit is fine for now
 export type ActionResponse = {
