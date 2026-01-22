@@ -8,7 +8,7 @@ export interface WorkerMenuItem {
   id: string;
   name: string;
   description: string;
-  category: string;
+
   imageUrl: string;
   allergens: string[];
 }
@@ -53,7 +53,6 @@ export async function fetchAllDishesForMenza(
     description:
       (dishesMap.get(item.dishId.toString()) as any)?.description || "",
     allergens: (dishesMap.get(item.dishId.toString()) as any)?.allergens || [],
-    category: (dishesMap.get(item.dishId.toString()) as any)?.category || "",
     imageUrl: (dishesMap.get(item.dishId.toString()) as any)?.imageUrl || "",
   }));
 }
@@ -122,7 +121,6 @@ export async function fetchTodaysOfferForMenza(
         (dishesMap.get(item.dishId.toString()) as any)?.description || "",
       allergens:
         (dishesMap.get(item.dishId.toString()) as any)?.allergens || [],
-      category: (dishesMap.get(item.dishId.toString()) as any)?.category || "",
       imageUrl: (dishesMap.get(item.dishId.toString()) as any)?.imageUrl || "",
     }));
 }

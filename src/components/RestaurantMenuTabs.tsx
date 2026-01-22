@@ -64,7 +64,7 @@ export default function RestaurantMenuTabs({
         setValue(newValue);
     };
 
-    const renderDishGrid = (dishes: DishData[], emptyMessage: string) => {
+    const renderDishGrid = (dishes: DishData[], emptyMessage: string, isOffer: boolean) => {
         if (dishes.length === 0) {
             return (
                 <Box
@@ -101,6 +101,7 @@ export default function RestaurantMenuTabs({
                             lastServed={item.lastServed}
                             rating={item.rating}
                             isInitiallySubscribed={item.isSubscribed}
+                            isOffer={isOffer}
                         />
                     </Grid>
                 ))}
@@ -136,7 +137,7 @@ export default function RestaurantMenuTabs({
                         Pregledajte dostupna jela i pretplatite se na obavijesti.
                     </Typography>
                 </Box>
-                {renderDishGrid(offer, "Trenutno nema dostupnih jela u ovom restoranu.")}
+                {renderDishGrid(offer, "Trenutno nema dostupnih jela u ovom restoranu.", true)}
             </CustomTabPanel>
 
             <CustomTabPanel value={value} index={1}>
@@ -145,7 +146,7 @@ export default function RestaurantMenuTabs({
                         Ostala jela koja se povremeno poslužuju. Pretplatite se na obavijesti.
                     </Typography>
                 </Box>
-                {renderDishGrid(otherDishes, "Nema ostalih jela.")}
+                {renderDishGrid(otherDishes, "Nema ostalih jela.", false)}
             </CustomTabPanel>
         </Box>
     );

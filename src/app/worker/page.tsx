@@ -199,7 +199,6 @@ export default function Page() {
                 >
                   <DishCard
                     name={dish.name}
-                    restaurantName={dish.category}
                     position={dish.description}
                     imageUrl={dish.imageUrl}
                     allergens={dish.allergens}

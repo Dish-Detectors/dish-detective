@@ -13,7 +13,6 @@ jest.mock("@vercel/blob", () => ({
 async function createDish(dishData: {
   name: string;
   description: string;
-  category: string;
   imageUrl: string;
   allergens: string[];
 }) {
@@ -23,7 +22,6 @@ async function createDish(dishData: {
   const formData = new FormData();
   formData.append("name", dishData.name);
   formData.append("description", dishData.description);
-  formData.append("category", dishData.category);
   formData.append("allergens", dishData.allergens.join(","));
 
   // Create a mock file
@@ -67,7 +65,6 @@ describe("Edit Dish Server Actions", () => {
       const createResult = await createDish({
         name: "Original Pizza",
         description: "Original description",
-        category: "Pizza",
         imageUrl: "https://example.com/original.jpg",
         allergens: [new mongoose.Types.ObjectId().toString()],
       });
@@ -88,7 +85,6 @@ describe("Edit Dish Server Actions", () => {
       const createResult = await createDish({
         name: "Test Dish",
         description: "Original description",
-        category: "Test",
         imageUrl: "https://example.com/test.jpg",
         allergens: [],
       });
@@ -101,27 +97,12 @@ describe("Edit Dish Server Actions", () => {
       expect(updateResult.message).toBe("Dish updated successfully");
     });
 
-    it("should update dish category successfully", async () => {
-      const createResult = await createDish({
-        name: "Test Dish",
-        description: "Description",
-        category: "Original Category",
-        imageUrl: "https://example.com/test.jpg",
-        allergens: [],
-      });
 
-      const updateResult = await updateDish(createResult.data.id, {
-        category: "New Category",
-      });
-
-      expect(updateResult.success).toBe(true);
-    });
 
     it("should update dish image URL successfully", async () => {
       const createResult = await createDish({
         name: "Test Dish",
         description: "Description",
-        category: "Test",
         imageUrl: "https://example.com/original.jpg",
         allergens: [],
       });
@@ -137,7 +118,6 @@ describe("Edit Dish Server Actions", () => {
       const createResult = await createDish({
         name: "Test Dish",
         description: "Description",
-        category: "Test",
         imageUrl: "https://example.com/test.jpg",
         allergens: [new mongoose.Types.ObjectId().toString()],
       });
@@ -157,7 +137,6 @@ describe("Edit Dish Server Actions", () => {
       const createResult = await createDish({
         name: "Original Dish",
         description: "Original description",
-        category: "Original",
         imageUrl: "https://example.com/original.jpg",
         allergens: [new mongoose.Types.ObjectId().toString()],
       });
@@ -165,7 +144,6 @@ describe("Edit Dish Server Actions", () => {
       const updateResult = await updateDish(createResult.data.id, {
         name: "Completely Updated Dish",
         description: "Completely updated description",
-        category: "Premium",
         allergens: [
           new mongoose.Types.ObjectId().toString(),
           new mongoose.Types.ObjectId().toString(),
@@ -202,7 +180,6 @@ describe("Edit Dish Server Actions", () => {
       const dish1 = await createDish({
         name: "Unique Dish 1",
         description: "Description 1",
-        category: "Category 1",
         imageUrl: "https://example.com/dish1.jpg",
         allergens: [],
       });
@@ -210,7 +187,6 @@ describe("Edit Dish Server Actions", () => {
       const dish2 = await createDish({
         name: "Unique Dish 2",
         description: "Description 2",
-        category: "Category 2",
         imageUrl: "https://example.com/dish2.jpg",
         allergens: [],
       });
@@ -229,7 +205,6 @@ describe("Edit Dish Server Actions", () => {
       const createResult = await createDish({
         name: "Test Dish",
         description: "Description",
-        category: "Test",
         imageUrl: "https://example.com/test.jpg",
         allergens: [],
       });
@@ -248,7 +223,6 @@ describe("Edit Dish Server Actions", () => {
       const createResult = await createDish({
         name: "Test Dish",
         description: "Description",
-        category: "Test",
         imageUrl: "https://example.com/test.jpg",
         allergens: [],
       });
@@ -256,7 +230,6 @@ describe("Edit Dish Server Actions", () => {
       const updateResult = await updateDish(createResult.data.id, {
         name: "  Trimmed Name  ",
         description: "  Trimmed Description  ",
-        category: "  Trimmed Category  ",
       });
 
       expect(updateResult.success).toBe(true);
@@ -266,7 +239,6 @@ describe("Edit Dish Server Actions", () => {
       const createResult = await createDish({
         name: "Original Name",
         description: "Original Description",
-        category: "Original Category",
         imageUrl: "https://example.com/original.jpg",
         allergens: [
           new mongoose.Types.ObjectId().toString(),
@@ -287,7 +259,6 @@ describe("Edit Dish Server Actions", () => {
       const createResult = await createDish({
         name: "Test Dish",
         description: "Description",
-        category: "Test",
         imageUrl: "https://example.com/test.jpg",
         allergens: [],
       });
@@ -303,7 +274,6 @@ describe("Edit Dish Server Actions", () => {
       const createResult = await createDish({
         name: "Test Dish",
         description: "Description",
-        category: "Test",
         imageUrl: "https://example.com/test.jpg",
         allergens: [
           new mongoose.Types.ObjectId().toString(),

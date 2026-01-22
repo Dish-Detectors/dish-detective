@@ -7,7 +7,6 @@ import { Types } from "mongoose";
 type DishInput = {
   name: string;
   description: string;
-  category: string;
   imageUrl: string;
   allergens: string[]; // Array of Allergen IDs
 };
@@ -40,8 +39,7 @@ export async function updateDish(
     if (input.name !== undefined) updateData.name = input.name.trim();
     if (input.description !== undefined)
       updateData.description = input.description.trim();
-    if (input.category !== undefined)
-      updateData.category = input.category.trim();
+
     if (input.imageUrl !== undefined)
       updateData.imageUrl = input.imageUrl.trim();
     if (input.allergens !== undefined) updateData.allergens = input.allergens;

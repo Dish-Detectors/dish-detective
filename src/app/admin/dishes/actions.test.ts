@@ -19,7 +19,6 @@ jest.mock("next/cache", () => ({
 async function createDish(dishData: {
   name: string;
   description: string;
-  category: string;
   imageUrl: string;
   allergens: string[];
 }) {
@@ -29,7 +28,6 @@ async function createDish(dishData: {
   const formData = new FormData();
   formData.append("name", dishData.name);
   formData.append("description", dishData.description);
-  formData.append("category", dishData.category);
   formData.append("allergens", dishData.allergens.join(","));
 
   // Create a mock file
@@ -89,21 +87,18 @@ describe("Dish Server Actions", () => {
       {
         name: "Margherita Pizza",
         description: "Classic Italian pizza",
-        category: "Pizza",
         imageUrl: "https://example.com/margherita.jpg",
         allergens: [gluten._id.toString(), dairy._id.toString()],
       },
       {
         name: "Caesar Salad",
         description: "Fresh romaine lettuce with Caesar dressing",
-        category: "Salads",
         imageUrl: "https://example.com/caesar.jpg",
         allergens: [dairy._id.toString(), eggs._id.toString()],
       },
       {
         name: "Spaghetti Carbonara",
         description: "Pasta with eggs, cheese, and bacon",
-        category: "Pasta",
         imageUrl: "https://example.com/carbonara.jpg",
         allergens: [
           gluten._id.toString(),
@@ -114,14 +109,12 @@ describe("Dish Server Actions", () => {
       {
         name: "Grilled Chicken",
         description: "Tender grilled chicken breast",
-        category: "Mains",
         imageUrl: "https://example.com/chicken.jpg",
         allergens: [],
       },
       {
         name: "Tiramisu",
         description: "Italian coffee-flavored dessert",
-        category: "Desserts",
         imageUrl: "https://example.com/tiramisu.jpg",
         allergens: [
           gluten._id.toString(),
@@ -161,7 +154,6 @@ describe("Dish Server Actions", () => {
     // Update third dish (Spaghetti Carbonara)
     const updateResult2 = await updateDish(createdDishIds[2], {
       name: "Spaghetti Carbonara Deluxe",
-      category: "Premium Pasta",
     });
     expect(updateResult2.success).toBe(true);
     console.log(`Updated dish: ${updateResult2.data.name}`);
@@ -185,7 +177,7 @@ describe("Dish Server Actions", () => {
       `Retrieved ${getAllResult.data.length} dishes (sorted by name):`,
     );
     getAllResult.data.forEach((dish: any, index: number) => {
-      console.log(`${index + 1}. ${dish.name} - ${dish.category}`);
+      console.log(`${index + 1}. ${dish.name}`);
     });
 
     // Verify sorting by name
@@ -210,7 +202,6 @@ describe("Dish Server Actions", () => {
       (d: any) => d.name === "Spaghetti Carbonara Deluxe",
     );
     expect(carbonara).toBeDefined();
-    expect(carbonara.category).toBe("Premium Pasta");
 
     const tiramisu = getAllResult.data.find((d: any) => d.name === "Tiramisu");
     expect(tiramisu.imageUrl).toBe("https://example.com/tiramisu-new.jpg");
@@ -249,7 +240,6 @@ describe("Dish Server Actions", () => {
     const invalidCreateResult = await createDish({
       name: "",
       description: "Test",
-      category: "Test",
       imageUrl: "test.jpg",
       allergens: [],
     });

@@ -29,7 +29,7 @@ interface Dish {
   _id: string;
   name: string;
   description: string;
-  category: string;
+
   imageUrl: string;
   allergens: string[];
   createdAt: string;
@@ -104,7 +104,6 @@ export default function Page() {
     return (
       dish.name.toLowerCase().includes(query) ||
       dish.description.toLowerCase().includes(query) ||
-      dish.category.toLowerCase().includes(query) ||
       dish.allergens.some((allergen) => allergen.toLowerCase().includes(query))
     );
   });
@@ -275,7 +274,6 @@ export default function Page() {
               >
                 <DishCard
                   name={dish.name}
-                  restaurantName={dish.category}
                   position={dish.description}
                   imageUrl={dish.imageUrl}
                   allergens={dish.allergens}

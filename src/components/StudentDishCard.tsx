@@ -30,6 +30,7 @@ interface StudentDishCardProps {
   lastServed: string;
   rating?: number;
   isInitiallySubscribed?: boolean;
+  isOffer?: boolean;
 }
 
 export default function StudentDishCard({
@@ -42,6 +43,7 @@ export default function StudentDishCard({
   lastServed,
   rating = 0,
   isInitiallySubscribed = false,
+  isOffer = true,
 }: StudentDishCardProps) {
   const [currentRating, setCurrentRating] = useState(rating);
   const [isSubscribed, setIsSubscribed] = useState(isInitiallySubscribed);
@@ -128,10 +130,9 @@ export default function StudentDishCard({
         <Typography
           variant="body2"
           color="text.secondary"
-          noWrap
-          sx={{ mb: 0.5 }}
+          sx={{ mb: 0.5, minHeight: "3em" }} // Allow some space for description
         >
-          Sastojci: {description}
+          {description}
         </Typography>
 
         <Typography
@@ -140,11 +141,11 @@ export default function StudentDishCard({
           noWrap
           sx={{ mb: 0.5 }}
         >
-          Allergeni: {allergens.join(", ") || "Nema"}
+          Alergeni: {allergens.join(", ") || "Nema"}
         </Typography>
 
         <Typography variant="body2" color="text.secondary" fontWeight="medium">
-          Promjena statusa: {lastServed}
+          {isOffer ? `Promjena statusa: ${lastServed}` : `Zadnje dostupno: ${lastServed}`}
         </Typography>
 
         <Box
@@ -157,7 +158,8 @@ export default function StudentDishCard({
         >
           <Rating
             value={currentRating}
-            onChange={handleRate} // Enables clicking
+            onChange={isOffer ? handleRate : undefined}
+            readOnly={!isOffer}
             size="small"
           />
 

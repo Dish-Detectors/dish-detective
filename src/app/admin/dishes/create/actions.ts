@@ -17,19 +17,17 @@ export async function createDish(formData: FormData): Promise<ActionResponse> {
     // Extract form data
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
-    const category = formData.get("category") as string;
     const allergensString = formData.get("allergens") as string;
     const imageFile = formData.get("image") as File | null;
 
     // Validate required fields
-    if (!name || !description || !category) {
+    if (!name || !description) {
       return {
         success: false,
         message: "Missing required fields",
         errors: {
           name: !name ? "Name is required" : "",
           description: !description ? "Description is required" : "",
-          category: !category ? "Category is required" : "",
         },
       };
     }
@@ -38,9 +36,9 @@ export async function createDish(formData: FormData): Promise<ActionResponse> {
     // Parse allergens
     const allergens = allergensString
       ? allergensString
-          .split(",")
-          .map((a) => a.trim())
-          .filter((id) => Types.ObjectId.isValid(id))
+        .split(",")
+        .map((a) => a.trim())
+        .filter((id) => Types.ObjectId.isValid(id))
       : [];
 
     let imageUrl = "";
@@ -74,7 +72,6 @@ export async function createDish(formData: FormData): Promise<ActionResponse> {
     const dish = await Dish.create({
       name: name.trim(),
       description: description.trim(),
-      category: category.trim(),
       imageUrl: imageUrl,
       allergens: allergens,
       rating: 0,

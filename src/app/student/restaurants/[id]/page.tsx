@@ -16,6 +16,8 @@ import StudentDishCard from "@/components/StudentDishCard";
 import RestaurantMenuTabs from "@/components/RestaurantMenuTabs";
 import Restaurant, { IRestaurant, IWorkingDay } from "@/models/Restaurant";
 import Dish from "@/models/Dish";
+import Menu, { MenuItem } from "@/models/Menu";
+import DishRating from "@/models/DishRating";
 import dbConnect from "@/utils/dbConnect";
 import NavigationIcon from "@mui/icons-material/Navigation";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -45,6 +47,32 @@ export default async function RestaurantOfferPage({
 
   const offer = await getRestaurantOffer(id);
   const subscriptions = await getUserSubscriptions();
+
+  // Fetch history for accurate "Last served"
+  const restaurantMenus = await Menu.find({ restaurantId: id }).select("items").lean();
+  const menuItemIds = restaurantMenus.flatMap(m => m.items);
+  const historyData = await MenuItem.find({ _id: { $in: menuItemIds } }).lean();
+
+  const lastServedMap = new Map<string, Date>();
+  historyData.forEach(item => {
+    const dId = item.dishId.toString();
+    if (!lastServedMap.has(dId) || item.lastServed > lastServedMap.get(dId)!) {
+      lastServedMap.set(dId, item.lastServed);
+    }
+  });
+
+  // Fetch all ratings for dishes in this restaurant
+  const allAvailableDishIds = (restaurant?.availableDishes || []).map((d: any) => d.toString());
+  const ratingsData = await DishRating.aggregate([
+    { $match: { dishId: { $in: allAvailableDishIds } } },
+    {
+      $group: {
+        _id: "$dishId",
+        avgRating: { $avg: "$rating" },
+      },
+    },
+  ]);
+  const ratingsMap = new Map(ratingsData.map(r => [r._id.toString(), r.avgRating]));
 
   let otherDishes: any[] = [];
   if (restaurant && restaurant.availableDishes && restaurant.availableDishes.length > 0) {
@@ -195,6 +223,7 @@ export default async function RestaurantOfferPage({
       <RestaurantMenuTabs
         offer={offer.map((item: any) => ({
           ...item,
+          rating: ratingsMap.get(item.dishId) || 0,
           isSubscribed: subscriptions.includes(item.dishId),
         }))}
         otherDishes={otherDishes.map((dish: any) => ({
@@ -203,9 +232,10 @@ export default async function RestaurantOfferPage({
           description: dish.description,
           imageUrl: dish.imageUrl,
           allergens: dish.allergens?.map((a: any) => a.name) || [],
-          lastServed: dish.updatedAt
-            ? new Date(dish.updatedAt).toLocaleDateString("hr-HR")
-            : "Nije dostupno",
+          lastServed: lastServedMap.has(dish._id.toString())
+            ? lastServedMap.get(dish._id.toString())!.toLocaleDateString("hr-HR")
+            : "Nikada do sada",
+          rating: ratingsMap.get(dish._id.toString()) || 0,
           isSubscribed: subscriptions.includes(dish._id.toString()),
         }))}
       />
