@@ -152,7 +152,7 @@ describe("Accounts Server Actions", () => {
 
       expect(result.success).toBe(true);
       expect(result.data).toHaveLength(1);
-      expect(result.data?.[0].restaurantName).toBe("Unknown");
+      expect(result.data?.[0].restaurantName).toBe("Nije pridodijeljen");
     });
 
     it("should return error when user is not authenticated", async () => {
@@ -219,7 +219,9 @@ describe("Accounts Server Actions", () => {
       const result = await deleteEmployee(clerkId);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Can only delete manager or worker accounts");
+      expect(result.error).toBe(
+        "Can only delete manager, worker, or unassigned accounts",
+      );
     });
 
     it("should handle Clerk deletion errors", async () => {

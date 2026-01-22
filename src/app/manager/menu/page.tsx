@@ -24,7 +24,6 @@ interface Dish {
   _id: string;
   name: string;
   imageUrl: string;
-  category: string;
   description: string;
   allergens: string[];
 }
@@ -245,12 +244,23 @@ export default function DailyMenuPage() {
               <DishCard
                 key={item.menuItemId}
                 name={item.dish.name}
-                restaurantName="Dostupno"
                 position=""
                 imageUrl={item.dish.imageUrl}
                 onDelete={() => handleRemoveDish(item.menuItemId)}
                 actionMode="delete"
                 actionDisabled={actionInProgress === item.menuItemId}
+                extraInfo={
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 700,
+                      color: item.available ? "success.main" : "error.main",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {item.available ? "Dostupno" : "Nedostupno"}
+                  </Typography>
+                }
               />
             ))}
           </Box>
@@ -299,7 +309,6 @@ export default function DailyMenuPage() {
               >
                 <DishCard
                   name={dish.name}
-                  restaurantName={dish.category}
                   position={dish.description}
                   imageUrl={dish.imageUrl}
                   onDelete={() => handleAddDish(dish)}

@@ -10,10 +10,16 @@ import {
   Divider,
   Chip,
 } from "@mui/material";
+import { auth } from "@clerk/nextjs/server";
 import { getRestaurantOffer } from "@/app/student/action";
 import { getUserSubscriptions } from "@/actions/notification";
 import StudentDishCard from "@/components/StudentDishCard";
+import RestaurantMenuTabs from "@/components/RestaurantMenuTabs";
 import Restaurant, { IRestaurant, IWorkingDay } from "@/models/Restaurant";
+import Dish from "@/models/Dish";
+import Allergen from "@/models/Allergen";
+import Menu, { MenuItem } from "@/models/Menu";
+import DishRating from "@/models/DishRating";
 import dbConnect from "@/utils/dbConnect";
 import NavigationIcon from "@mui/icons-material/Navigation";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -40,8 +46,76 @@ export default async function RestaurantOfferPage({
   const restaurant = (await Restaurant.findById(
     id,
   ).lean()) as unknown as IRestaurant;
+
   const offer = await getRestaurantOffer(id);
   const subscriptions = await getUserSubscriptions();
+
+  // Fetch history for accurate "Last served"
+  const restaurantMenus = await Menu.find({ restaurantId: id })
+    .select("items")
+    .lean();
+  const menuItemIds = restaurantMenus.flatMap((m) => m.items);
+  const historyData = await MenuItem.find({ _id: { $in: menuItemIds } }).lean();
+
+  const lastServedMap = new Map<string, Date>();
+  historyData.forEach((item) => {
+    const dId = item.dishId.toString();
+    if (!lastServedMap.has(dId) || item.lastServed > lastServedMap.get(dId)!) {
+      lastServedMap.set(dId, item.lastServed);
+    }
+  });
+
+  // Fetch all ratings for dishes in this restaurant - filtered by context
+  const allAvailableDishIds = (restaurant?.availableDishes || []).map(
+    (d: any) => d.toString(),
+  );
+  const ratingsData = await DishRating.aggregate([
+    { $match: { dishId: { $in: allAvailableDishIds }, restaurantId: id } },
+    {
+      $group: {
+        _id: "$dishId",
+        avgRating: { $avg: "$rating" },
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+  const ratingsMap = new Map(
+    ratingsData.map((r) => [
+      r._id.toString(),
+      { avg: r.avgRating, count: r.count },
+    ]),
+  );
+
+  // Fetch current user's ratings
+  const { userId } = await auth();
+  let userRatingsMap = new Map<string, number>();
+  if (userId) {
+    const userRatings = await DishRating.find({
+      dishId: { $in: allAvailableDishIds },
+      restaurantId: id,
+      userId,
+    }).lean();
+    userRatingsMap = new Map(
+      userRatings.map((r) => [r.dishId.toString(), r.rating]),
+    );
+  }
+
+  let otherDishes: any[] = [];
+  if (
+    restaurant &&
+    restaurant.availableDishes &&
+    restaurant.availableDishes.length > 0
+  ) {
+    const dishes = await Dish.find({ _id: { $in: restaurant.availableDishes } })
+      .populate("allergens")
+      .lean();
+    const offerDishIds = new Set(
+      offer.map((item: any) => item.dishId.toString()),
+    );
+    otherDishes = dishes.filter(
+      (dish: any) => !offerDishIds.has(dish._id.toString()),
+    );
+  }
 
   if (!restaurant) {
     return (
@@ -54,6 +128,25 @@ export default async function RestaurantOfferPage({
   // Coordinates are [longitude, latitude]
   const [lng, lat] = restaurant.location.coordinates;
   const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+
+  // Check if restaurant is currently open
+  const now = new Date();
+  const currentDay = now.getDay(); // 0-6
+  const currentTime = now.getHours() * 60 + now.getMinutes();
+
+  const todaysHours = restaurant.workingHours.find(
+    (wh) => wh.day === currentDay,
+  );
+  let isOpen = false;
+  if (todaysHours) {
+    isOpen = todaysHours.shifts.some((shift) => {
+      const [startH, startM] = shift.start.split(":").map(Number);
+      const [endH, endM] = shift.end.split(":").map(Number);
+      const startTime = startH * 60 + startM;
+      const endTime = endH * 60 + endM;
+      return currentTime >= startTime && currentTime <= endTime;
+    });
+  }
 
   const sortWorkingHours = (hours: IWorkingDay[]) => {
     // Sort by day index, starting from Monday (1) to Sunday (0)
@@ -85,9 +178,24 @@ export default async function RestaurantOfferPage({
       >
         <Grid container spacing={4} alignItems="flex-start">
           <Grid size={{ xs: 12, md: 7 }}>
-            <Typography variant="h3" fontWeight="800" gutterBottom>
-              {restaurant.name}
-            </Typography>
+            <Box
+              sx={{
+                mb: 1,
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                flexWrap: "wrap",
+              }}
+            >
+              <Typography variant="h3" fontWeight="800">
+                {restaurant.name}
+              </Typography>
+              <Chip
+                label={isOpen ? "OTVORENO" : "ZATVORENO - Van radnog vremena"}
+                color={isOpen ? "success" : "error"}
+                sx={{ fontWeight: 700, borderRadius: 2 }}
+              />
+            </Box>
             <Stack
               direction="row"
               alignItems="center"
@@ -180,54 +288,36 @@ export default async function RestaurantOfferPage({
         </Grid>
       </Paper>
 
-      {/* Offer Section */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
-          Trenutna ponuda
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Pregledajte dostupna jela i pretplatite se na obavijesti.
-        </Typography>
-      </Box>
-
-      {offer.length === 0 ? (
-        <Box
-          sx={{
-            textAlign: "center",
-            py: 8,
-            bgcolor: "grey.50",
-            borderRadius: 4,
-            border: "1px dashed",
-            borderColor: "divider",
-          }}
-        >
-          <Typography variant="h6" color="text.secondary">
-            Trenutno nema dostupnih jela u ovom restoranu.
-          </Typography>
-        </Box>
-      ) : (
-        <Grid container spacing={3}>
-          {offer.map((item: any) => (
-            <Grid
-              size={{ xs: 12, sm: 6, md: 4 }}
-              key={item.id}
-              sx={{ display: "flex" }}
-            >
-              <StudentDishCard
-                menuItemId={item.id}
-                dishId={item.dishId}
-                name={item.name}
-                description={item.description}
-                imageUrl={item.imageUrl}
-                allergens={item.allergens}
-                lastServed={item.lastServed}
-                rating={item.rating}
-                isInitiallySubscribed={subscriptions.includes(item.id)}
-              />
-            </Grid>
-          ))}
-        </Grid>
-      )}
+      <RestaurantMenuTabs
+        offer={offer.map((item: any) => ({
+          ...item,
+          isSubscribed: subscriptions.includes(item.dishId),
+        }))}
+        otherDishes={otherDishes.map((dish: any) => {
+          const ratingInfo = ratingsMap.get(dish._id.toString()) || {
+            avg: 0,
+            count: 0,
+          };
+          return {
+            dishId: dish._id.toString(),
+            name: dish.name,
+            description: dish.description,
+            imageUrl: dish.imageUrl,
+            allergens: dish.allergens?.map((a: any) => a.name) || [],
+            lastServed: lastServedMap.has(dish._id.toString())
+              ? lastServedMap
+                  .get(dish._id.toString())!
+                  .toLocaleDateString("hr-HR")
+              : "Nikada do sada",
+            rating: ratingInfo.avg,
+            ratingCount: ratingInfo.count,
+            userRating: userRatingsMap.get(dish._id.toString()) || 0,
+            isSubscribed: subscriptions.includes(dish._id.toString()),
+          };
+        })}
+        isOpen={isOpen}
+        restaurantId={id}
+      />
     </Container>
   );
 }

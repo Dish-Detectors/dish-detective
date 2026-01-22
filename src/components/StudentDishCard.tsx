@@ -10,9 +10,13 @@ import {
   IconButton,
   Rating,
   Button,
+  Divider,
+  Chip,
 } from "@mui/material";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import ScheduleIcon from "@mui/icons-material/Schedule";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import {
   subscribeToDishTopic,
   unsubscribeFromDishTopic,
@@ -21,7 +25,7 @@ import { toggleSubscription } from "@/actions/notification";
 import { rateDish } from "@/app/student/action";
 
 interface StudentDishCardProps {
-  menuItemId: string;
+  menuItemId?: string;
   dishId: string;
   name: string;
   description: string;
@@ -29,7 +33,11 @@ interface StudentDishCardProps {
   allergens: string[];
   lastServed: string;
   rating?: number;
+  ratingCount?: number;
+  userRating?: number;
   isInitiallySubscribed?: boolean;
+  isOffer?: boolean;
+  restaurantId: string;
 }
 
 export default function StudentDishCard({
@@ -41,9 +49,13 @@ export default function StudentDishCard({
   allergens,
   lastServed,
   rating = 0,
+  ratingCount = 0,
+  userRating = 0,
   isInitiallySubscribed = false,
+  isOffer = true,
+  restaurantId,
 }: StudentDishCardProps) {
-  const [currentRating, setCurrentRating] = useState(rating);
+  const [personalRating, setPersonalRating] = useState(userRating);
   const [isSubscribed, setIsSubscribed] = useState(isInitiallySubscribed);
   const [loading, setLoading] = useState(false);
 
@@ -51,23 +63,27 @@ export default function StudentDishCard({
     setIsSubscribed(isInitiallySubscribed);
   }, [isInitiallySubscribed]);
 
+  useEffect(() => {
+    setPersonalRating(userRating);
+  }, [userRating]);
+
   const handleToggleSubscription = async () => {
     setLoading(true);
     let success = false;
 
     try {
       if (isSubscribed) {
-        success = await unsubscribeFromDishTopic(menuItemId);
+        success = await unsubscribeFromDishTopic(dishId);
         if (success) {
-          const res = await toggleSubscription(menuItemId);
+          const res = await toggleSubscription(dishId);
           if (res.success) {
             setIsSubscribed(false);
           }
         }
       } else {
-        success = await subscribeToDishTopic(menuItemId);
+        success = await subscribeToDishTopic(dishId);
         if (success) {
-          const res = await toggleSubscription(menuItemId);
+          const res = await toggleSubscription(dishId);
           if (res.success) {
             setIsSubscribed(true);
           }
@@ -85,17 +101,18 @@ export default function StudentDishCard({
     newValue: number | null,
   ) => {
     if (newValue === null) return;
-    setCurrentRating(newValue);
+    const oldRating = personalRating;
+    setPersonalRating(newValue);
 
     try {
-      const result = await rateDish({ dishId, rating: newValue });
+      const result = await rateDish({ dishId, restaurantId, rating: newValue });
       if (!result.success) {
         console.error(result.message);
-        setCurrentRating(rating);
+        setPersonalRating(oldRating);
       }
     } catch (error) {
       console.error("Failed to rate dish:", error);
-      setCurrentRating(rating);
+      setPersonalRating(oldRating);
     }
   };
 
@@ -121,67 +138,165 @@ export default function StudentDishCard({
         alt={name}
       />
       <CardContent sx={{ p: 2 }}>
-        <Typography variant="h6" fontWeight="bold" gutterBottom>
-          {name}
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            mb: 0.5,
+          }}
+        >
+          <Typography variant="h6" fontWeight="bold">
+            {name}
+          </Typography>
+          <Box
+            sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.5 }}
+          >
+            <Rating value={rating} readOnly size="small" precision={0.1} />
+            {ratingCount > 0 && (
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                fontWeight="bold"
+              >
+                {rating.toFixed(1)} ({ratingCount})
+              </Typography>
+            )}
+          </Box>
+        </Box>
 
         <Typography
           variant="body2"
           color="text.secondary"
-          noWrap
-          sx={{ mb: 0.5 }}
+          sx={{ mb: 0.5, minHeight: "3em" }} // Allow some space for description
         >
-          Sastojci: {description}
+          {description}
         </Typography>
 
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          noWrap
-          sx={{ mb: 0.5 }}
-        >
-          Allergeni: {allergens.join(", ") || "Nema"}
-        </Typography>
+        {/* Allergens: Styled as Chips */}
+        <Box sx={{ mb: 2, display: "flex", flexWrap: "wrap", gap: 0.8 }}>
+          {allergens.length > 0 ? (
+            allergens.map((allergen) => (
+              <Chip
+                key={allergen}
+                label={allergen}
+                size="small"
+                variant="outlined"
+                icon={<WarningAmberIcon sx={{ fontSize: "14px !important" }} />}
+                sx={{
+                  height: "24px",
+                  fontSize: "0.7rem",
+                  borderColor: "warning.light",
+                  color: "warning.dark",
+                  bgcolor: "warning.50",
+                  "& .MuiChip-icon": { color: "warning.main", ml: 0.5 },
+                }}
+              />
+            ))
+          ) : (
+            <Typography variant="caption" color="text.disabled">
+              Nema alergena
+            </Typography>
+          )}
+        </Box>
 
-        <Typography variant="body2" color="text.secondary" fontWeight="medium">
-          Promjena statusa: {lastServed}
-        </Typography>
-
+        {/* Availability Info Row */}
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
-            mt: 2,
+            gap: 1,
+            color: "text.secondary",
+            bgcolor: "grey.100",
+            py: 0.8,
+            px: 1.5,
+            borderRadius: 1.5,
+            width: "fit-content",
           }}
         >
-          <Rating
-            value={currentRating}
-            onChange={handleRate} // Enables clicking
-            size="small"
-          />
+          <ScheduleIcon sx={{ fontSize: 18, color: "primary.main" }} />
+          <Typography variant="caption" fontWeight="700">
+            {isOffer
+              ? `Dostupno od: ${lastServed}`
+              : `Zadnje dostupno: ${lastServed}`}
+          </Typography>
+        </Box>
 
-          <Button
-            onClick={handleToggleSubscription}
-            disabled={loading}
-            startIcon={
-              isSubscribed ? (
-                <NotificationsActiveIcon />
-              ) : (
-                <NotificationsNoneIcon />
-              )
-            }
+        {/* Action Box: Streamlined interactive elements */}
+        <Box
+          sx={{
+            mt: 2.5,
+            p: 2,
+            borderRadius: 3,
+            bgcolor: "grey.50",
+            border: "1px solid",
+            borderColor: "grey.200",
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
+        >
+          {isOffer && (
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Rating
+                  value={personalRating}
+                  onChange={handleRate}
+                  size="large"
+                  sx={{
+                    "& .MuiRating-iconFilled": {
+                      color: "primary.main",
+                    },
+                  }}
+                />
+              </Box>
+              <Divider sx={{ opacity: 0.4 }} />
+            </>
+          )}
+
+          <Box
             sx={{
-              textTransform: "none",
-              color: isSubscribed ? "success.main" : "text.secondary",
-              "&:hover": {
-                bgcolor: "transparent",
-                color: isSubscribed ? "success.dark" : "primary.main",
-              },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            {isSubscribed ? "Ukloni" : "Pretplati se"}
-          </Button>
+            <Button
+              onClick={handleToggleSubscription}
+              disabled={loading}
+              fullWidth
+              variant={isSubscribed ? "contained" : "outlined"}
+              color={isSubscribed ? "error" : "primary"}
+              startIcon={
+                isSubscribed ? (
+                  <NotificationsActiveIcon
+                    sx={{ fontSize: "1.5rem !important" }}
+                  />
+                ) : (
+                  <NotificationsNoneIcon
+                    sx={{ fontSize: "1.5rem !important" }}
+                  />
+                )
+              }
+              sx={{
+                borderRadius: 2.5,
+                textTransform: "none",
+                fontWeight: 700,
+                py: 1,
+                boxShadow: isSubscribed
+                  ? "0 4px 12px rgba(211, 47, 47, 0.15)"
+                  : "none",
+              }}
+            >
+              {isSubscribed ? "Ukloni pretplatu" : "Pretplati se"}
+            </Button>
+          </Box>
         </Box>
       </CardContent>
     </Card>

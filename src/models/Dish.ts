@@ -1,10 +1,10 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
+import "./Allergen"; // Ensure Allergen schema is registered before Dish is used
 
 // Dish document interface
 export interface IDish extends Document {
   name: string;
   description: string;
-  category: string;
   imageUrl: string;
   allergens: mongoose.Types.ObjectId[];
   createdAt: Date;
@@ -21,11 +21,6 @@ const dishSchema = new Schema<IDish>(
     description: {
       type: String,
       required: [true, "Description is required"],
-      trim: true,
-    },
-    category: {
-      type: String,
-      required: [true, "Category is required"],
       trim: true,
     },
     imageUrl: {

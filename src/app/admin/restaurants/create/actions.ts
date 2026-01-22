@@ -70,7 +70,11 @@ export async function createRestaurant(
       },
     };
   } catch (error: any) {
-    console.error("Error creating restaurant:", error);
+    // Handle known errors without logging to console in non-dev environments if they are expected (like validation)
+    // Or just log only if NOT a validation error to keep logs clean
+    if (error.name !== "ValidationError" && error.code !== 11000) {
+      console.error("Error creating restaurant:", error);
+    }
 
     // Handle duplicate name error
     if (error.code === 11000) {

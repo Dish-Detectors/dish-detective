@@ -9,7 +9,7 @@ import { revalidatePath } from "next/cache";
 type DishInput = {
   name: string;
   description: string;
-  category: string;
+
   imageUrl: string;
   allergens: string[];
 };

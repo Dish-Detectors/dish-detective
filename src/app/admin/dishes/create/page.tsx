@@ -38,7 +38,6 @@ export default function Page() {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    category: "",
     allergens: [] as Allergen[],
   });
 
@@ -101,7 +100,6 @@ export default function Page() {
       const formDataToSend = new FormData();
       formDataToSend.append("name", formData.name);
       formDataToSend.append("description", formData.description);
-      formDataToSend.append("category", formData.category);
       // Map allergen objects to IDs and join
       formDataToSend.append(
         "allergens",
@@ -295,23 +293,6 @@ export default function Page() {
                   }}
                 />
 
-                <TextField
-                  fullWidth
-                  label="Kategorija"
-                  value={formData.category}
-                  onChange={(e) =>
-                    setFormData({ ...formData, category: e.target.value })
-                  }
-                  required
-                  sx={{
-                    mb: 3,
-                    bgcolor: "white",
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 2,
-                    },
-                  }}
-                />
-
                 {/* Allergens Input */}
                 <Box sx={{ mb: 3 }}>
                   <Autocomplete
@@ -339,17 +320,21 @@ export default function Page() {
                       />
                     )}
                     renderTags={(value, getTagProps) =>
-                      value.map((option, index) => (
-                        <Chip
-                          label={option.name}
-                          {...getTagProps({ index })}
-                          sx={{
-                            bgcolor: "white",
-                            border: "1px solid",
-                            borderColor: "primary.main",
-                          }}
-                        />
-                      ))
+                      value.map((option, index) => {
+                        const { key, ...tagProps } = getTagProps({ index });
+                        return (
+                          <Chip
+                            key={key}
+                            label={option.name}
+                            {...tagProps}
+                            sx={{
+                              bgcolor: "white",
+                              border: "1px solid",
+                              borderColor: "primary.main",
+                            }}
+                          />
+                        );
+                      })
                     }
                   />
                 </Box>
@@ -464,22 +449,6 @@ export default function Page() {
                     color: "#212222",
                     mb: 1,
                     lineHeight: 1.2,
-                    "& input": { p: 0 },
-                  }}
-                />
-                <InputBase
-                  value={formData.category}
-                  onChange={(e) =>
-                    setFormData({ ...formData, category: e.target.value })
-                  }
-                  placeholder="Kategorija (npr. Glavno jelo)"
-                  fullWidth
-                  required
-                  sx={{
-                    fontSize: "1.5rem",
-                    color: "text.secondary",
-                    fontWeight: 500,
-                    mb: 4,
                     "& input": { p: 0 },
                   }}
                 />
@@ -695,18 +664,22 @@ export default function Page() {
                   />
                 )}
                 renderTags={(value, getTagProps) =>
-                  value.map((option, index) => (
-                    <Chip
-                      label={option.name}
-                      {...getTagProps({ index })}
-                      sx={{
-                        bgcolor: "primary.50",
-                        color: "primary.main",
-                        fontWeight: 600,
-                        borderRadius: 2,
-                      }}
-                    />
-                  ))
+                  value.map((option, index) => {
+                    const { key, ...tagProps } = getTagProps({ index });
+                    return (
+                      <Chip
+                        key={key}
+                        label={option.name}
+                        {...tagProps}
+                        sx={{
+                          bgcolor: "primary.50",
+                          color: "primary.main",
+                          fontWeight: 600,
+                          borderRadius: 2,
+                        }}
+                      />
+                    );
+                  })
                 }
               />
             </Box>

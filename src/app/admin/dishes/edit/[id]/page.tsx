@@ -44,7 +44,6 @@ export default function DishEditPage({
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    category: "",
     allergens: [] as Allergen[],
   });
 
@@ -84,7 +83,6 @@ export default function DishEditPage({
             setFormData({
               name: dish.name,
               description: dish.description,
-              category: dish.category,
               allergens: dish.allergens || [],
             });
             setCurrentImageUrl(dish.imageUrl);
@@ -156,7 +154,6 @@ export default function DishEditPage({
       const result = await updateDish(id, {
         name: formData.name,
         description: formData.description,
-        category: formData.category,
         imageUrl: imageUrl,
         allergens: formData.allergens.map((a) => a._id),
       });
@@ -351,23 +348,6 @@ export default function DishEditPage({
                   }}
                 />
 
-                <TextField
-                  fullWidth
-                  label="Kategorija"
-                  value={formData.category}
-                  onChange={(e) =>
-                    setFormData({ ...formData, category: e.target.value })
-                  }
-                  required
-                  sx={{
-                    mb: 3,
-                    bgcolor: "white",
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 2,
-                    },
-                  }}
-                />
-
                 <Box sx={{ mb: 3 }}>
                   <Autocomplete
                     multiple
@@ -519,22 +499,6 @@ export default function DishEditPage({
                     color: "#212222",
                     mb: 1,
                     lineHeight: 1.2,
-                    "& input": { p: 0 },
-                  }}
-                />
-                <InputBase
-                  value={formData.category}
-                  onChange={(e) =>
-                    setFormData({ ...formData, category: e.target.value })
-                  }
-                  placeholder="Kategorija (npr. Glavno jelo)"
-                  fullWidth
-                  required
-                  sx={{
-                    fontSize: "1.5rem",
-                    color: "text.secondary",
-                    fontWeight: 500,
-                    mb: 4,
                     "& input": { p: 0 },
                   }}
                 />

@@ -58,7 +58,6 @@ describe("Create Dish Server Actions", () => {
     const formData = new FormData();
     formData.append("name", "Test Pizza");
     formData.append("description", "Delicious test pizza");
-    formData.append("category", "Pizza");
     // Ensure no spaces or validation
     formData.append("allergens", `${gluten._id},${dairy._id}`);
 
@@ -87,7 +86,6 @@ describe("Create Dish Server Actions", () => {
     const formData = new FormData();
     formData.append("name", "Simple Salad");
     formData.append("description", "Fresh green salad");
-    formData.append("category", "Salads");
     formData.append("allergens", "");
 
     // Provide a small image with content
@@ -120,7 +118,6 @@ describe("Create Dish Server Actions", () => {
     const formData = new FormData();
     formData.append("name", "Peanut Butter Sandwich");
     formData.append("description", "Classic PB sandwich");
-    formData.append("category", "Sandwiches");
     formData.append("allergens", `${peanuts._id},${gluten._id},${soy._id}`);
 
     const mockFile = new File(["test"], "sandwich.jpg", { type: "image/jpeg" });
@@ -146,7 +143,7 @@ describe("Create Dish Server Actions", () => {
   it("should fail with missing required fields", async () => {
     const formData = new FormData();
     formData.append("name", "Incomplete Dish");
-    // Missing description and category
+    // Missing description
     // Missing image
 
     const result = await createDish(formData);
@@ -155,7 +152,6 @@ describe("Create Dish Server Actions", () => {
     expect(result.message).toBe("Missing required fields");
     expect(result.errors).toBeDefined();
     expect(result.errors?.description).toBeDefined();
-    expect(result.errors?.category).toBeDefined();
   });
 
   it("should handle duplicate dish names", async () => {
@@ -166,7 +162,6 @@ describe("Create Dish Server Actions", () => {
     const formData1 = new FormData();
     formData1.append("name", "Unique Pizza");
     formData1.append("description", "First pizza");
-    formData1.append("category", "Pizza");
     const mockFile1 = new File(["test"], "pizza1.jpg", { type: "image/jpeg" });
     formData1.append("image", mockFile1);
 
@@ -177,7 +172,6 @@ describe("Create Dish Server Actions", () => {
     const formData2 = new FormData();
     formData2.append("name", "Unique Pizza");
     formData2.append("description", "Second pizza");
-    formData2.append("category", "Pizza");
     const mockFile2 = new File(["test"], "pizza2.jpg", { type: "image/jpeg" });
     formData2.append("image", mockFile2);
 
@@ -195,7 +189,6 @@ describe("Create Dish Server Actions", () => {
     const formData = new FormData();
     formData.append("name", "Test Dish");
     formData.append("description", "Test description");
-    formData.append("category", "Test");
 
     const mockFile = new File(["test"], "test.jpg", { type: "image/jpeg" });
     formData.append("image", mockFile);
@@ -218,7 +211,6 @@ describe("Create Dish Server Actions", () => {
     const formData = new FormData();
     formData.append("name", "  Spaced Pizza  ");
     formData.append("description", "  Spaced description  ");
-    formData.append("category", "  Spaced Category  ");
     // Use IDs, comma separated.
     formData.append("allergens", `${dairy._id},${gluten._id},${eggs._id}`);
     const mockFile = new File(["test"], "pizza.jpg", { type: "image/jpeg" });
@@ -235,7 +227,6 @@ describe("Create Dish Server Actions", () => {
 
     expect(dish.name).toBe("Spaced Pizza");
     expect(dish.description).toBe("Spaced description");
-    expect(dish.category).toBe("Spaced Category");
 
     const storedIds = dish.allergens.map((id: any) => id.toString());
     expect(storedIds).toContain(dairy._id.toString());

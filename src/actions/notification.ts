@@ -145,6 +145,10 @@ export async function sendDishNotification(
           restaurantId: (restaurant as any)._id.toString(),
           menuItemId: menuItemId,
           availableFrom: availableFrom,
+          url: `/student/restaurants/${(restaurant as any)._id.toString()}`,
+        },
+        fcmOptions: {
+          link: `/student/restaurants/${(restaurant as any)._id.toString()}`,
         },
       },
       data: {
@@ -154,15 +158,16 @@ export async function sendDishNotification(
         restaurantId: (restaurant as any)._id.toString(),
         menuItemId: menuItemId,
         availableFrom: availableFrom,
+        url: `/student/restaurants/${(restaurant as any)._id.toString()}`,
       },
-      topic: `dish_notify_${menuItemId}`,
+      topic: `dish_notify_${(dish as any)._id.toString()}`,
     };
 
     const response = await messaging.send(message);
     console.log("Successfully sent message:", response);
 
-    // Find all subscribers
-    const subscribers = await Subscription.find({ menuItemId });
+    // Find all subscribers (by dishId)
+    const subscribers = await Subscription.find({ dishId: (dish as any)._id });
 
     // Save to database for each subscribed student
     const notificationPromises = subscribers.map((sub) =>
@@ -173,6 +178,8 @@ export async function sendDishNotification(
         type: "student",
         postedBy: userId,
         targetUserId: sub.userId,
+        restaurantId: (restaurant as any)._id.toString(),
+        dishId: (dish as any)._id.toString(),
       }),
     );
     await Promise.all(notificationPromises);
@@ -181,6 +188,54 @@ export async function sendDishNotification(
   } catch (error: any) {
     console.error("Error sending message:", error);
     return { success: false, error: error.message || JSON.stringify(error) };
+  }
+}
+
+export async function sendPollNotifications(params: {
+  pollId: string;
+  pollTitle: string;
+  targetUserIds: string[];
+  restaurantName: string;
+}) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  await dbConnect();
+
+  try {
+    const title = "Nova anketa dostupna! 📊";
+    const body = `Imamo nekoliko pitanja o hrani u restoranu ${params.restaurantName}: "${params.pollTitle}"`;
+    const pollLink = `/student/polls/${params.pollId}`;
+
+    const messages = params.targetUserIds.map((targetUserId) => ({
+      topic: `user_${targetUserId}`,
+      notification: {
+        title,
+        body,
+      },
+      data: {
+        type: "poll",
+        pollId: params.pollId,
+        url: pollLink,
+      },
+      webpush: {
+        fcmOptions: {
+          link: pollLink,
+        },
+      },
+    }));
+
+    // FCM Admin SDK sendEach can handle up to 500 messages at once
+    // If targetUserIds is larger, we might need chunking, but for polls it should be fine.
+    const response = await messaging.sendEach(messages);
+    console.log(
+      `Successfully sent ${response.successCount} poll notifications.`,
+    );
+
+    return { success: true, count: response.successCount };
+  } catch (error: any) {
+    console.error("Error sending poll notifications:", error);
+    return { success: false, error: error.message };
   }
 }
 
@@ -214,18 +269,18 @@ export async function unsubscribeTokenFromTopic(token: string, topic: string) {
   }
 }
 
-export async function toggleSubscription(menuItemId: string) {
+export async function toggleSubscription(dishId: string) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
   await dbConnect();
 
-  const existing = await Subscription.findOne({ userId, menuItemId });
+  const existing = await Subscription.findOne({ userId, dishId });
   if (existing) {
     await Subscription.findByIdAndDelete(existing._id);
     return { success: true, subscribed: false };
   } else {
-    await Subscription.create({ userId, menuItemId });
+    await Subscription.create({ userId, dishId });
     return { success: true, subscribed: true };
   }
 }
@@ -236,7 +291,7 @@ export async function getUserSubscriptions() {
 
   await dbConnect();
   const subs = await Subscription.find({ userId });
-  return subs.map((sub) => sub.menuItemId.toString());
+  return subs.map((sub) => sub.dishId.toString());
 }
 
 export async function syncDeviceSubscriptions(token: string) {
@@ -250,14 +305,14 @@ export async function syncDeviceSubscriptions(token: string) {
 
     // Subscribe token to all topics the user has in DB
     const syncPromises = subs.map((sub) =>
-      messaging.subscribeToTopic(token, `dish_notify_${sub.menuItemId}`),
+      messaging.subscribeToTopic(token, `dish_notify_${sub.dishId}`),
     );
 
     // Also subscribe to general public announcements
-    // In a real app we might check role, but for now we subscribe everyone to students topic
-    // or distinct topics based on their role if available.
-    // The requirement says "student" notifications go to push.
     syncPromises.push(messaging.subscribeToTopic(token, "topic_all_students"));
+
+    // Subscribe to a personal topic for targeted notifications (like polls)
+    syncPromises.push(messaging.subscribeToTopic(token, `user_${userId}`));
 
     await Promise.all(syncPromises);
     return { success: true, count: subs.length };

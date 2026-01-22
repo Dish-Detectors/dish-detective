@@ -26,7 +26,26 @@ export async function GET() {
 
     messaging.onBackgroundMessage((payload) => {
       console.log("[firebase-messaging-sw.js] Received background message ", payload);
-      // Let the browser handle the notification automatically from the payload.
+    });
+
+    self.addEventListener("notificationclick", (event) => {
+      event.notification.close();
+      const data = event.notification.data || {};
+      const urlToOpen = data.url || data.fcmOptions?.link || data.link || "/";
+      
+      event.waitUntil(
+        self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((windowClients) => {
+          for (let i = 0; i < windowClients.length; i++) {
+            const client = windowClients[i];
+            if (client.url === urlToOpen && "focus" in client) {
+              return client.focus();
+            }
+          }
+          if (self.clients.openWindow) {
+            return self.clients.openWindow(urlToOpen);
+          }
+        })
+      );
     });
   `;
 

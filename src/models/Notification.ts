@@ -16,6 +16,9 @@ export interface INotification extends Document {
     type: string;
     size: string;
   };
+  pollId?: string;
+  restaurantId?: string;
+  dishId?: string;
 }
 
 const notifSchema = new Schema<INotification>(
@@ -45,6 +48,15 @@ const notifSchema = new Schema<INotification>(
       url: { type: String },
       type: { type: String },
       size: { type: String },
+    },
+    pollId: {
+      type: String,
+    },
+    restaurantId: {
+      type: String,
+    },
+    dishId: {
+      type: String,
     },
     postedBy: {
       type: String,

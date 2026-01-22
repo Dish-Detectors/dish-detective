@@ -10,10 +10,19 @@ export default async function RedirectAfterSignIn() {
 
   const client = await clerkClient();
   const user = await client.users.getUser(userId);
-  let role = user.publicMetadata?.role as string | undefined;
+  let role = user.publicMetadata?.role as string | null | undefined;
+  const restaurantId = user.publicMetadata?.restaurantId as
+    | string
+    | null
+    | undefined;
 
-  // If role is not set, default to student and update Clerk metadata
-  if (!role) {
+  // Check for explicitly unassigned employee
+  if (role === null && restaurantId === null) {
+    redirect("/unassigned");
+  }
+
+  // If role is missing (undefined), default to student
+  if (role === undefined) {
     try {
       await client.users.updateUserMetadata(userId, {
         publicMetadata: {
@@ -23,7 +32,6 @@ export default async function RedirectAfterSignIn() {
       role = "student";
     } catch (error) {
       console.error("Error setting default role in Clerk:", error);
-      // Fallback to student even if Clerk update fails
       role = "student";
     }
   }

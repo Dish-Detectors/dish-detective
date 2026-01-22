@@ -1,0 +1,1071 @@
+
+> dish-detective@0.1.0 test
+> jest
+
+(node:60602) Warning: `--localstorage-file` was provided without a valid path
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS src/app/actions.test.ts
+(node:60603) Warning: `--localstorage-file` was provided without a valid path
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS src/app/admin/accounts/edit/actions.test.ts
+(node:60596) Warning: `--localstorage-file` was provided without a valid path
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL src/app/admin/accounts/actions.test.ts
+  ● Accounts Server Actions › getAllEmployees › should handle missing restaurant gracefully
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "Unknown"
+    Received: "Nije pridodijeljen"
+
+      153 |       expect(result.success).toBe(true);
+      154 |       expect(result.data).toHaveLength(1);
+    > 155 |       expect(result.data?.[0].restaurantName).toBe("Unknown");
+          |                                               ^
+      156 |     });
+      157 |
+      158 |     it("should return error when user is not authenticated", async () => {
+
+      at Object.toBe (src/app/admin/accounts/actions.test.ts:155:47)
+
+  ● Accounts Server Actions › deleteEmployee › should prevent deletion of admin accounts
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "Can only delete manager or worker accounts"
+    Received: "Can only delete manager, worker, or unassigned accounts"
+
+      220 |
+      221 |       expect(result.success).toBe(false);
+    > 222 |       expect(result.error).toBe("Can only delete manager or worker accounts");
+          |                            ^
+      223 |     });
+      224 |
+      225 |     it("should handle Clerk deletion errors", async () => {
+
+      at Object.toBe (src/app/admin/accounts/actions.test.ts:222:28)
+
+(node:60604) Warning: `--localstorage-file` was provided without a valid path
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS src/app/admin/accounts/create/actions.test.ts
+(node:60601) Warning: `--localstorage-file` was provided without a valid path
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS src/app/admin/actions.test.ts
+  ● Console
+
+    console.error
+      Error fetching user first name: Error: Clerk API error: User not found
+          at Object.<anonymous> (/Users/lukarazem/repos/dish-detective/src/app/admin/actions.test.ts:93:28)
+          at Promise.finally.completed (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:1557:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:1497:10)
+          at _callCircusTest (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:1007:40)
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at _runTest (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:947:3)
+          at /Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:849:7
+          at _runTestsForDescribeBlock (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:862:11)
+          at _runTestsForDescribeBlock (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+          at _runTestsForDescribeBlock (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+          at run (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:761:3)
+          at runAndTransformResultsToJestFormat (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:1918:21)
+          at jestAdapter (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/runner.js:101:19)
+          at runTestInternal (/Users/lukarazem/repos/dish-detective/node_modules/jest-runner/build/testWorker.js:275:16)
+          at runTest (/Users/lukarazem/repos/dish-detective/node_modules/jest-runner/build/testWorker.js:343:7)
+          at Object.worker (/Users/lukarazem/repos/dish-detective/node_modules/jest-runner/build/testWorker.js:497:12)
+
+      22 |     };
+      23 |   } catch (error) {
+    > 24 |     console.error("Error fetching user first name:", error);
+         |             ^
+      25 |     return {
+      26 |       success: false,
+      27 |       firstName: null,
+
+      at error (src/app/admin/actions.ts:24:13)
+      at Object.<anonymous> (src/app/admin/actions.test.ts:101:22)
+
+    console.error
+      Error fetching user first name: Error: Authentication service unavailable
+          at Object.<anonymous> (/Users/lukarazem/repos/dish-detective/src/app/admin/actions.test.ts:111:9)
+          at Promise.finally.completed (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:1557:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:1497:10)
+          at _callCircusTest (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:1007:40)
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at _runTest (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:947:3)
+          at /Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:849:7
+          at _runTestsForDescribeBlock (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:862:11)
+          at _runTestsForDescribeBlock (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+          at _runTestsForDescribeBlock (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+          at run (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:761:3)
+          at runAndTransformResultsToJestFormat (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:1918:21)
+          at jestAdapter (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/runner.js:101:19)
+          at runTestInternal (/Users/lukarazem/repos/dish-detective/node_modules/jest-runner/build/testWorker.js:275:16)
+          at runTest (/Users/lukarazem/repos/dish-detective/node_modules/jest-runner/build/testWorker.js:343:7)
+          at Object.worker (/Users/lukarazem/repos/dish-detective/node_modules/jest-runner/build/testWorker.js:497:12)
+
+      22 |     };
+      23 |   } catch (error) {
+    > 24 |     console.error("Error fetching user first name:", error);
+         |             ^
+      25 |     return {
+      26 |       success: false,
+      27 |       firstName: null,
+
+      at error (src/app/admin/actions.ts:24:13)
+      at Object.<anonymous> (src/app/admin/actions.test.ts:114:22)
+
+    console.error
+      Error fetching user first name: Error: Failed to initialize Clerk client
+          at Object.<anonymous> (/Users/lukarazem/repos/dish-detective/src/app/admin/actions.test.ts:130:9)
+          at Promise.finally.completed (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:1557:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:1497:10)
+          at _callCircusTest (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:1007:40)
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at _runTest (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:947:3)
+          at /Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:849:7
+          at _runTestsForDescribeBlock (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:862:11)
+          at _runTestsForDescribeBlock (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+          at _runTestsForDescribeBlock (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+          at run (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:761:3)
+          at runAndTransformResultsToJestFormat (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:1918:21)
+          at jestAdapter (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/runner.js:101:19)
+          at runTestInternal (/Users/lukarazem/repos/dish-detective/node_modules/jest-runner/build/testWorker.js:275:16)
+          at runTest (/Users/lukarazem/repos/dish-detective/node_modules/jest-runner/build/testWorker.js:343:7)
+          at Object.worker (/Users/lukarazem/repos/dish-detective/node_modules/jest-runner/build/testWorker.js:497:12)
+
+      22 |     };
+      23 |   } catch (error) {
+    > 24 |     console.error("Error fetching user first name:", error);
+         |             ^
+      25 |     return {
+      26 |       success: false,
+      27 |       firstName: null,
+
+      at error (src/app/admin/actions.ts:24:13)
+      at Object.<anonymous> (src/app/admin/actions.test.ts:133:22)
+
+(node:60599) Warning: `--localstorage-file` was provided without a valid path
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS src/app/admin/dishes/edit/actions.test.ts
+  ● Console
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.error
+      Error updating dish: MongoServerError: Plan executor error during findAndModify :: caused by :: E11000 duplicate key error collection: test.dishes index: name_1 dup key: { name: "Unique Dish 1" }
+          at Connection.sendCommand (/Users/lukarazem/repos/dish-detective/node_modules/mongoose/node_modules/mongodb/src/cmap/connection.ts:559:17)
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at Connection.command (/Users/lukarazem/repos/dish-detective/node_modules/mongoose/node_modules/mongodb/src/cmap/connection.ts:633:22)
+          at Server.command (/Users/lukarazem/repos/dish-detective/node_modules/mongoose/node_modules/mongodb/src/sdam/server.ts:350:21)
+          at tryOperation (/Users/lukarazem/repos/dish-detective/node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:289:24)
+          at executeOperation (/Users/lukarazem/repos/dish-detective/node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:119:12)
+          at Collection.findOneAndUpdate (/Users/lukarazem/repos/dish-detective/node_modules/mongoose/node_modules/mongodb/src/collection.ts:1041:12)
+          at model.Query._findOneAndUpdate (/Users/lukarazem/repos/dish-detective/node_modules/mongoose/lib/query.js:3536:13)
+          at model.Query.exec (/Users/lukarazem/repos/dish-detective/node_modules/mongoose/lib/query.js:4627:63)
+          at updateDish (/Users/lukarazem/repos/dish-detective/src/app/admin/dishes/edit/actions.ts:47:25)
+          at Object.<anonymous> (/Users/lukarazem/repos/dish-detective/src/app/admin/dishes/edit/actions.test.ts:195:28) {
+        errorLabelSet: Set(0) {},
+        errorResponse: {
+          ok: 0,
+          errmsg: 'Plan executor error during findAndModify :: caused by :: E11000 duplicate key error collection: test.dishes index: name_1 dup key: { name: "Unique Dish 1" }',
+          code: 11000,
+          codeName: 'DuplicateKey',
+          keyPattern: { name: 1 },
+          keyValue: { name: 'Unique Dish 1' }
+        },
+        ok: 0,
+        code: 11000,
+        codeName: 'DuplicateKey',
+        keyPattern: { name: 1 },
+        keyValue: { name: 'Unique Dish 1' }
+      }
+
+      66 |     };
+      67 |   } catch (error: any) {
+    > 68 |     console.error("Error updating dish:", error);
+         |             ^
+      69 |
+      70 |     // Handle duplicate name error
+      71 |     if (error.code === 11000) {
+
+      at error (src/app/admin/dishes/edit/actions.ts:68:13)
+      at Object.<anonymous> (src/app/admin/dishes/edit/actions.test.ts:195:28)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.error
+      Error updating dish: Error: Validation failed: name: Dish name is required
+          at ValidationError.inspect (/Users/lukarazem/repos/dish-detective/node_modules/mongoose/lib/error/validation.js:52:26)
+          at formatValue (node:internal/util/inspect:1148:19)
+          at inspect (node:internal/util/inspect:409:10)
+          at formatWithOptionsInternal (node:internal/util/inspect:2897:40)
+          at format (node:internal/util/inspect:2754:10)
+          at console.error (/Users/lukarazem/repos/dish-detective/node_modules/@jest/console/build/index.js:124:43)
+          at error (/Users/lukarazem/repos/dish-detective/src/app/admin/dishes/edit/actions.ts:68:13)
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at Object.<anonymous> (/Users/lukarazem/repos/dish-detective/src/app/admin/dishes/edit/actions.test.ts:213:28) {
+        errors: {
+          name: ValidatorError: Dish name is required
+              at validate (/Users/lukarazem/repos/dish-detective/node_modules/mongoose/lib/schemaType.js:1417:13)
+              at SchemaString.SchemaType.doValidate (/Users/lukarazem/repos/dish-detective/node_modules/mongoose/lib/schemaType.js:1401:7)
+              at /Users/lukarazem/repos/dish-detective/node_modules/mongoose/lib/helpers/updateValidators.js:150:22
+              at module.exports (/Users/lukarazem/repos/dish-detective/node_modules/mongoose/lib/helpers/updateValidators.js:201:7)
+              at /Users/lukarazem/repos/dish-detective/node_modules/mongoose/lib/query.js:4115:7
+              at new Promise (<anonymous>)
+              at model.Query.validate (/Users/lukarazem/repos/dish-detective/node_modules/mongoose/lib/query.js:4114:11)
+              at processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at model.Query._findOneAndUpdate (/Users/lukarazem/repos/dish-detective/node_modules/mongoose/lib/query.js:3529:5)
+              at model.Query.exec (/Users/lukarazem/repos/dish-detective/node_modules/mongoose/lib/query.js:4627:63)
+              at updateDish (/Users/lukarazem/repos/dish-detective/src/app/admin/dishes/edit/actions.ts:47:25)
+              at Object.<anonymous> (/Users/lukarazem/repos/dish-detective/src/app/admin/dishes/edit/actions.test.ts:213:28) {
+            properties: [Object],
+            kind: 'required',
+            path: 'name',
+            value: '',
+            reason: undefined,
+            Symbol(mongoose#validatorError): true
+          }
+        },
+        _message: 'Validation failed'
+      }
+
+      66 |     };
+      67 |   } catch (error: any) {
+    > 68 |     console.error("Error updating dish:", error);
+         |             ^
+      69 |
+      70 |     // Handle duplicate name error
+      71 |     if (error.code === 11000) {
+
+      at error (src/app/admin/dishes/edit/actions.ts:68:13)
+      at Object.<anonymous> (src/app/admin/dishes/edit/actions.test.ts:213:28)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+(node:60598) Warning: `--localstorage-file` was provided without a valid path
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS src/app/admin/dishes/actions.test.ts
+  ● Console
+
+    console.log
+      Step 1: Creating dishes...
+
+      at Object.log (src/app/admin/dishes/actions.test.ts:84:13)
+
+    console.log
+      Created dish: Margherita Pizza with ID: 6971b4706494880153f42900
+
+      at Object.log (src/app/admin/dishes/actions.test.ts:134:15)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Created dish: Caesar Salad with ID: 6971b4706494880153f42902
+
+      at Object.log (src/app/admin/dishes/actions.test.ts:134:15)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Created dish: Spaghetti Carbonara with ID: 6971b4706494880153f42904
+
+      at Object.log (src/app/admin/dishes/actions.test.ts:134:15)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Created dish: Grilled Chicken with ID: 6971b4706494880153f42906
+
+      at Object.log (src/app/admin/dishes/actions.test.ts:134:15)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Created dish: Tiramisu with ID: 6971b4706494880153f42908
+
+      at Object.log (src/app/admin/dishes/actions.test.ts:134:15)
+
+    console.log
+      
+      Step 2: Modifying dishes...
+
+      at Object.log (src/app/admin/dishes/actions.test.ts:140:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Updated dish: Margherita Pizza
+
+      at Object.log (src/app/admin/dishes/actions.test.ts:152:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Updated dish: Spaghetti Carbonara Deluxe
+
+      at Object.log (src/app/admin/dishes/actions.test.ts:159:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Updated dish image: Tiramisu
+
+      at Object.log (src/app/admin/dishes/actions.test.ts:166:13)
+
+    console.log
+      
+      Step 3: Retrieving all dishes...
+
+      at Object.log (src/app/admin/dishes/actions.test.ts:169:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Retrieved 5 dishes (sorted by name):
+
+      at Object.log (src/app/admin/dishes/actions.test.ts:176:13)
+
+    console.log
+      1. Caesar Salad
+
+      at log (src/app/admin/dishes/actions.test.ts:180:15)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      2. Grilled Chicken
+
+      at log (src/app/admin/dishes/actions.test.ts:180:15)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      3. Margherita Pizza
+
+      at log (src/app/admin/dishes/actions.test.ts:180:15)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      4. Spaghetti Carbonara Deluxe
+
+      at log (src/app/admin/dishes/actions.test.ts:180:15)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      5. Tiramisu
+
+      at log (src/app/admin/dishes/actions.test.ts:180:15)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      
+      Step 4: Deleting dishes...
+
+      at Object.log (src/app/admin/dishes/actions.test.ts:210:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Deleted dish with ID: 6971b4706494880153f42900
+
+      at Object.log (src/app/admin/dishes/actions.test.ts:215:15)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Deleted dish with ID: 6971b4706494880153f42902
+
+      at Object.log (src/app/admin/dishes/actions.test.ts:215:15)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Deleted dish with ID: 6971b4706494880153f42904
+
+      at Object.log (src/app/admin/dishes/actions.test.ts:215:15)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Deleted dish with ID: 6971b4706494880153f42906
+
+      at Object.log (src/app/admin/dishes/actions.test.ts:215:15)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Deleted dish with ID: 6971b4706494880153f42908
+
+      at Object.log (src/app/admin/dishes/actions.test.ts:215:15)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      
+      All dishes successfully deleted!
+
+      at Object.log (src/app/admin/dishes/actions.test.ts:222:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+(node:60600) Warning: `--localstorage-file` was provided without a valid path
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS src/app/admin/dishes/create/actions.test.ts
+  ● Console
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.error
+      Error creating dish: MongoServerError: E11000 duplicate key error collection: test.dishes index: name_1 dup key: { name: "Unique Pizza" }
+          at InsertOneOperation.handleOk (/Users/lukarazem/repos/dish-detective/node_modules/mongoose/node_modules/mongodb/src/operations/insert.ts:79:13)
+          at tryOperation (/Users/lukarazem/repos/dish-detective/node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:290:26)
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at executeOperation (/Users/lukarazem/repos/dish-detective/node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:119:12)
+          at Collection.insertOne (/Users/lukarazem/repos/dish-detective/node_modules/mongoose/node_modules/mongodb/src/collection.ts:294:12) {
+        errorLabelSet: Set(0) {},
+        errorResponse: {
+          index: 0,
+          code: 11000,
+          errmsg: 'E11000 duplicate key error collection: test.dishes index: name_1 dup key: { name: "Unique Pizza" }',
+          keyPattern: { name: 1 },
+          keyValue: { name: 'Unique Pizza' }
+        },
+        index: 0,
+        code: 11000,
+        keyPattern: { name: 1 },
+        keyValue: { name: 'Unique Pizza' }
+      }
+
+      88 |     };
+      89 |   } catch (error: any) {
+    > 90 |     console.error("Error creating dish:", error);
+         |             ^
+      91 |
+      92 |     // Handle duplicate name error
+      93 |     if (error.code === 11000) {
+
+      at error (src/app/admin/dishes/create/actions.ts:90:13)
+      at Object.<anonymous> (src/app/admin/dishes/create/actions.test.ts:178:21)
+
+    console.error
+      Error uploading image: Error: Upload failed
+          at Object.<anonymous> (/Users/lukarazem/repos/dish-detective/src/app/admin/dishes/create/actions.test.ts:187:42)
+          at Promise.finally.completed (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:1557:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:1497:10)
+          at _callCircusTest (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:1007:40)
+          at processTicksAndRejections (node:internal/process/task_queues:103:5)
+          at _runTest (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:947:3)
+          at /Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:849:7
+          at _runTestsForDescribeBlock (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:862:11)
+          at _runTestsForDescribeBlock (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+          at run (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:761:3)
+          at runAndTransformResultsToJestFormat (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/jestAdapterInit.js:1918:21)
+          at jestAdapter (/Users/lukarazem/repos/dish-detective/node_modules/jest-circus/build/runner.js:101:19)
+          at runTestInternal (/Users/lukarazem/repos/dish-detective/node_modules/jest-runner/build/testWorker.js:275:16)
+          at runTest (/Users/lukarazem/repos/dish-detective/node_modules/jest-runner/build/testWorker.js:343:7)
+          at Object.worker (/Users/lukarazem/repos/dish-detective/node_modules/jest-runner/build/testWorker.js:497:12)
+
+      58 |         imageUrl = blob.url;
+      59 |       } catch (error) {
+    > 60 |         console.error("Error uploading image:", error);
+         |                 ^
+      61 |         return {
+      62 |           success: false,
+      63 |           message: "Failed to upload image",
+
+      at error (src/app/admin/dishes/create/actions.ts:60:17)
+      at Object.<anonymous> (src/app/admin/dishes/create/actions.test.ts:196:20)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+(node:60597) Warning: `--localstorage-file` was provided without a valid path
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS src/app/admin/restaurants/actions.test.ts (6.63 s)
+  ● Console
+
+    console.log
+      Step 1: Creating restaurants...
+
+      at Object.log (src/app/admin/restaurants/actions.test.ts:46:13)
+
+    console.log
+      Created restaurant: Pizza Paradise with ID: 6971b4704020f6696f06d371
+
+      at Object.log (src/app/admin/restaurants/actions.test.ts:147:15)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Created restaurant: Sushi House with ID: 6971b4704020f6696f06d382
+
+      at Object.log (src/app/admin/restaurants/actions.test.ts:147:15)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Created restaurant: Burger Joint with ID: 6971b4704020f6696f06d392
+
+      at Object.log (src/app/admin/restaurants/actions.test.ts:147:15)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Created restaurant: Taco Fiesta with ID: 6971b4704020f6696f06d3a2
+
+      at Object.log (src/app/admin/restaurants/actions.test.ts:147:15)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Created restaurant: Pasta Palace with ID: 6971b4704020f6696f06d3b2
+
+      at Object.log (src/app/admin/restaurants/actions.test.ts:147:15)
+
+    console.log
+      
+      Step 2: Modifying restaurants...
+
+      at Object.log (src/app/admin/restaurants/actions.test.ts:155:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Updated working hours for: Pasta Palace
+
+      at Object.log (src/app/admin/restaurants/actions.test.ts:180:13)
+
+    console.log
+      
+      Step 3: Retrieving all restaurants...
+
+      at Object.log (src/app/admin/restaurants/actions.test.ts:183:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Retrieved 5 restaurants (sorted by name):
+
+      at Object.log (src/app/admin/restaurants/actions.test.ts:190:13)
+
+    console.log
+      1. Burger Joint Premium - 789 Elm St, Chicago, IL 60601
+
+      at log (src/app/admin/restaurants/actions.test.ts:194:15)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      2. Pasta Palace - 654 Maple Dr, Miami, FL 33101
+
+      at log (src/app/admin/restaurants/actions.test.ts:194:15)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      3. Pizza Paradise - 123 Main St, Suite 100, New York, NY 10001
+
+      at log (src/app/admin/restaurants/actions.test.ts:194:15)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      4. Sushi House - 456 Oak Ave, Los Angeles, CA 90001
+
+      at log (src/app/admin/restaurants/actions.test.ts:194:15)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      5. Taco Fiesta - 321 Pine St, Austin, TX 78701
+
+      at log (src/app/admin/restaurants/actions.test.ts:194:15)
+          at Array.forEach (<anonymous>)
+
+    console.log
+      
+      Step 4: Deleting restaurants...
+
+      at Object.log (src/app/admin/restaurants/actions.test.ts:234:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Deleted restaurant with ID: 6971b4704020f6696f06d371
+
+      at Object.log (src/app/admin/restaurants/actions.test.ts:239:15)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Deleted restaurant with ID: 6971b4704020f6696f06d382
+
+      at Object.log (src/app/admin/restaurants/actions.test.ts:239:15)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Deleted restaurant with ID: 6971b4704020f6696f06d392
+
+      at Object.log (src/app/admin/restaurants/actions.test.ts:239:15)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Deleted restaurant with ID: 6971b4704020f6696f06d3a2
+
+      at Object.log (src/app/admin/restaurants/actions.test.ts:239:15)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Deleted restaurant with ID: 6971b4704020f6696f06d3b2
+
+      at Object.log (src/app/admin/restaurants/actions.test.ts:239:15)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      
+      All restaurants successfully deleted!
+
+      at Object.log (src/app/admin/restaurants/actions.test.ts:246:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+    console.log
+      Using existing MongoDB connection.
+
+      at log (src/utils/dbConnect.ts:27:13)
+
+
+Test Suites: 1 failed, 8 passed, 9 total
+Tests:       2 failed, 65 passed, 67 total
+Snapshots:   0 total
+Time:        7.142 s
+Ran all test suites.

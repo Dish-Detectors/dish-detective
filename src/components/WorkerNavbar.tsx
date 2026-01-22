@@ -2,7 +2,8 @@
 
 import { Box, Stack, IconButton } from "@mui/material";
 import { usePathname, useRouter } from "next/navigation";
-import HomeFilledIcon from "@mui/icons-material/HomeFilled";
+import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
+import AddIcon from "@mui/icons-material/Add";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import NotificationCenter from "./NotificationCenter";
 import React from "react";
@@ -105,9 +106,9 @@ export default function WorkerNavbar({ isMobile = false }: WorkerNavbarProps) {
         <IconButton
           onClick={() => router.push("/worker")}
           sx={getIconButtonStyle("/worker")}
-          aria-label="Home"
+          aria-label="Ponuda"
         >
-          <HomeFilledIcon />
+          <RestaurantMenuIcon />
         </IconButton>
         <IconButton
           onClick={handleToggleNotif}

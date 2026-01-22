@@ -20,13 +20,19 @@ export default function NotificationSync() {
     const checkAndSync = async () => {
       // 1. Check if browser already has permission
       const permission = checkNotificationPermission();
+      const lastSync = localStorage.getItem("lastNotifSyncVer");
+      const currentSyncVer = "2"; // Personal topic sync version
 
-      // If denied or default, we might need a sync
-      if (permission !== "granted") {
-        // 2. Check if user has any subscriptions in DB
-        // const subs = await getUserSubscriptions();
-
-        // Always prompt to enable notifications if not granted, so they get announcements
+      if (permission === "granted") {
+        if (lastSync !== currentSyncVer) {
+          const token = await requestNotificationPermission();
+          if (token) {
+            await syncDeviceSubscriptions(token);
+            localStorage.setItem("lastNotifSyncVer", currentSyncVer);
+          }
+        }
+      } else if (permission !== "denied") {
+        // Only prompt if not already denied
         setOpen(true);
       }
     };
@@ -40,6 +46,7 @@ export default function NotificationSync() {
       const token = await requestNotificationPermission();
       if (token) {
         await syncDeviceSubscriptions(token);
+        localStorage.setItem("lastNotifSyncVer", "2");
         setOpen(false);
       }
     } catch (error) {

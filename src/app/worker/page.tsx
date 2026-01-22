@@ -17,9 +17,10 @@ import {
   WorkerMenuItem,
   getWorkerMenzaId,
   fetchTodaysOfferForMenza,
-  removeDishFromTodaysOffer,
+  toggleDishAvailability,
 } from "./actions";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
+import { FormControlLabel, Switch } from "@mui/material";
 
 export default function Page() {
   const theme = useTheme();
@@ -91,6 +92,7 @@ export default function Page() {
             flex: 1,
             overflowY: "auto",
             pr: 1,
+            pt: 1,
             pb: isMobile ? 5 : 4,
           }}
         >
@@ -119,72 +121,6 @@ export default function Page() {
                 pb: 2,
               }}
             >
-              {/* Dodaj u ponudu */}
-              <Paper
-                role="button"
-                tabIndex={0}
-                onClick={() => router.push("/worker/add")}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    router.push("/worker/add");
-                  }
-                }}
-                elevation={0}
-                sx={{
-                  cursor: "pointer",
-                  borderRadius: 3,
-                  bgcolor: "white",
-                  border: "2px dashed #d0d0d0",
-                  transition: "all 0.2s ease-in-out",
-                  outline: "none",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: isMobile ? 96 : 380,
-                  minHeight: isMobile ? 96 : 380,
-                  maxHeight: isMobile ? 96 : 380,
-                  "&:hover": {
-                    borderColor: theme.palette.primary.main,
-                    boxShadow: 2,
-                  },
-                  "&:focus-visible": {
-                    borderColor: theme.palette.primary.main,
-                    boxShadow: `0 0 0 3px ${theme.palette.primary.light}`,
-                  },
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 1.5,
-                    px: 2,
-                  }}
-                >
-                  <AddIcon
-                    sx={{
-                      fontSize: isMobile ? 50 : 128,
-                      color: "grey.500",
-                    }}
-                  />
-                  {!isMobile && (
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 700,
-                        color: "#212222",
-                        textAlign: "center",
-                      }}
-                    >
-                      Dodaj u ponudu
-                    </Typography>
-                  )}
-                </Box>
-              </Paper>
-
               {sortedDishes.map((dish, index) => (
                 <Box
                   key={dish.id}
@@ -199,33 +135,56 @@ export default function Page() {
                 >
                   <DishCard
                     name={dish.name}
-                    restaurantName={dish.category}
                     position={dish.description}
                     imageUrl={dish.imageUrl}
                     allergens={dish.allergens}
-                    onDelete={() => {
-                      if (!menzaId) return;
-                      const removedId = dish.id;
+                    showActions={false}
+                    extraInfo={
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={dish.available}
+                            onChange={async (e) => {
+                              const newAvailable = e.target.checked;
+                              // Optimistic UI update
+                              setDishes((prev) =>
+                                prev.map((d) =>
+                                  d.id === dish.id
+                                    ? { ...d, available: newAvailable }
+                                    : d,
+                                ),
+                              );
 
-                      // Optimistic UI update
-                      setDishes((prev) =>
-                        prev.filter((d) => d.id !== removedId),
-                      );
-
-                      void removeDishFromTodaysOffer({
-                        menuItemId: removedId,
-                        updateDate: new Date(),
-                      }).catch(async (err: any) => {
-                        console.error(
-                          "Failed to remove dish from today's offer",
-                          err,
-                        );
-                        // Fallback: refresh from server to keep UI consistent
-                        const refreshed =
-                          await fetchTodaysOfferForMenza(menzaId);
-                        setDishes(refreshed);
-                      });
-                    }}
+                              try {
+                                await toggleDishAvailability({
+                                  menuItemId: dish.id,
+                                  available: newAvailable,
+                                  updateDate: new Date(),
+                                });
+                              } catch (err) {
+                                console.error("Toggle failed", err);
+                                if (menzaId) {
+                                  const result =
+                                    await fetchTodaysOfferForMenza(menzaId);
+                                  setDishes(result);
+                                }
+                              }
+                            }}
+                            color="primary"
+                          />
+                        }
+                        label={dish.available ? "Dostupno" : "Nedostupno"}
+                        sx={{
+                          m: 0,
+                          "& .MuiTypography-root": {
+                            fontWeight: 700,
+                            color: dish.available
+                              ? "success.main"
+                              : "text.secondary",
+                          },
+                        }}
+                      />
+                    }
                   />
                 </Box>
               ))}

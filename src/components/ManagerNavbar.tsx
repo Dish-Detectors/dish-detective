@@ -7,6 +7,7 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import CampaignIcon from "@mui/icons-material/Campaign";
+import BallotIcon from "@mui/icons-material/Ballot";
 
 export const navWidth = 80;
 export const headerHeight = 64;
@@ -104,6 +105,12 @@ export default function ManagerNavbar({
           sx={getIconButtonStyle("/manager/announcements")}
         >
           <CampaignIcon />
+        </IconButton>
+        <IconButton
+          onClick={() => router.push("/manager/polls")}
+          sx={getIconButtonStyle("/manager/polls")}
+        >
+          <BallotIcon />
         </IconButton>
       </Stack>
     </Box>

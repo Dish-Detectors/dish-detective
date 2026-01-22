@@ -47,8 +47,8 @@ export async function createEmployeeAccount({
       lastName: lastName,
       skipPasswordRequirement: false,
       publicMetadata: {
-        role: role || null,
-        restaurantId: restaurantId || null,
+        role: role ?? null,
+        restaurantId: restaurantId ?? null,
       },
     });
 

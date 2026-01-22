@@ -16,7 +16,6 @@ import AddIcon from "@mui/icons-material/Add";
 
 interface DishCardProps {
   name: string;
-  restaurantName: string;
   position: string;
   imageUrl?: string;
   allergens?: (string | { name: string })[];
@@ -30,7 +29,6 @@ interface DishCardProps {
 
 const DishCard = ({
   name,
-  restaurantName,
   position,
   imageUrl,
   allergens = [],
@@ -130,22 +128,7 @@ const DishCard = ({
             >
               {name}
             </Typography>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                display: "-webkit-box",
-                WebkitLineClamp: 1,
-                WebkitBoxOrient: "vertical",
-                mb: 0.5,
-                maxWidth: "100%",
-                wordBreak: "break-all",
-              }}
-            >
-              {restaurantName}
-            </Typography>
+
             <Box
               sx={{
                 display: "flex",
@@ -333,22 +316,7 @@ const DishCard = ({
           >
             {name}
           </Typography>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{
-              mb: 0.5,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              display: "-webkit-box",
-              WebkitLineClamp: 1,
-              WebkitBoxOrient: "vertical",
-              maxWidth: "100%",
-              wordBreak: "break-all",
-            }}
-          >
-            {restaurantName}
-          </Typography>
+
           <Typography
             variant="body2"
             color="text.secondary"

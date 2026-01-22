@@ -32,6 +32,7 @@ export default function RestaurantsPage() {
     null,
   );
   const [deleting, setDeleting] = useState(false);
+  const [confirmationName, setConfirmationName] = useState("");
 
   useEffect(() => {
     loadRestaurants();
@@ -61,6 +62,7 @@ export default function RestaurantsPage() {
 
   const handleDelete = (id: string) => {
     setRestaurantToDelete(id);
+    setConfirmationName("");
     setDeleteDialogOpen(true);
   };
 
@@ -93,6 +95,9 @@ export default function RestaurantsPage() {
       restaurant.address.toLowerCase().includes(query)
     );
   });
+
+  const restaurantName =
+    restaurants.find((r) => r._id === restaurantToDelete)?.name || "";
 
   if (loading) {
     return (
@@ -243,9 +248,20 @@ export default function RestaurantsPage() {
         <DialogTitle>Potvrda brisanja</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Jeste li sigurni da želite obrisati ovaj restoran? Ova radnja se ne
-            može poništiti.
+            Jeste li sigurni da želite obrisati restoran <b>{restaurantName}</b>
+            ? Ova radnja se ne može poništiti.
+            <br />
+            Molimo upišite <b>{restaurantName}</b> za potvrdu.
           </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Ime restorana"
+            fullWidth
+            variant="standard"
+            value={confirmationName}
+            onChange={(e) => setConfirmationName(e.target.value)}
+          />
         </DialogContent>
         <DialogActions>
           <Button
@@ -258,7 +274,7 @@ export default function RestaurantsPage() {
             onClick={confirmDelete}
             color="error"
             variant="contained"
-            disabled={deleting}
+            disabled={deleting || confirmationName !== restaurantName}
           >
             {deleting ? "Brisanje..." : "Obriši"}
           </Button>

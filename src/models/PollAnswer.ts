@@ -3,7 +3,10 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 export interface IAnswers extends Document {
   userId: string;
   pollId: string;
-  answers: number[];
+  answers: {
+    question: string;
+    rating: number;
+  }[];
 }
 
 const answerSchema = new Schema<IAnswers>(
@@ -18,11 +21,12 @@ const answerSchema = new Schema<IAnswers>(
       required: [true, "Poll ID is required"],
       trim: true,
     },
-    answers: {
-      type: [Number],
-      required: [true, "Poll ID is required"],
-      trim: true,
-    },
+    answers: [
+      {
+        question: { type: String, required: true },
+        rating: { type: Number, required: true, min: 1, max: 5 },
+      },
+    ],
   },
   {
     timestamps: true,
@@ -30,11 +34,11 @@ const answerSchema = new Schema<IAnswers>(
 );
 
 if (process.env.NODE_ENV === "development") {
-  delete mongoose.models.Notification;
+  delete mongoose.models.Answers;
 }
 
 const Answers: Model<IAnswers> =
-  (mongoose.models.Notification as Model<IAnswers>) ||
+  (mongoose.models.Answers as Model<IAnswers>) ||
   mongoose.model<IAnswers>("Answers", answerSchema);
 
 export default Answers;

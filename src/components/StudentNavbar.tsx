@@ -65,21 +65,21 @@ export default function StudentNavbar({
         position: "fixed",
         ...(isMobile
           ? {
-            top: "auto",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            width: "100%",
-            height: "64px",
-            boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
-          }
+              top: "auto",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              width: "100%",
+              height: "64px",
+              boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
+            }
           : {
-            top: `${headerHeight}px`,
-            left: 0,
-            bottom: 0,
-            width: `${navWidth}px`,
-            boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
-          }),
+              top: `${headerHeight}px`,
+              left: 0,
+              bottom: 0,
+              width: `${navWidth}px`,
+              boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
+            }),
         bgcolor: "common.white",
         display: "flex",
         flexDirection: isMobile ? "row" : "column",
@@ -97,7 +97,6 @@ export default function StudentNavbar({
           justifyContent: isMobile ? "space-around" : "center",
         }}
       >
-
         <IconButton
           onClick={() => router.push("/student/restaurants")}
           sx={getIconButtonStyle("/student/restaurants")}

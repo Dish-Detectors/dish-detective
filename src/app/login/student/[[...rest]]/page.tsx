@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useSignUp } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import {
   Box,
   Typography,
@@ -13,6 +14,7 @@ import PancakeStackLoader from "@/components/PancakeStackLoader";
 
 export default function Page() {
   const { signUp, isLoaded } = useSignUp();
+  const router = useRouter();
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -43,6 +45,19 @@ export default function Page() {
       });
     } catch (err: any) {
       console.error("Google login error:", err);
+
+      // Check for specific Clerk error "You're already signed in."
+      const errors = err.errors || [];
+      const alreadySignedIn = errors.some(
+        (e: any) => e.message === "You're already signed in.",
+      );
+
+      if (alreadySignedIn) {
+        // If they are already signed in, redirect them to the role-based redistribution page
+        router.push("/auth/redirect");
+        return;
+      }
+
       setError("Greška prilikom prijave s Google računom");
       setLoading(false);
     }
