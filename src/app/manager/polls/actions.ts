@@ -39,6 +39,7 @@ export async function getEligibleStudentCount() {
 }
 
 export async function createPoll(formData: {
+    title: string,
     questions: string[],
     percentage: number,
 }) {
@@ -76,6 +77,7 @@ export async function createPoll(formData: {
 
         // 3. Create Poll
         const poll = await Poll.create({
+            title: formData.title,
             questions: formData.questions,
             restaurantId: restaurantId,
             createdBy: userId,
@@ -99,5 +101,70 @@ export async function createPoll(formData: {
     } catch (error) {
         console.error("Error creating poll:", error);
         return { error: "Failed to create poll" };
+    }
+}
+
+export async function fetchManagerPolls() {
+    const { userId } = await auth();
+    if (!userId) return { error: "Unauthorized" };
+
+    try {
+        const client = await clerkClient();
+        const user = await client.users.getUser(userId);
+        const restaurantId = user.publicMetadata.restaurantId as string;
+
+        if (!restaurantId) return { error: "Manager not assigned to any restaurant" };
+
+        await dbConnect();
+        const polls = await Poll.find({ restaurantId }).sort({ createdAt: -1 });
+
+        return { polls: JSON.parse(JSON.stringify(polls)) };
+    } catch (error) {
+        console.error("Error fetching polls:", error);
+        return { error: "Failed to fetch polls" };
+    }
+}
+
+export async function getPollResults(pollId: string) {
+    const { userId } = await auth();
+    if (!userId) return { error: "Unauthorized" };
+
+    try {
+        await dbConnect();
+        const poll = await Poll.findById(pollId);
+        if (!poll) return { error: "Poll not found" };
+
+        const answers = await (mongoose.models.Answers || mongoose.model("Answers")).find({ pollId });
+
+        // Aggregate results
+        const results = poll.questions.map((questionText) => {
+            const counts = [0, 0, 0, 0, 0]; // For ratings 1, 2, 3, 4, 5
+            answers.forEach((ans) => {
+                const qAns = ans.answers.find((a: any) => a.question === questionText);
+                if (qAns && qAns.rating >= 1 && qAns.rating <= 5) {
+                    counts[qAns.rating - 1]++;
+                }
+            });
+            return {
+                question: questionText,
+                data: [
+                    { rating: 1, count: counts[0] },
+                    { rating: 2, count: counts[1] },
+                    { rating: 3, count: counts[2] },
+                    { rating: 4, count: counts[3] },
+                    { rating: 5, count: counts[4] },
+                ]
+            };
+        });
+
+        return {
+            poll: JSON.parse(JSON.stringify(poll)),
+            results,
+            totalAnswers: answers.length
+        };
+
+    } catch (error) {
+        console.error("Error getting poll results:", error);
+        return { error: "Failed to get poll results" };
     }
 }

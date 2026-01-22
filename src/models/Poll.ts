@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IPoll extends Document {
+  title: string;
   questions: string[];
   createdBy: string;
   restaurantId: mongoose.Types.ObjectId;
@@ -8,6 +9,11 @@ export interface IPoll extends Document {
 
 const pollSchema = new Schema<IPoll>(
   {
+    title: {
+      type: String,
+      required: [true, "Title is required"],
+      trim: true,
+    },
     questions: {
       type: [String],
       required: [true, "Questions are required"],
