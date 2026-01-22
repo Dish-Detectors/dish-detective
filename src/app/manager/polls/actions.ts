@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import dbConnect from "@/utils/dbConnect";
 import Restaurant from "@/models/Restaurant";
 import Menu from "@/models/Menu";
@@ -14,10 +14,17 @@ export async function getEligibleStudentCount() {
         const { userId } = await auth();
         if (!userId) return { count: 0, error: "Unauthorized" };
 
+        const client = await clerkClient();
+        const user = await client.users.getUser(userId);
+        const restaurantId = user.publicMetadata.restaurantId as string;
+
+        if (!restaurantId) return { count: 0, error: "Manager not assigned to any restaurant" };
+
         await dbConnect();
-        const restaurant = await Restaurant.findOne({ manager: userId });
+        // Determine if we really need to fetch the restaurant object or just verify ID?
+        // Let's verify it exists to be safe.
+        const restaurant = await Restaurant.findById(restaurantId);
         if (!restaurant) return { count: 0, error: "Restaurant not found" };
-        const restaurantId = restaurant._id;
 
         // 1. Get all menus for this restaurant
         const menus = await Menu.find({ restaurantId });
@@ -44,7 +51,7 @@ export async function getEligibleStudentCount() {
             { $unwind: "$menu" },
             {
                 $match: {
-                    "menu.restaurantId": new mongoose.Types.ObjectId(restaurantId as string)
+                    "menu.restaurantId": new mongoose.Types.ObjectId(restaurantId)
                 }
             },
             {
@@ -73,10 +80,15 @@ export async function createPoll(formData: {
     if (!userId) return { error: "Unauthorized" };
 
     try {
+        const client = await clerkClient();
+        const user = await client.users.getUser(userId);
+        const restaurantId = user.publicMetadata.restaurantId as string;
+
+        if (!restaurantId) return { error: "Manager not assigned to any restaurant" };
+
         await dbConnect();
-        const restaurant = await Restaurant.findOne({ manager: userId });
+        const restaurant = await Restaurant.findById(restaurantId);
         if (!restaurant) return { error: "Restaurant not found" };
-        const restaurantId = restaurant._id;
 
         // 1. Get distinct eligible users
         const eligibleUsers = await Subscription.aggregate([
@@ -100,7 +112,7 @@ export async function createPoll(formData: {
             { $unwind: "$menu" },
             {
                 $match: {
-                    "menu.restaurantId": new mongoose.Types.ObjectId(restaurantId as string)
+                    "menu.restaurantId": new mongoose.Types.ObjectId(restaurantId)
                 }
             },
             {

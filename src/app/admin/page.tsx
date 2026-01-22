@@ -212,13 +212,15 @@ export default function Page() {
           >
             Jela
           </MobileActionCard>
-          <MobileActionCard
-            onClick={() => router.push("/admin/accounts")}
-            icon={<PeopleIcon sx={{ fontSize: 32, color: "text.primary" }} />}
-            animationDelay="0.5s"
-          >
-            Računi
-          </MobileActionCard>
+          <Box sx={{ gridColumn: "span 2" }}>
+            <MobileActionCard
+              onClick={() => router.push("/admin/accounts")}
+              icon={<PeopleIcon sx={{ fontSize: 32, color: "text.primary" }} />}
+              animationDelay="0.5s"
+            >
+              Računi
+            </MobileActionCard>
+          </Box>
         </Box>
       </Box>
     );
@@ -297,7 +299,7 @@ export default function Page() {
             />
           </Box>
 
-          <Box sx={{ width: "calc(50% - 14px)" }}>
+          <Box sx={{ width: "100%" }}>
             <DesktopActionCard
               icon={
                 <PeopleIcon

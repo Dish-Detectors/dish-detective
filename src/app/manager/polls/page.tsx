@@ -128,30 +128,6 @@ export default function ManagerPollsPage() {
                 <Stack spacing={4}>
                     <Box>
                         <Typography variant="h6" gutterBottom>
-                            Dostupni studenti
-                        </Typography>
-                        {loadingCount ? (
-                            <CircularProgress size={24} />
-                        ) : eligibleCount !== null ? (
-                            <Box>
-                                <Typography variant="body1">
-                                    Ukupno pretplaćenih studenata: <strong>{eligibleCount}</strong>
-                                </Typography>
-                                <Alert severity="info" sx={{ mt: 2 }}>
-                                    Odabrali ste <strong>{percentage}%</strong> uzorka. Anketa će
-                                    biti poslana na približno{" "}
-                                    <strong>{calculateTargetCount()}</strong> studenata.
-                                </Alert>
-                            </Box>
-                        ) : (
-                            <Alert severity="error">Neuspješno dohvaćanje broja studenata.</Alert>
-                        )}
-                    </Box>
-
-                    <Divider />
-
-                    <Box>
-                        <Typography variant="h6" gutterBottom>
                             Pitanja
                         </Typography>
                         <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 2 }}>
@@ -190,23 +166,47 @@ export default function ManagerPollsPage() {
 
                     <Divider />
 
-                    <Box>
-                        <Typography variant="h6" gutterBottom>
-                            Uzorak studenata
-                        </Typography>
-                        <ToggleButtonGroup
-                            value={percentage}
-                            exclusive
-                            onChange={handlePercentageChange}
-                            fullWidth
-                            sx={{ mt: 1 }}
-                        >
-                            <ToggleButton value={25}>25%</ToggleButton>
-                            <ToggleButton value={50}>50%</ToggleButton>
-                            <ToggleButton value={75}>75%</ToggleButton>
-                            <ToggleButton value={100}>100%</ToggleButton>
-                        </ToggleButtonGroup>
-                    </Box>
+                    <Stack direction={{ xs: "column", md: "row" }} spacing={4}>
+                        <Box sx={{ flex: 1 }}>
+                            <Typography variant="h6" gutterBottom>
+                                Dostupni studenti
+                            </Typography>
+                            {loadingCount ? (
+                                <CircularProgress size={24} />
+                            ) : eligibleCount !== null ? (
+                                <Box>
+                                    <Typography variant="body1">
+                                        Ukupno pretplaćenih studenata: <strong>{eligibleCount}</strong>
+                                    </Typography>
+                                    <Alert severity="info" sx={{ mt: 2 }}>
+                                        Odabrali ste <strong>{percentage}%</strong> uzorka. Anketa će
+                                        biti poslana na približno{" "}
+                                        <strong>{calculateTargetCount()}</strong> studenata.
+                                    </Alert>
+                                </Box>
+                            ) : (
+                                <Alert severity="error">Neuspješno dohvaćanje broja studenata.</Alert>
+                            )}
+                        </Box>
+
+                        <Box sx={{ flex: 1 }}>
+                            <Typography variant="h6" gutterBottom>
+                                Uzorak studenata
+                            </Typography>
+                            <ToggleButtonGroup
+                                value={percentage}
+                                exclusive
+                                onChange={handlePercentageChange}
+                                fullWidth
+                                sx={{ mt: 1 }}
+                            >
+                                <ToggleButton value={25}>25%</ToggleButton>
+                                <ToggleButton value={50}>50%</ToggleButton>
+                                <ToggleButton value={75}>75%</ToggleButton>
+                                <ToggleButton value={100}>100%</ToggleButton>
+                            </ToggleButtonGroup>
+                        </Box>
+                    </Stack>
 
                     <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
                         <Button
