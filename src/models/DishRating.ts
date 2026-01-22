@@ -35,6 +35,11 @@ const dishRatingSchema = new Schema<IDishRating>(
 
 dishRatingSchema.index({ dishId: 1, userId: 1, restaurantId: 1 }, { unique: true });
 
+// Force-clear the model in development if schema changed
+if (process.env.NODE_ENV === "development") {
+  delete mongoose.models.DishRating;
+}
+
 const DishRating: Model<IDishRating> =
   (mongoose.models.DishRating as Model<IDishRating>) ||
   mongoose.model<IDishRating>("DishRating", dishRatingSchema);

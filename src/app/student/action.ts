@@ -83,18 +83,31 @@ export async function getRestaurantOffer(restaurantId: string) {
       $group: {
         _id: "$dishId",
         avgRating: { $avg: "$rating" },
+        count: { $sum: 1 },
       },
     },
   ]);
 
   const ratingsMap = new Map(
-    ratingsData.map((r) => [r._id.toString(), r.avgRating]),
+    ratingsData.map((r) => [r._id.toString(), { avg: r.avgRating, count: r.count }]),
   );
+
+  // Fetch current user's ratings
+  const { userId } = await auth();
+  let userRatingsMap = new Map<string, number>();
+  if (userId) {
+    const userRatings = await DishRating.find({
+      dishId: { $in: dishIds },
+      restaurantId,
+      userId,
+    }).lean();
+    userRatingsMap = new Map(userRatings.map((r) => [r.dishId.toString(), r.rating]));
+  }
 
   return menuItems.map((item) => {
     const dishIdStr = item.dishId.toString();
     const dishDetails = dishesMap.get(dishIdStr) as any;
-    const averageRating = ratingsMap.get(dishIdStr) || 0;
+    const ratingInfo = ratingsMap.get(dishIdStr) || { avg: 0, count: 0 };
 
     return {
       id: item._id.toString(),
@@ -110,7 +123,9 @@ export async function getRestaurantOffer(restaurantId: string) {
         })
         : "--:--",
       available: item.available,
-      rating: averageRating,
+      rating: ratingInfo.avg,
+      ratingCount: ratingInfo.count,
+      userRating: userRatingsMap.get(dishIdStr) || 0,
     };
   });
 }

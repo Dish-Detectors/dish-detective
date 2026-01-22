@@ -10,6 +10,7 @@ import {
   IconButton,
   Rating,
   Button,
+  Divider,
 } from "@mui/material";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
@@ -29,6 +30,8 @@ interface StudentDishCardProps {
   allergens: string[];
   lastServed: string;
   rating?: number;
+  ratingCount?: number;
+  userRating?: number;
   isInitiallySubscribed?: boolean;
   isOffer?: boolean;
   restaurantId: string;
@@ -43,17 +46,23 @@ export default function StudentDishCard({
   allergens,
   lastServed,
   rating = 0,
+  ratingCount = 0,
+  userRating = 0,
   isInitiallySubscribed = false,
   isOffer = true,
   restaurantId,
 }: StudentDishCardProps) {
-  const [currentRating, setCurrentRating] = useState(rating);
+  const [personalRating, setPersonalRating] = useState(userRating);
   const [isSubscribed, setIsSubscribed] = useState(isInitiallySubscribed);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setIsSubscribed(isInitiallySubscribed);
   }, [isInitiallySubscribed]);
+
+  useEffect(() => {
+    setPersonalRating(userRating);
+  }, [userRating]);
 
   const handleToggleSubscription = async () => {
     setLoading(true);
@@ -89,17 +98,18 @@ export default function StudentDishCard({
     newValue: number | null,
   ) => {
     if (newValue === null) return;
-    setCurrentRating(newValue);
+    const oldRating = personalRating;
+    setPersonalRating(newValue);
 
     try {
       const result = await rateDish({ dishId, restaurantId, rating: newValue });
       if (!result.success) {
         console.error(result.message);
-        setCurrentRating(rating);
+        setPersonalRating(oldRating);
       }
     } catch (error) {
       console.error("Failed to rate dish:", error);
-      setCurrentRating(rating);
+      setPersonalRating(oldRating);
     }
   };
 
@@ -125,9 +135,19 @@ export default function StudentDishCard({
         alt={name}
       />
       <CardContent sx={{ p: 2 }}>
-        <Typography variant="h6" fontWeight="bold" gutterBottom>
-          {name}
-        </Typography>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 0.5 }}>
+          <Typography variant="h6" fontWeight="bold">
+            {name}
+          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.5 }}>
+            <Rating value={rating} readOnly size="small" precision={0.1} />
+            {ratingCount > 0 && (
+              <Typography variant="caption" color="text.secondary" fontWeight="bold">
+                {rating.toFixed(1)} ({ratingCount})
+              </Typography>
+            )}
+          </Box>
+        </Box>
 
         <Typography
           variant="body2"
@@ -150,42 +170,75 @@ export default function StudentDishCard({
           {isOffer ? `Dostupno od: ${lastServed}` : `Zadnje dostupno: ${lastServed}`}
         </Typography>
 
+        {/* Action Box: Streamlined interactive elements */}
         <Box
           sx={{
+            mt: 2.5,
+            p: 2,
+            borderRadius: 3,
+            bgcolor: "grey.50",
+            border: "1px solid",
+            borderColor: "grey.200",
             display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            mt: 2,
+            flexDirection: "column",
+            gap: 2,
           }}
         >
-          <Rating
-            value={currentRating}
-            onChange={isOffer ? handleRate : undefined}
-            readOnly={!isOffer}
-            size="medium"
-          />
+          {isOffer && (
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Rating
+                  value={personalRating}
+                  onChange={handleRate}
+                  size="large"
+                  sx={{
+                    "& .MuiRating-iconFilled": {
+                      color: "primary.main",
+                    },
+                  }}
+                />
+              </Box>
+              <Divider sx={{ opacity: 0.4 }} />
+            </>
+          )}
 
-          <Button
-            onClick={handleToggleSubscription}
-            disabled={loading}
-            startIcon={
-              isSubscribed ? (
-                <NotificationsActiveIcon />
-              ) : (
-                <NotificationsNoneIcon />
-              )
-            }
+          <Box
             sx={{
-              textTransform: "none",
-              color: isSubscribed ? "success.main" : "text.secondary",
-              "&:hover": {
-                bgcolor: "transparent",
-                color: isSubscribed ? "success.dark" : "primary.main",
-              },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            {isSubscribed ? "Ukloni" : "Pretplati se"}
-          </Button>
+            <Button
+              onClick={handleToggleSubscription}
+              disabled={loading}
+              fullWidth
+              variant={isSubscribed ? "contained" : "outlined"}
+              color={isSubscribed ? "error" : "primary"}
+              startIcon={
+                isSubscribed ? (
+                  <NotificationsActiveIcon sx={{ fontSize: "1.5rem !important" }} />
+                ) : (
+                  <NotificationsNoneIcon sx={{ fontSize: "1.5rem !important" }} />
+                )
+              }
+              sx={{
+                borderRadius: 2.5,
+                textTransform: "none",
+                fontWeight: 700,
+                py: 1,
+                boxShadow: isSubscribed ? "0 4px 12px rgba(211, 47, 47, 0.15)" : "none",
+              }}
+            >
+              {isSubscribed ? "Ukloni pretplatu" : "Pretplati se"}
+            </Button>
+          </Box>
         </Box>
       </CardContent>
     </Card>

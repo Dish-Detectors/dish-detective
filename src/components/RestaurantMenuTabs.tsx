@@ -19,6 +19,8 @@ interface DishData {
     allergens: string[];
     lastServed: string;
     rating?: number;
+    ratingCount?: number;
+    userRating?: number;
     available?: boolean;
     isSubscribed: boolean;
 }
@@ -126,6 +128,8 @@ export default function RestaurantMenuTabs({
                             allergens={item.allergens}
                             lastServed={item.lastServed}
                             rating={item.rating}
+                            ratingCount={item.ratingCount}
+                            userRating={item.userRating}
                             isInitiallySubscribed={item.isSubscribed}
                             isOffer={isOffer}
                             restaurantId={restaurantId}
@@ -168,20 +172,10 @@ export default function RestaurantMenuTabs({
             )}
 
             <CustomTabPanel value={value} index={0}>
-                <Box sx={{ mb: 3 }}>
-                    <Typography variant="body1" color="text.secondary">
-                        Pregledajte dostupna jela i pretplatite se na obavijesti.
-                    </Typography>
-                </Box>
                 {renderDishGrid(offer, "Trenutno nema dostupnih jela u ovom restoranu.", true)}
             </CustomTabPanel>
 
             <CustomTabPanel value={value} index={1}>
-                <Box sx={{ mb: 3 }}>
-                    <Typography variant="body1" color="text.secondary">
-                        Ostala jela koja se povremeno poslužuju. Pretplatite se na obavijesti.
-                    </Typography>
-                </Box>
                 {renderDishGrid(otherDishes, "Nema ostalih jela.", false)}
             </CustomTabPanel>
         </Box>

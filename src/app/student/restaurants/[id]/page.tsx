@@ -10,6 +10,7 @@ import {
   Divider,
   Chip,
 } from "@mui/material";
+import { auth } from "@clerk/nextjs/server";
 import { getRestaurantOffer } from "@/app/student/action";
 import { getUserSubscriptions } from "@/actions/notification";
 import StudentDishCard from "@/components/StudentDishCard";
@@ -69,10 +70,23 @@ export default async function RestaurantOfferPage({
       $group: {
         _id: "$dishId",
         avgRating: { $avg: "$rating" },
+        count: { $sum: 1 },
       },
     },
   ]);
-  const ratingsMap = new Map(ratingsData.map(r => [r._id.toString(), r.avgRating]));
+  const ratingsMap = new Map(ratingsData.map(r => [r._id.toString(), { avg: r.avgRating, count: r.count }]));
+
+  // Fetch current user's ratings
+  const { userId } = await auth();
+  let userRatingsMap = new Map<string, number>();
+  if (userId) {
+    const userRatings = await DishRating.find({
+      dishId: { $in: allAvailableDishIds },
+      restaurantId: id,
+      userId,
+    }).lean();
+    userRatingsMap = new Map(userRatings.map(r => [r.dishId.toString(), r.rating]));
+  }
 
   let otherDishes: any[] = [];
   if (restaurant && restaurant.availableDishes && restaurant.availableDishes.length > 0) {
@@ -247,21 +261,25 @@ export default async function RestaurantOfferPage({
       <RestaurantMenuTabs
         offer={offer.map((item: any) => ({
           ...item,
-          rating: ratingsMap.get(item.dishId) || 0,
           isSubscribed: subscriptions.includes(item.dishId),
         }))}
-        otherDishes={otherDishes.map((dish: any) => ({
-          dishId: dish._id.toString(),
-          name: dish.name,
-          description: dish.description,
-          imageUrl: dish.imageUrl,
-          allergens: dish.allergens?.map((a: any) => a.name) || [],
-          lastServed: lastServedMap.has(dish._id.toString())
-            ? lastServedMap.get(dish._id.toString())!.toLocaleDateString("hr-HR")
-            : "Nikada do sada",
-          rating: ratingsMap.get(dish._id.toString()) || 0,
-          isSubscribed: subscriptions.includes(dish._id.toString()),
-        }))}
+        otherDishes={otherDishes.map((dish: any) => {
+          const ratingInfo = ratingsMap.get(dish._id.toString()) || { avg: 0, count: 0 };
+          return {
+            dishId: dish._id.toString(),
+            name: dish.name,
+            description: dish.description,
+            imageUrl: dish.imageUrl,
+            allergens: dish.allergens?.map((a: any) => a.name) || [],
+            lastServed: lastServedMap.has(dish._id.toString())
+              ? lastServedMap.get(dish._id.toString())!.toLocaleDateString("hr-HR")
+              : "Nikada do sada",
+            rating: ratingInfo.avg,
+            ratingCount: ratingInfo.count,
+            userRating: userRatingsMap.get(dish._id.toString()) || 0,
+            isSubscribed: subscriptions.includes(dish._id.toString()),
+          };
+        })}
         isOpen={isOpen}
         restaurantId={id}
       />
