@@ -145,6 +145,10 @@ export async function sendDishNotification(
           restaurantId: (restaurant as any)._id.toString(),
           menuItemId: menuItemId,
           availableFrom: availableFrom,
+          url: `/student/restaurants/${(restaurant as any)._id.toString()}`,
+        },
+        fcmOptions: {
+          link: `/student/restaurants/${(restaurant as any)._id.toString()}`,
         },
       },
       data: {
@@ -154,6 +158,7 @@ export async function sendDishNotification(
         restaurantId: (restaurant as any)._id.toString(),
         menuItemId: menuItemId,
         availableFrom: availableFrom,
+        url: `/student/restaurants/${(restaurant as any)._id.toString()}`,
       },
       topic: `dish_notify_${(dish as any)._id.toString()}`,
     };
@@ -181,6 +186,51 @@ export async function sendDishNotification(
   } catch (error: any) {
     console.error("Error sending message:", error);
     return { success: false, error: error.message || JSON.stringify(error) };
+  }
+}
+
+export async function sendPollNotifications(params: {
+  pollId: string;
+  targetUserIds: string[];
+  restaurantName: string;
+}) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  await dbConnect();
+
+  try {
+    const title = "Nova anketa dostupna! 📊";
+    const body = `Imamo nekoliko pitanja o hrani u restoranu ${params.restaurantName}.`;
+    const pollLink = `/student/polls/${params.pollId}`;
+
+    const messages = params.targetUserIds.map((targetUserId) => ({
+      topic: `user_${targetUserId}`,
+      notification: {
+        title,
+        body,
+      },
+      data: {
+        type: "poll",
+        pollId: params.pollId,
+        url: pollLink,
+      },
+      webpush: {
+        fcmOptions: {
+          link: pollLink,
+        },
+      },
+    }));
+
+    // FCM Admin SDK sendEach can handle up to 500 messages at once
+    // If targetUserIds is larger, we might need chunking, but for polls it should be fine.
+    const response = await messaging.sendEach(messages);
+    console.log(`Successfully sent ${response.successCount} poll notifications.`);
+
+    return { success: true, count: response.successCount };
+  } catch (error: any) {
+    console.error("Error sending poll notifications:", error);
+    return { success: false, error: error.message };
   }
 }
 
@@ -254,10 +304,10 @@ export async function syncDeviceSubscriptions(token: string) {
     );
 
     // Also subscribe to general public announcements
-    // In a real app we might check role, but for now we subscribe everyone to students topic
-    // or distinct topics based on their role if available.
-    // The requirement says "student" notifications go to push.
     syncPromises.push(messaging.subscribeToTopic(token, "topic_all_students"));
+
+    // Subscribe to a personal topic for targeted notifications (like polls)
+    syncPromises.push(messaging.subscribeToTopic(token, `user_${userId}`));
 
     await Promise.all(syncPromises);
     return { success: true, count: subs.length };

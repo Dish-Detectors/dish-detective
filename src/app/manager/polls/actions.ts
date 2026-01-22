@@ -38,6 +38,8 @@ export async function getEligibleStudentCount() {
     }
 }
 
+import { sendPollNotifications } from "@/actions/notification";
+
 export async function createPoll(formData: {
     title: string,
     questions: string[],
@@ -83,18 +85,32 @@ export async function createPoll(formData: {
             createdBy: userId,
         });
 
-        // 4. Create Notifications
-        const notifications = selectedUsers.map(targetUserId => ({
+        const pollIdStr = (poll as any)._id.toString();
+
+        // 4. Create Notifications (Database)
+        const dbNotifications = selectedUsers.map(targetUserId => ({
             title: "Nova anketa dostupna!",
-            description: "Imamo nekoliko pitanja o hrani u tvojoj omiljenoj menzi.",
+            description: `Imamo nekoliko pitanja o hrani u restoranu ${restaurant.name}.`,
             type: "student",
             postedBy: userId,
             targetUserId,
-            pollId: (poll as any)._id.toString(),
+            pollId: pollIdStr,
             read: false,
         }));
 
-        await Notification.insertMany(notifications);
+        await Notification.insertMany(dbNotifications);
+
+        // 5. Send Push Notifications
+        try {
+            await sendPollNotifications({
+                pollId: pollIdStr,
+                targetUserIds: selectedUsers,
+                restaurantName: restaurant.name
+            });
+        } catch (pushError) {
+            console.error("Failed to send poll push notifications:", pushError);
+            // We don't fail the whole creation if push fails
+        }
 
         return { success: true, count: selectedUsers.length };
 
