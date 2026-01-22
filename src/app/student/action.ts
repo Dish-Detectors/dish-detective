@@ -68,7 +68,9 @@ export async function getRestaurantOffer(restaurantId: string) {
   }).lean();
 
   const dishIds = menuItems.map((item) => item.dishId.toString());
-  const dishes = await Dish.find({ _id: { $in: dishIds } }).lean();
+  const dishes = await Dish.find({ _id: { $in: dishIds } })
+    .populate("allergens")
+    .lean();
   const dishesMap = new Map(dishes.map((dish) => [dish._id.toString(), dish]));
 
   const ratingsData = await DishRating.aggregate([
@@ -96,7 +98,7 @@ export async function getRestaurantOffer(restaurantId: string) {
       name: dishDetails?.name || "Nepoznato jelo",
       description: dishDetails?.description || "",
       imageUrl: dishDetails?.imageUrl || "",
-      allergens: dishDetails?.allergens || [],
+      allergens: dishDetails?.allergens?.map((a: any) => a.name) || [],
       lastServed: item.lastServed
         ? new Date(item.lastServed).toLocaleTimeString("hr-HR", {
           hour: "2-digit",

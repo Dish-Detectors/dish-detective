@@ -339,17 +339,21 @@ export default function Page() {
                       />
                     )}
                     renderTags={(value, getTagProps) =>
-                      value.map((option, index) => (
-                        <Chip
-                          label={option.name}
-                          {...getTagProps({ index })}
-                          sx={{
-                            bgcolor: "white",
-                            border: "1px solid",
-                            borderColor: "primary.main",
-                          }}
-                        />
-                      ))
+                      value.map((option, index) => {
+                        const { key, ...tagProps } = getTagProps({ index });
+                        return (
+                          <Chip
+                            key={key}
+                            label={option.name}
+                            {...tagProps}
+                            sx={{
+                              bgcolor: "white",
+                              border: "1px solid",
+                              borderColor: "primary.main",
+                            }}
+                          />
+                        );
+                      })
                     }
                   />
                 </Box>
@@ -695,18 +699,22 @@ export default function Page() {
                   />
                 )}
                 renderTags={(value, getTagProps) =>
-                  value.map((option, index) => (
-                    <Chip
-                      label={option.name}
-                      {...getTagProps({ index })}
-                      sx={{
-                        bgcolor: "primary.50",
-                        color: "primary.main",
-                        fontWeight: 600,
-                        borderRadius: 2,
-                      }}
-                    />
-                  ))
+                  value.map((option, index) => {
+                    const { key, ...tagProps } = getTagProps({ index });
+                    return (
+                      <Chip
+                        key={key}
+                        label={option.name}
+                        {...tagProps}
+                        sx={{
+                          bgcolor: "primary.50",
+                          color: "primary.main",
+                          fontWeight: 600,
+                          borderRadius: 2,
+                        }}
+                      />
+                    );
+                  })
                 }
               />
             </Box>

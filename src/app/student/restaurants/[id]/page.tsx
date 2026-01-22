@@ -13,6 +13,7 @@ import {
 import { getRestaurantOffer } from "@/app/student/action";
 import { getUserSubscriptions } from "@/actions/notification";
 import StudentDishCard from "@/components/StudentDishCard";
+import RestaurantMenuTabs from "@/components/RestaurantMenuTabs";
 import Restaurant, { IRestaurant, IWorkingDay } from "@/models/Restaurant";
 import Dish from "@/models/Dish";
 import dbConnect from "@/utils/dbConnect";
@@ -47,7 +48,9 @@ export default async function RestaurantOfferPage({
 
   let otherDishes: any[] = [];
   if (restaurant && restaurant.availableDishes && restaurant.availableDishes.length > 0) {
-    const dishes = await Dish.find({ _id: { $in: restaurant.availableDishes } }).lean();
+    const dishes = await Dish.find({ _id: { $in: restaurant.availableDishes } })
+      .populate("allergens")
+      .lean();
     const offerDishIds = new Set(offer.map((item: any) => item.dishId.toString()));
     otherDishes = dishes.filter((dish: any) => !offerDishIds.has(dish._id.toString()));
   }
@@ -189,104 +192,23 @@ export default async function RestaurantOfferPage({
         </Grid>
       </Paper>
 
-      {/* Offer Section */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
-          Trenutna ponuda
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Pregledajte dostupna jela i pretplatite se na obavijesti.
-        </Typography>
-      </Box>
-
-      {offer.length === 0 ? (
-        <Box
-          sx={{
-            textAlign: "center",
-            py: 8,
-            bgcolor: "grey.50",
-            borderRadius: 4,
-            border: "1px dashed",
-            borderColor: "divider",
-          }}
-        >
-          <Typography variant="h6" color="text.secondary">
-            Trenutno nema dostupnih jela u ovom restoranu.
-          </Typography>
-        </Box>
-      ) : (
-        <Grid container spacing={3}>
-          {offer.map((item: any) => (
-            <Grid
-              size={{ xs: 12, sm: 6, md: 4 }}
-              key={item.id}
-              sx={{ display: "flex" }}
-            >
-              <StudentDishCard
-                menuItemId={item.id}
-                dishId={item.dishId}
-                name={item.name}
-                description={item.description}
-                imageUrl={item.imageUrl}
-                allergens={item.allergens}
-                lastServed={item.lastServed}
-                rating={item.rating}
-                isInitiallySubscribed={subscriptions.includes(item.dishId)}
-              />
-            </Grid>
-          ))}
-        </Grid>
-      )}
-
-
-      {/* All Dishes Section */}
-      <Box sx={{ mb: 4, mt: 8 }}>
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
-          Sva jela
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Ostala jela koja se povremeno poslužuju. Pretplatite se na obavijesti.
-        </Typography>
-      </Box>
-
-      {
-        otherDishes.length === 0 ? (
-          <Box
-            sx={{
-              textAlign: "center",
-              py: 8,
-              bgcolor: "grey.50",
-              borderRadius: 4,
-              border: "1px dashed",
-              borderColor: "divider",
-            }}
-          >
-            <Typography variant="h6" color="text.secondary">
-              Nema ostalih jela.
-            </Typography>
-          </Box>
-        ) : (
-          <Grid container spacing={3}>
-            {otherDishes.map((dish: any) => (
-              <Grid
-                size={{ xs: 12, sm: 6, md: 4 }}
-                key={dish._id}
-                sx={{ display: "flex" }}
-              >
-                <StudentDishCard
-                  dishId={dish._id}
-                  name={dish.name}
-                  description={dish.description}
-                  imageUrl={dish.imageUrl}
-                  allergens={dish.allergens || []}
-                  lastServed={dish.updatedAt ? new Date(dish.updatedAt).toLocaleDateString("hr-HR") : "Nije dostupno"}
-                  isInitiallySubscribed={subscriptions.includes(dish._id)}
-                />
-              </Grid>
-            ))}
-          </Grid>
-        )
-      }
-    </Container >
+      <RestaurantMenuTabs
+        offer={offer.map((item: any) => ({
+          ...item,
+          isSubscribed: subscriptions.includes(item.dishId),
+        }))}
+        otherDishes={otherDishes.map((dish: any) => ({
+          dishId: dish._id.toString(),
+          name: dish.name,
+          description: dish.description,
+          imageUrl: dish.imageUrl,
+          allergens: dish.allergens?.map((a: any) => a.name) || [],
+          lastServed: dish.updatedAt
+            ? new Date(dish.updatedAt).toLocaleDateString("hr-HR")
+            : "Nije dostupno",
+          isSubscribed: subscriptions.includes(dish._id.toString()),
+        }))}
+      />
+    </Container>
   );
 }
