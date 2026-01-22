@@ -31,6 +31,7 @@ interface StudentDishCardProps {
   rating?: number;
   isInitiallySubscribed?: boolean;
   isOffer?: boolean;
+  restaurantId: string;
 }
 
 export default function StudentDishCard({
@@ -44,6 +45,7 @@ export default function StudentDishCard({
   rating = 0,
   isInitiallySubscribed = false,
   isOffer = true,
+  restaurantId,
 }: StudentDishCardProps) {
   const [currentRating, setCurrentRating] = useState(rating);
   const [isSubscribed, setIsSubscribed] = useState(isInitiallySubscribed);
@@ -90,7 +92,7 @@ export default function StudentDishCard({
     setCurrentRating(newValue);
 
     try {
-      const result = await rateDish({ dishId, rating: newValue });
+      const result = await rateDish({ dishId, restaurantId, rating: newValue });
       if (!result.success) {
         console.error(result.message);
         setCurrentRating(rating);
@@ -145,7 +147,7 @@ export default function StudentDishCard({
         </Typography>
 
         <Typography variant="body2" color="text.secondary" fontWeight="medium">
-          {isOffer ? `Promjena statusa: ${lastServed}` : `Zadnje dostupno: ${lastServed}`}
+          {isOffer ? `Dostupno od: ${lastServed}` : `Zadnje dostupno: ${lastServed}`}
         </Typography>
 
         <Box

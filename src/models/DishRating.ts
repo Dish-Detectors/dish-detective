@@ -2,6 +2,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IDishRating extends Document {
   dishId: string;
+  restaurantId: string;
   userId: string;
   rating: number;
 }
@@ -11,6 +12,11 @@ const dishRatingSchema = new Schema<IDishRating>(
     dishId: {
       type: String,
       required: [true, "Dish id is required"],
+      trim: true,
+    },
+    restaurantId: {
+      type: String,
+      required: [true, "Restaurant id is required"],
       trim: true,
     },
     userId: {
@@ -27,7 +33,7 @@ const dishRatingSchema = new Schema<IDishRating>(
   },
 );
 
-dishRatingSchema.index({ dishId: 1, userId: 1 }, { unique: true });
+dishRatingSchema.index({ dishId: 1, userId: 1, restaurantId: 1 }, { unique: true });
 
 const DishRating: Model<IDishRating> =
   (mongoose.models.DishRating as Model<IDishRating>) ||

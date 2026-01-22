@@ -61,10 +61,10 @@ export default async function RestaurantOfferPage({
     }
   });
 
-  // Fetch all ratings for dishes in this restaurant
+  // Fetch all ratings for dishes in this restaurant - filtered by context
   const allAvailableDishIds = (restaurant?.availableDishes || []).map((d: any) => d.toString());
   const ratingsData = await DishRating.aggregate([
-    { $match: { dishId: { $in: allAvailableDishIds } } },
+    { $match: { dishId: { $in: allAvailableDishIds }, restaurantId: id } },
     {
       $group: {
         _id: "$dishId",
@@ -263,6 +263,7 @@ export default async function RestaurantOfferPage({
           isSubscribed: subscriptions.includes(dish._id.toString()),
         }))}
         isOpen={isOpen}
+        restaurantId={id}
       />
     </Container>
   );

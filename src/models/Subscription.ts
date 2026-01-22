@@ -38,4 +38,11 @@ const Subscription: Model<ISubscription> =
   mongoose.models.Subscription ||
   mongoose.model<ISubscription>("Subscription", subscriptionSchema);
 
+// One-time cleanup of problematic index if it exists
+if (mongoose.connection.readyState === 1) {
+  Subscription.collection.dropIndex("userId_1_menuItemId_1").catch(() => {
+    // Index probably doesn't exist, ignore
+  });
+}
+
 export default Subscription;

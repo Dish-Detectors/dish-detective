@@ -27,6 +27,7 @@ interface RestaurantMenuTabsProps {
     offer: DishData[];
     otherDishes: DishData[];
     isOpen: boolean;
+    restaurantId: string;
 }
 
 interface TabPanelProps {
@@ -59,6 +60,7 @@ export default function RestaurantMenuTabs({
     offer,
     otherDishes,
     isOpen,
+    restaurantId,
 }: RestaurantMenuTabsProps) {
     const [value, setValue] = useState(isOpen ? 0 : 1);
 
@@ -126,6 +128,7 @@ export default function RestaurantMenuTabs({
                             rating={item.rating}
                             isInitiallySubscribed={item.isSubscribed}
                             isOffer={isOffer}
+                            restaurantId={restaurantId}
                         />
                     </Grid>
                 ))}

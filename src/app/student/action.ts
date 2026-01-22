@@ -26,6 +26,7 @@ export async function addDishToTodaysOffer(params: {
 
 export async function rateDish(params: {
   dishId: string;
+  restaurantId: string;
   rating: number;
 }): Promise<ActionResponse> {
   await dbConnect();
@@ -37,7 +38,7 @@ export async function rateDish(params: {
 
   try {
     const dishRating = await DishRating.findOneAndUpdate(
-      { dishId: params.dishId, userId },
+      { dishId: params.dishId, restaurantId: params.restaurantId, userId },
       { rating: params.rating },
       { upsert: true, new: true },
     );
@@ -74,7 +75,7 @@ export async function getRestaurantOffer(restaurantId: string) {
   const dishesMap = new Map(dishes.map((dish) => [dish._id.toString(), dish]));
 
   const ratingsData = await DishRating.aggregate([
-    { $match: { dishId: { $in: dishIds } } },
+    { $match: { dishId: { $in: dishIds }, restaurantId } },
     {
       $group: {
         _id: "$dishId",
