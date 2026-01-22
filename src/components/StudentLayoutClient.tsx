@@ -1,7 +1,10 @@
 "use client";
 
 import { ReactNode, useState, useEffect } from "react";
-import StudentNavbar, { navWidth, headerHeight } from "@/components/StudentNavbar";
+import StudentNavbar, {
+  navWidth,
+  headerHeight,
+} from "@/components/StudentNavbar";
 import NotificationSync from "@/components/NotificationSync";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import PancakeStackLoader from "@/components/PancakeStackLoader";

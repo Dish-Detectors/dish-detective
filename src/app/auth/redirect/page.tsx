@@ -11,7 +11,10 @@ export default async function RedirectAfterSignIn() {
   const client = await clerkClient();
   const user = await client.users.getUser(userId);
   let role = user.publicMetadata?.role as string | null | undefined;
-  const restaurantId = user.publicMetadata?.restaurantId as string | null | undefined;
+  const restaurantId = user.publicMetadata?.restaurantId as
+    | string
+    | null
+    | undefined;
 
   // Check for explicitly unassigned employee
   if (role === null && restaurantId === null) {

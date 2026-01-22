@@ -34,7 +34,6 @@ export async function getWorkerMenzaId(): Promise<string> {
 }
 import { sendDishNotification } from "@/actions/notification";
 
-
 export async function fetchTodaysOfferForMenza(
   menzaId: string,
 ): Promise<WorkerMenuItem[]> {

@@ -576,7 +576,9 @@ export default function EditRestaurantPage({
                 Dostupna jela
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                Odaberite sva jela koja ovaj restoran može ponuditi. Ova lista će se koristiti za filtriranje "Sva jela" na studentskoj stranici.
+                Odaberite sva jela koja ovaj restoran može ponuditi. Ova lista
+                će se koristiti za filtriranje "Sva jela" na studentskoj
+                stranici.
               </Typography>
               <RestaurantDishSelector
                 initialSelectedIds={availableDishes}

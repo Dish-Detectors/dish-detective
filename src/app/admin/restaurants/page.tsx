@@ -248,8 +248,8 @@ export default function RestaurantsPage() {
         <DialogTitle>Potvrda brisanja</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Jeste li sigurni da želite obrisati restoran <b>{restaurantName}</b>?
-            Ova radnja se ne može poništiti.
+            Jeste li sigurni da želite obrisati restoran <b>{restaurantName}</b>
+            ? Ova radnja se ne može poništiti.
             <br />
             Molimo upišite <b>{restaurantName}</b> za potvrdu.
           </DialogContentText>

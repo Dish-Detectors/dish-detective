@@ -126,7 +126,9 @@ export async function updateRestaurant(
 export async function getAllDishes(): Promise<ActionResponse> {
   try {
     await dbConnect();
-    const dishes = await Dish.find({}).select("name description imageUrl").lean();
+    const dishes = await Dish.find({})
+      .select("name description imageUrl")
+      .lean();
     return {
       success: true,
       message: "Dishes retrieved",

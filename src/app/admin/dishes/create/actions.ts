@@ -36,9 +36,9 @@ export async function createDish(formData: FormData): Promise<ActionResponse> {
     // Parse allergens
     const allergens = allergensString
       ? allergensString
-        .split(",")
-        .map((a) => a.trim())
-        .filter((id) => Types.ObjectId.isValid(id))
+          .split(",")
+          .map((a) => a.trim())
+          .filter((id) => Types.ObjectId.isValid(id))
       : [];
 
     let imageUrl = "";

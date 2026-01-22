@@ -90,7 +90,10 @@ export async function getRestaurantOffer(restaurantId: string) {
   ]);
 
   const ratingsMap = new Map(
-    ratingsData.map((r) => [r._id.toString(), { avg: r.avgRating, count: r.count }]),
+    ratingsData.map((r) => [
+      r._id.toString(),
+      { avg: r.avgRating, count: r.count },
+    ]),
   );
 
   // Fetch current user's ratings
@@ -102,7 +105,9 @@ export async function getRestaurantOffer(restaurantId: string) {
       restaurantId,
       userId,
     }).lean();
-    userRatingsMap = new Map(userRatings.map((r) => [r.dishId.toString(), r.rating]));
+    userRatingsMap = new Map(
+      userRatings.map((r) => [r.dishId.toString(), r.rating]),
+    );
   }
 
   return menuItems.map((item) => {
@@ -119,9 +124,9 @@ export async function getRestaurantOffer(restaurantId: string) {
       allergens: dishDetails?.allergens?.map((a: any) => a.name) || [],
       lastServed: item.lastServed
         ? new Date(item.lastServed).toLocaleTimeString("hr-HR", {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
+            hour: "2-digit",
+            minute: "2-digit",
+          })
         : "--:--",
       available: item.available,
       rating: ratingInfo.avg,

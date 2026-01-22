@@ -44,7 +44,12 @@ interface NotificationCenterProps {
   audience?: "student" | "worker";
 }
 
-const SwipeableNotificationItem = ({ notif, onDelete, onClick, setPreviewImage }: any) => {
+const SwipeableNotificationItem = ({
+  notif,
+  onDelete,
+  onClick,
+  setPreviewImage,
+}: any) => {
   const [startX, setStartX] = useState<number | null>(null);
   const [offsetX, setOffsetX] = useState(0);
   const [isSwiping, setIsSwiping] = useState(false);
@@ -117,10 +122,14 @@ const SwipeableNotificationItem = ({ notif, onDelete, onClick, setPreviewImage }
       sx={{
         px: 2,
         py: isClosing ? 0 : 2.5,
-        borderBottom: isClosing ? "0px solid transparent" : "1px solid rgba(0,0,0,0.04)",
+        borderBottom: isClosing
+          ? "0px solid transparent"
+          : "1px solid rgba(0,0,0,0.04)",
         maxHeight: isClosing ? 0 : 500,
         bgcolor: "transparent",
-        transition: isSwiping ? "none" : "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+        transition: isSwiping
+          ? "none"
+          : "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
         cursor: "pointer",
         transform: `translateX(${offsetX}px)`,
         opacity: isClosing ? 0 : Math.max(0.3, 1 - Math.abs(offsetX) / 400),
@@ -138,23 +147,23 @@ const SwipeableNotificationItem = ({ notif, onDelete, onClick, setPreviewImage }
       {Math.abs(offsetX) > 20 && (
         <Box
           sx={{
-            position: 'absolute',
+            position: "absolute",
             top: 0,
-            left: offsetX > 0 ? 0 : 'auto',
-            right: offsetX < 0 ? 0 : 'auto',
-            height: '100%',
+            left: offsetX > 0 ? 0 : "auto",
+            right: offsetX < 0 ? 0 : "auto",
+            height: "100%",
             width: Math.abs(offsetX),
-            bgcolor: 'error.main',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: offsetX > 0 ? 'flex-start' : 'flex-end',
+            bgcolor: "error.main",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: offsetX > 0 ? "flex-start" : "flex-end",
             px: 2,
-            transition: 'opacity 0.2s',
+            transition: "opacity 0.2s",
             opacity: Math.min(1, Math.abs(offsetX) / 150),
             zIndex: -1,
           }}
         >
-          <DeleteOutlineIcon sx={{ color: 'white' }} />
+          <DeleteOutlineIcon sx={{ color: "white" }} />
         </Box>
       )}
 
@@ -237,7 +246,7 @@ const SwipeableNotificationItem = ({ notif, onDelete, onClick, setPreviewImage }
             sx={{
               color: notif.read ? "text.primary" : "primary.main",
               fontSize: "0.95rem",
-              lineHeight: 1.2
+              lineHeight: 1.2,
             }}
           >
             {notif.title || "Obavijest"}
@@ -254,14 +263,17 @@ const SwipeableNotificationItem = ({ notif, onDelete, onClick, setPreviewImage }
             display: "-webkit-box",
             WebkitLineClamp: 3,
             WebkitBoxOrient: "vertical",
-            overflow: "hidden"
+            overflow: "hidden",
           }}
         >
           {notif.description}
         </Typography>
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Typography variant="caption" sx={{ color: "text.disabled", fontWeight: 500 }}>
+          <Typography
+            variant="caption"
+            sx={{ color: "text.disabled", fontWeight: 500 }}
+          >
             {new Date(notif.createdAt).toLocaleString("hr-HR", {
               day: "2-digit",
               month: "2-digit",
@@ -392,8 +404,6 @@ export default function NotificationCenter({
     }
   };
 
-
-
   const handleClickAway = (event: MouseEvent | TouchEvent) => {
     const target = event.target as Node | null;
     if (anchorEl && target && anchorEl.contains(target)) {
@@ -422,7 +432,9 @@ export default function NotificationCenter({
       try {
         await markNotificationAsRead(notif._id);
         setNotifications((prev) =>
-          prev.map((n) => (n._id === notif._id ? { ...n, read: true } : n) as any),
+          prev.map(
+            (n) => (n._id === notif._id ? { ...n, read: true } : n) as any,
+          ),
         );
         if (onRead) onRead();
       } catch (error) {
@@ -474,7 +486,11 @@ export default function NotificationCenter({
 
   return (
     <>
-      <ClickAwayListener onClickAway={handleClickAway} mouseEvent="onMouseDown" touchEvent="onTouchStart">
+      <ClickAwayListener
+        onClickAway={handleClickAway}
+        mouseEvent="onMouseDown"
+        touchEvent="onTouchStart"
+      >
         <Fade in={open} timeout={400} onExited={() => setShouldRender(false)}>
           <Paper
             elevation={0}

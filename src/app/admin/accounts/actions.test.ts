@@ -40,7 +40,7 @@ describe("Accounts Server Actions", () => {
     });
 
     jest.clearAllMocks();
-    consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+    consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
   }, 10000);
 
   afterEach(() => {

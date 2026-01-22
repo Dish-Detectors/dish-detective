@@ -293,8 +293,6 @@ export default function Page() {
                   }}
                 />
 
-
-
                 {/* Allergens Input */}
                 <Box sx={{ mb: 3 }}>
                   <Autocomplete
@@ -454,7 +452,6 @@ export default function Page() {
                     "& input": { p: 0 },
                   }}
                 />
-
 
                 <Typography variant="h6" fontWeight="bold" gutterBottom>
                   Opis

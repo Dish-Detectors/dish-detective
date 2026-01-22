@@ -51,12 +51,14 @@ export default async function RestaurantOfferPage({
   const subscriptions = await getUserSubscriptions();
 
   // Fetch history for accurate "Last served"
-  const restaurantMenus = await Menu.find({ restaurantId: id }).select("items").lean();
-  const menuItemIds = restaurantMenus.flatMap(m => m.items);
+  const restaurantMenus = await Menu.find({ restaurantId: id })
+    .select("items")
+    .lean();
+  const menuItemIds = restaurantMenus.flatMap((m) => m.items);
   const historyData = await MenuItem.find({ _id: { $in: menuItemIds } }).lean();
 
   const lastServedMap = new Map<string, Date>();
-  historyData.forEach(item => {
+  historyData.forEach((item) => {
     const dId = item.dishId.toString();
     if (!lastServedMap.has(dId) || item.lastServed > lastServedMap.get(dId)!) {
       lastServedMap.set(dId, item.lastServed);
@@ -64,7 +66,9 @@ export default async function RestaurantOfferPage({
   });
 
   // Fetch all ratings for dishes in this restaurant - filtered by context
-  const allAvailableDishIds = (restaurant?.availableDishes || []).map((d: any) => d.toString());
+  const allAvailableDishIds = (restaurant?.availableDishes || []).map(
+    (d: any) => d.toString(),
+  );
   const ratingsData = await DishRating.aggregate([
     { $match: { dishId: { $in: allAvailableDishIds }, restaurantId: id } },
     {
@@ -75,7 +79,12 @@ export default async function RestaurantOfferPage({
       },
     },
   ]);
-  const ratingsMap = new Map(ratingsData.map(r => [r._id.toString(), { avg: r.avgRating, count: r.count }]));
+  const ratingsMap = new Map(
+    ratingsData.map((r) => [
+      r._id.toString(),
+      { avg: r.avgRating, count: r.count },
+    ]),
+  );
 
   // Fetch current user's ratings
   const { userId } = await auth();
@@ -86,16 +95,26 @@ export default async function RestaurantOfferPage({
       restaurantId: id,
       userId,
     }).lean();
-    userRatingsMap = new Map(userRatings.map(r => [r.dishId.toString(), r.rating]));
+    userRatingsMap = new Map(
+      userRatings.map((r) => [r.dishId.toString(), r.rating]),
+    );
   }
 
   let otherDishes: any[] = [];
-  if (restaurant && restaurant.availableDishes && restaurant.availableDishes.length > 0) {
+  if (
+    restaurant &&
+    restaurant.availableDishes &&
+    restaurant.availableDishes.length > 0
+  ) {
     const dishes = await Dish.find({ _id: { $in: restaurant.availableDishes } })
       .populate("allergens")
       .lean();
-    const offerDishIds = new Set(offer.map((item: any) => item.dishId.toString()));
-    otherDishes = dishes.filter((dish: any) => !offerDishIds.has(dish._id.toString()));
+    const offerDishIds = new Set(
+      offer.map((item: any) => item.dishId.toString()),
+    );
+    otherDishes = dishes.filter(
+      (dish: any) => !offerDishIds.has(dish._id.toString()),
+    );
   }
 
   if (!restaurant) {
@@ -115,10 +134,12 @@ export default async function RestaurantOfferPage({
   const currentDay = now.getDay(); // 0-6
   const currentTime = now.getHours() * 60 + now.getMinutes();
 
-  const todaysHours = restaurant.workingHours.find(wh => wh.day === currentDay);
+  const todaysHours = restaurant.workingHours.find(
+    (wh) => wh.day === currentDay,
+  );
   let isOpen = false;
   if (todaysHours) {
-    isOpen = todaysHours.shifts.some(shift => {
+    isOpen = todaysHours.shifts.some((shift) => {
       const [startH, startM] = shift.start.split(":").map(Number);
       const [endH, endM] = shift.end.split(":").map(Number);
       const startTime = startH * 60 + startM;
@@ -157,7 +178,15 @@ export default async function RestaurantOfferPage({
       >
         <Grid container spacing={4} alignItems="flex-start">
           <Grid size={{ xs: 12, md: 7 }}>
-            <Box sx={{ mb: 1, display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
+            <Box
+              sx={{
+                mb: 1,
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                flexWrap: "wrap",
+              }}
+            >
               <Typography variant="h3" fontWeight="800">
                 {restaurant.name}
               </Typography>
@@ -265,7 +294,10 @@ export default async function RestaurantOfferPage({
           isSubscribed: subscriptions.includes(item.dishId),
         }))}
         otherDishes={otherDishes.map((dish: any) => {
-          const ratingInfo = ratingsMap.get(dish._id.toString()) || { avg: 0, count: 0 };
+          const ratingInfo = ratingsMap.get(dish._id.toString()) || {
+            avg: 0,
+            count: 0,
+          };
           return {
             dishId: dish._id.toString(),
             name: dish.name,
@@ -273,7 +305,9 @@ export default async function RestaurantOfferPage({
             imageUrl: dish.imageUrl,
             allergens: dish.allergens?.map((a: any) => a.name) || [],
             lastServed: lastServedMap.has(dish._id.toString())
-              ? lastServedMap.get(dish._id.toString())!.toLocaleDateString("hr-HR")
+              ? lastServedMap
+                  .get(dish._id.toString())!
+                  .toLocaleDateString("hr-HR")
               : "Nikada do sada",
             rating: ratingInfo.avg,
             ratingCount: ratingInfo.count,

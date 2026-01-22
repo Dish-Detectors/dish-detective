@@ -33,7 +33,10 @@ const dishRatingSchema = new Schema<IDishRating>(
   },
 );
 
-dishRatingSchema.index({ dishId: 1, userId: 1, restaurantId: 1 }, { unique: true });
+dishRatingSchema.index(
+  { dishId: 1, userId: 1, restaurantId: 1 },
+  { unique: true },
+);
 
 // Force-clear the model in development if schema changed
 if (process.env.NODE_ENV === "development") {

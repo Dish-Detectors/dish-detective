@@ -348,8 +348,6 @@ export default function DishEditPage({
                   }}
                 />
 
-
-
                 <Box sx={{ mb: 3 }}>
                   <Autocomplete
                     multiple
@@ -504,7 +502,6 @@ export default function DishEditPage({
                     "& input": { p: 0 },
                   }}
                 />
-
 
                 <Typography variant="h6" fontWeight="bold" gutterBottom>
                   Opis

@@ -87,8 +87,6 @@ export default function RestaurantCard({
           </Typography>
         </Box>
 
-
-
         <Box sx={{ mt: "auto", pt: 2, display: "flex", gap: 1.5 }}>
           <Button
             variant="contained"

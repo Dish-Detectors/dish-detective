@@ -12,7 +12,11 @@ export async function getSubscriptionCountsForMenuItems(
     const counts = await Subscription.aggregate([
       {
         $match: {
-          dishId: { $in: dishIds.map((id) => new (Subscription as any).base.Types.ObjectId(id)) },
+          dishId: {
+            $in: dishIds.map(
+              (id) => new (Subscription as any).base.Types.ObjectId(id),
+            ),
+          },
         },
       },
       {
@@ -39,7 +43,9 @@ export async function getSubscriptionCountsForMenuItems(
   }
 }
 
-export async function getManagerSubscriptionCounts(restaurantId: string): Promise<Record<string, number>> {
+export async function getManagerSubscriptionCounts(
+  restaurantId: string,
+): Promise<Record<string, number>> {
   await dbConnect();
 
   try {

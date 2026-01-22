@@ -121,7 +121,6 @@ export default function Page() {
                 pb: 2,
               }}
             >
-
               {sortedDishes.map((dish, index) => (
                 <Box
                   key={dish.id}
@@ -165,7 +164,8 @@ export default function Page() {
                               } catch (err) {
                                 console.error("Toggle failed", err);
                                 if (menzaId) {
-                                  const result = await fetchTodaysOfferForMenza(menzaId);
+                                  const result =
+                                    await fetchTodaysOfferForMenza(menzaId);
                                   setDishes(result);
                                 }
                               }
@@ -178,7 +178,9 @@ export default function Page() {
                           m: 0,
                           "& .MuiTypography-root": {
                             fontWeight: 700,
-                            color: dish.available ? "success.main" : "text.secondary",
+                            color: dish.available
+                              ? "success.main"
+                              : "text.secondary",
                           },
                         }}
                       />

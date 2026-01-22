@@ -72,10 +72,7 @@ export const unsubscribeFromDishTopic = async (dishId: string) => {
   if (!token) return false;
 
   try {
-    const res = await unsubscribeTokenFromTopic(
-      token,
-      `dish_notify_${dishId}`,
-    );
+    const res = await unsubscribeTokenFromTopic(token, `dish_notify_${dishId}`);
     return res.success;
   } catch (error) {
     console.error("Unsubscription failed", error);

@@ -395,10 +395,7 @@ export default function StaffAssignment({
         </DialogActions>
       </Dialog>
 
-      <Dialog
-        open={!!userToDelete}
-        onClose={() => setUserToDelete(null)}
-      >
+      <Dialog open={!!userToDelete} onClose={() => setUserToDelete(null)}>
         <DialogTitle>Potvrda brisanja</DialogTitle>
         <DialogContent>
           <DialogContentText>

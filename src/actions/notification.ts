@@ -228,7 +228,9 @@ export async function sendPollNotifications(params: {
     // FCM Admin SDK sendEach can handle up to 500 messages at once
     // If targetUserIds is larger, we might need chunking, but for polls it should be fine.
     const response = await messaging.sendEach(messages);
-    console.log(`Successfully sent ${response.successCount} poll notifications.`);
+    console.log(
+      `Successfully sent ${response.successCount} poll notifications.`,
+    );
 
     return { success: true, count: response.successCount };
   } catch (error: any) {

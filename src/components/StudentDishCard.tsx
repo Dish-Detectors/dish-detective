@@ -138,14 +138,27 @@ export default function StudentDishCard({
         alt={name}
       />
       <CardContent sx={{ p: 2 }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 0.5 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            mb: 0.5,
+          }}
+        >
           <Typography variant="h6" fontWeight="bold">
             {name}
           </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.5 }}>
+          <Box
+            sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.5 }}
+          >
             <Rating value={rating} readOnly size="small" precision={0.1} />
             {ratingCount > 0 && (
-              <Typography variant="caption" color="text.secondary" fontWeight="bold">
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                fontWeight="bold"
+              >
                 {rating.toFixed(1)} ({ratingCount})
               </Typography>
             )}
@@ -203,7 +216,9 @@ export default function StudentDishCard({
         >
           <ScheduleIcon sx={{ fontSize: 18, color: "primary.main" }} />
           <Typography variant="caption" fontWeight="700">
-            {isOffer ? `Dostupno od: ${lastServed}` : `Zadnje dostupno: ${lastServed}`}
+            {isOffer
+              ? `Dostupno od: ${lastServed}`
+              : `Zadnje dostupno: ${lastServed}`}
           </Typography>
         </Box>
 
@@ -260,9 +275,13 @@ export default function StudentDishCard({
               color={isSubscribed ? "error" : "primary"}
               startIcon={
                 isSubscribed ? (
-                  <NotificationsActiveIcon sx={{ fontSize: "1.5rem !important" }} />
+                  <NotificationsActiveIcon
+                    sx={{ fontSize: "1.5rem !important" }}
+                  />
                 ) : (
-                  <NotificationsNoneIcon sx={{ fontSize: "1.5rem !important" }} />
+                  <NotificationsNoneIcon
+                    sx={{ fontSize: "1.5rem !important" }}
+                  />
                 )
               }
               sx={{
@@ -270,7 +289,9 @@ export default function StudentDishCard({
                 textTransform: "none",
                 fontWeight: 700,
                 py: 1,
-                boxShadow: isSubscribed ? "0 4px 12px rgba(211, 47, 47, 0.15)" : "none",
+                boxShadow: isSubscribed
+                  ? "0 4px 12px rgba(211, 47, 47, 0.15)"
+                  : "none",
               }}
             >
               {isSubscribed ? "Ukloni pretplatu" : "Pretplati se"}

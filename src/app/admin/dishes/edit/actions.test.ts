@@ -97,8 +97,6 @@ describe("Edit Dish Server Actions", () => {
       expect(updateResult.message).toBe("Dish updated successfully");
     });
 
-
-
     it("should update dish image URL successfully", async () => {
       const createResult = await createDish({
         name: "Test Dish",

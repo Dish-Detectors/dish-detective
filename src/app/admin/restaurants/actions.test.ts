@@ -30,7 +30,7 @@ describe("Restaurant Server Actions", () => {
 
   // Clear database after each test
   beforeEach(() => {
-    consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+    consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
   });
 
   afterEach(async () => {
