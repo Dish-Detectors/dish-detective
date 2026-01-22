@@ -51,7 +51,7 @@ export default function PollPage() {
                 setError(res.error);
             } else if (res.poll) {
                 setPoll(res.poll);
-                setRestaurantName(res.restaurantName);
+                setRestaurantName(res.restaurantName || "");
             }
             setLoading(false);
         }
