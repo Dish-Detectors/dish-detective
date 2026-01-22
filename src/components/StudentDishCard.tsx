@@ -160,7 +160,7 @@ export default function StudentDishCard({
             value={currentRating}
             onChange={isOffer ? handleRate : undefined}
             readOnly={!isOffer}
-            size="small"
+            size="medium"
           />
 
           <Button
