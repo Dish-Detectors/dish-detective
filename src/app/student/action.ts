@@ -1,5 +1,6 @@
 "use server";
 import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 import Menu, { MenuItem } from "@/models/Menu";
 import Dish from "@/models/Dish";
 import DishRating from "@/models/DishRating";
@@ -22,6 +23,7 @@ export async function addDishToTodaysOffer(params: {
     { $set: { available: true, lastServed: params.updateDate } },
     { new: true },
   );
+  revalidatePath("/student/restaurants/[id]", "page");
 }
 
 export async function rateDish(params: {
@@ -66,6 +68,7 @@ export async function getRestaurantOffer(restaurantId: string) {
 
   const menuItems = await MenuItem.find({
     _id: { $in: menu.items },
+    available: true,
   }).lean();
 
   const dishIds = menuItems.map((item) => item.dishId.toString());

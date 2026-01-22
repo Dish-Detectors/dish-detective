@@ -1,5 +1,6 @@
 "use server";
 import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 import Restaurant from "@/models/Restaurant";
 import Menu, { MenuItem } from "@/models/Menu";
 import Dish from "@/models/Dish";
@@ -140,6 +141,8 @@ export async function addDishToTodaysOffer(params: {
   if (menuItemId) {
     await sendDishNotification(menuItemId, timeString);
   }
+  revalidatePath("/student/restaurants/[id]", "page");
+  revalidatePath("/worker", "page");
 }
 
 export async function fetchTodaysOfferForMenza(
@@ -194,4 +197,6 @@ export async function removeDishFromTodaysOffer(params: {
     { $set: { available: false, lastServed: params.updateDate } },
     { new: true },
   );
+  revalidatePath("/student/restaurants/[id]", "page");
+  revalidatePath("/worker", "page");
 }
