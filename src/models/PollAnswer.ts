@@ -20,7 +20,7 @@ const answerSchema = new Schema<IAnswers>(
     },
     answers: {
       type: [Number],
-      required: [true, "Poll ID is required"],
+      required: [true, "Answers are required"],
       trim: true,
     },
   },
@@ -30,11 +30,11 @@ const answerSchema = new Schema<IAnswers>(
 );
 
 if (process.env.NODE_ENV === "development") {
-  delete mongoose.models.Notification;
+  delete mongoose.models.Answers;
 }
 
 const Answers: Model<IAnswers> =
-  (mongoose.models.Notification as Model<IAnswers>) ||
+  (mongoose.models.Answers as Model<IAnswers>) ||
   mongoose.model<IAnswers>("Answers", answerSchema);
 
 export default Answers;

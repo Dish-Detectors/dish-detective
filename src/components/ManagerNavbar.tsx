@@ -7,6 +7,7 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import CampaignIcon from "@mui/icons-material/Campaign";
+import BallotIcon from "@mui/icons-material/Ballot";
 
 export const navWidth = 80;
 export const headerHeight = 64;
@@ -43,21 +44,21 @@ export default function ManagerNavbar({
         position: "fixed",
         ...(isMobile
           ? {
-              top: "auto",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              width: "100%",
-              height: "64px",
-              boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
-            }
+            top: "auto",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            width: "100%",
+            height: "64px",
+            boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
+          }
           : {
-              top: `${headerHeight}px`,
-              left: 0,
-              bottom: 0,
-              width: `${navWidth}px`,
-              boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
-            }),
+            top: `${headerHeight}px`,
+            left: 0,
+            bottom: 0,
+            width: `${navWidth}px`,
+            boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
+          }),
         bgcolor: "common.white",
         display: "flex",
         flexDirection: isMobile ? "row" : "column",
@@ -104,6 +105,12 @@ export default function ManagerNavbar({
           sx={getIconButtonStyle("/manager/announcements")}
         >
           <CampaignIcon />
+        </IconButton>
+        <IconButton
+          onClick={() => router.push("/manager/polls")}
+          sx={getIconButtonStyle("/manager/polls")}
+        >
+          <BallotIcon />
         </IconButton>
       </Stack>
     </Box>

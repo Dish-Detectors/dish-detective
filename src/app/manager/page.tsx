@@ -13,6 +13,7 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import BallotIcon from "@mui/icons-material/Ballot";
 
 import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -215,6 +216,14 @@ export default function ManagerPage() {
           >
             Obavijesti
           </MobileActionCard>
+
+          <MobileActionCard
+            onClick={() => router.push("/manager/polls")}
+            icon={<BallotIcon sx={{ fontSize: 32, color: "text.primary" }} />}
+            animationDelay="0.9s"
+          >
+            Ankete
+          </MobileActionCard>
         </Box>
       </Box>
     );
@@ -254,74 +263,98 @@ export default function ManagerPage() {
         <Box
           sx={{
             width: "100%",
-            maxWidth: 900, // Limit max width for 2x2 grid
-            display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
-            mt: -7,
+            maxWidth: 1000,
+            display: "flex",
+            flexWrap: "wrap",
             gap: 3.5,
             justifyContent: "center",
-            alignContent: "center",
+            mt: -7,
           }}
         >
-          <DesktopActionCard
-            icon={
-              <MenuBookIcon
-                sx={{
-                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
-                  color: "text.primary",
-                }}
-              />
-            }
-            title="Dnevni meni"
-            descriptions={[]}
-            onClick={() => router.push("/manager/menu")}
-            animationDelay="0.1s"
-          />
+          <Box sx={{ flex: "1 1 300px" }}>
+            <DesktopActionCard
+              icon={
+                <MenuBookIcon
+                  sx={{
+                    fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                    color: "text.primary",
+                  }}
+                />
+              }
+              title="Dnevni meni"
+              descriptions={[]}
+              onClick={() => router.push("/manager/menu")}
+              animationDelay="0.1s"
+            />
+          </Box>
 
-          <DesktopActionCard
-            icon={
-              <AccessTimeIcon
-                sx={{
-                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
-                  color: "text.primary",
-                }}
-              />
-            }
-            title="Radno vrijeme"
-            descriptions={[]}
-            onClick={() => router.push("/manager/hours")}
-            animationDelay="0.3s"
-          />
+          <Box sx={{ flex: "1 1 300px" }}>
+            <DesktopActionCard
+              icon={
+                <AccessTimeIcon
+                  sx={{
+                    fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                    color: "text.primary",
+                  }}
+                />
+              }
+              title="Radno vrijeme"
+              descriptions={[]}
+              onClick={() => router.push("/manager/hours")}
+              animationDelay="0.3s"
+            />
+          </Box>
 
-          <DesktopActionCard
-            icon={
-              <BarChartIcon
-                sx={{
-                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
-                  color: "text.primary",
-                }}
-              />
-            }
-            title="Statistika"
-            descriptions={[]}
-            onClick={() => router.push("/manager/stats")}
-            animationDelay="0.5s"
-          />
+          <Box sx={{ flex: "1 1 300px" }}>
+            <DesktopActionCard
+              icon={
+                <BarChartIcon
+                  sx={{
+                    fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                    color: "text.primary",
+                  }}
+                />
+              }
+              title="Statistika"
+              descriptions={[]}
+              onClick={() => router.push("/manager/stats")}
+              animationDelay="0.5s"
+            />
+          </Box>
 
-          <DesktopActionCard
-            icon={
-              <CampaignIcon
-                sx={{
-                  fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
-                  color: "text.primary",
-                }}
-              />
-            }
-            title="Obavijesti"
-            descriptions={[]}
-            onClick={() => router.push("/manager/announcements")}
-            animationDelay="0.7s"
-          />
+          <Box sx={{ flex: "1 1 300px" }}>
+            <DesktopActionCard
+              icon={
+                <CampaignIcon
+                  sx={{
+                    fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                    color: "text.primary",
+                  }}
+                />
+              }
+              title="Obavijesti"
+              descriptions={[]}
+              onClick={() => router.push("/manager/announcements")}
+              animationDelay="0.7s"
+            />
+          </Box>
+
+          <Box sx={{ flex: "1 1 300px" }}>
+            <DesktopActionCard
+              icon={
+                <BallotIcon
+                  sx={{
+                    fontSize: { xs: 44, sm: 52, md: 60, lg: 68 },
+                    color: "text.primary",
+                  }}
+                />
+              }
+              title="Ankete"
+              descriptions={[]}
+              onClick={() => router.push("/manager/polls")}
+              animationDelay="0.9s"
+            />
+          </Box>
         </Box>
       </Box>
     </Box>
