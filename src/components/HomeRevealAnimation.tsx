@@ -84,9 +84,10 @@ export default function HomeRevealAnimation({
       try {
         const fallback = new Promise<void>((r) => window.setTimeout(r, 900));
         await Promise.race([
-          Promise.all([preloadImage("/fork.png"), preloadImage("/knife.png")]).then(
-            () => undefined,
-          ),
+          Promise.all([
+            preloadImage("/fork.png"),
+            preloadImage("/knife.png"),
+          ]).then(() => undefined),
           fallback,
         ]);
       } catch {

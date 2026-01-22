@@ -26,8 +26,6 @@ export default function Header() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-
-
   const [showHomepageHeader, setShowHomepageHeader] = useState(false);
 
   // Get the role from the public metadata we just set
