@@ -27,11 +27,7 @@ export async function getAllWorkerNotifications(): Promise<any[]> {
 
   const populatedNotifications = await Promise.all(
     notifications.map(async (notif: any) => {
-      // Determine read status:
-      // If broadcast (no targetUserId), check receipt.
-      // If personal (targetUserId exists), check notif.read (though personal worker notifs might not exist yet, logic stands)
-      // Actually worker notifications are currently ALL broadcasts (type defined by sender usually, but here 'worker' type is generic).
-      // Assuming 'worker' type notifications are broadcasts to all workers.
+
       const isRead = notif.targetUserId
         ? notif.read
         : readSet.has(notif._id.toString());
