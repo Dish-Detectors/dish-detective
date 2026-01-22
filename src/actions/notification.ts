@@ -78,9 +78,7 @@ export async function getAllStudentNotifications(): Promise<any[]> {
 
   const populatedNotifications = await Promise.all(
     notifications.map(async (notif: any) => {
-      // Logic:
-      // If it's MY personal notification, use the 'read' field on the doc.
-      // If it's a broadcast (targetUserId is null/missing), use ReadReceipt.
+
       const isBroadcast = !notif.targetUserId;
       const isRead = isBroadcast
         ? readSet.has(notif._id.toString())
@@ -130,8 +128,6 @@ export async function sendDishNotification(
     const imageUrl = dish.imageUrl || "";
 
     const message = {
-      // Removing root-level notification to prevent automatic browser display
-      // shifting control to either webpush or the service worker.
       webpush: {
         notification: {
           title: title,
@@ -224,9 +220,6 @@ export async function sendPollNotifications(params: {
         },
       },
     }));
-
-    // FCM Admin SDK sendEach can handle up to 500 messages at once
-    // If targetUserIds is larger, we might need chunking, but for polls it should be fine.
     const response = await messaging.sendEach(messages);
     console.log(
       `Successfully sent ${response.successCount} poll notifications.`,
@@ -359,40 +352,18 @@ export async function markAllNotificationsAsRead() {
       { read: true },
     );
 
-    // 2. Mark all relevant broadcasts as read
-    // Find all broadcasts this user CAN see (student or worker)
     const role = sessionClaims?.metadata?.role || "student";
-    // If worker/manager, they see worker type? Or student?
-    // Let's assume standard logic:
-    // If getting student notifs -> mark student broadcasts
-    // If getting worker notifs -> mark worker broadcasts
-    // Actually, safer to just find ALL unread broadcasts for this user context?
-    // Let's match the fetch logic.
 
-    // We'll mark 'student' broadcasts if user is student, and 'worker' if worker.
-    // Simplifying: Just find all broadcasts of relevant types that don't have a receipt yet.
-    // This is complex to query efficiently ("find not in other collection").
-
-    // Alternative: Client calls this. We can just insert receipts for ALL broadcasts currently visible?
-    // Or just fetch IDs of unread broadcasts and insert.
 
     const typeFilter =
       role === "worker" || role === "manager" ? "worker" : "student";
-    // Wait, managers might want student notifs too?
-    // Let's rely on what getAllStudentNotifications fetches.
-    // Currently users usually act as one role.
 
-    // Let's Fetch all broadcasts relevant to user
     const query = {
       $or: [{ targetUserId: { $exists: false } }, { targetUserId: null }],
-      // If we want to be strict about type, we need to know context.
-      // But usually marking *all* as read implies all visible.
-      // Let's just find ALL broadcasts.
     };
 
     const allBroadcasts = await Notification.find(query).select("_id").lean();
 
-    // Insert receipts for all of them. Use ordered: false to ignore duplicates.
     const receipts = allBroadcasts.map((n) => ({
       userId,
       notificationId: n._id,
@@ -418,24 +389,14 @@ export async function getUnreadNotificationCount() {
   await dbConnect();
 
   try {
-    // 1. Personal unread
     const personalCount = await Notification.countDocuments({
       targetUserId: userId,
       read: false,
     });
 
-    // 2. Broadcast unread
-    // Count total broadcasts meant for this user
-    // Subtract count of read receipts
-
-    // Determine type context. This is tricky without passing argument.
-    // But usually simple users are students. Workers are workers.
     const role = sessionClaims?.metadata?.role;
 
-    // If worker/manager, check 'worker' type broadcasts.
-    // If student (or undefined role), check 'student' type.
     const type = role === "worker" || role === "manager" ? "worker" : "student";
-    // NOTE: This assumes a user only checks ONE stream.
 
     const broadcastQuery = {
       type: type,
@@ -444,26 +405,6 @@ export async function getUnreadNotificationCount() {
 
     const totalBroadcasts = await Notification.countDocuments(broadcastQuery);
 
-    // Count receipts for this user that correspond to these broadcasts
-    // (We count receipts where notificationId is in the set of broadcast IDs?
-    //  Or just count all receipts for this user and assume they match?
-    //  Safest: Count receipts for notifications of this type.)
-
-    // Optimize: Get IDs of broadcasts? No, too many?
-    // Actually, `ReadReceipt.countDocuments({ userId })` counts ALL receipts.
-    // If user has receipts for old notifications that are deleted? Or different type?
-
-    // Let's count receipts where notificationId refers to a notification of correct type.
-    // This requires aggregation/lookup.
-
-    // For MVP/Speed: Just count all receipts for user?
-    // Risk: If user switches roles or there are other types.
-
-    // Better: Fetch all broadcast IDs (usually not THAT many active ones? history is 50 limit in UI but DB has more).
-    // Let's stick to recent history? Notification Center usually loads all? No action loads 50?
-    // getAllStudentNotifications logic used `find` without limit (actually bad for scale!).
-
-    // Let's mirror `getAllStudentNotifications` logic but just count.
 
     const allBroadcasts = await Notification.find(broadcastQuery)
       .select("_id")
