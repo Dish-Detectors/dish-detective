@@ -95,6 +95,23 @@ export default async function RestaurantOfferPage({
   const [lng, lat] = restaurant.location.coordinates;
   const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
 
+  // Check if restaurant is currently open
+  const now = new Date();
+  const currentDay = now.getDay(); // 0-6
+  const currentTime = now.getHours() * 60 + now.getMinutes();
+
+  const todaysHours = restaurant.workingHours.find(wh => wh.day === currentDay);
+  let isOpen = false;
+  if (todaysHours) {
+    isOpen = todaysHours.shifts.some(shift => {
+      const [startH, startM] = shift.start.split(":").map(Number);
+      const [endH, endM] = shift.end.split(":").map(Number);
+      const startTime = startH * 60 + startM;
+      const endTime = endH * 60 + endM;
+      return currentTime >= startTime && currentTime <= endTime;
+    });
+  }
+
   const sortWorkingHours = (hours: IWorkingDay[]) => {
     // Sort by day index, starting from Monday (1) to Sunday (0)
     // Actually standard compliant is 0-6 (Sun-Sat). Let's display Monday first usually?
@@ -125,9 +142,16 @@ export default async function RestaurantOfferPage({
       >
         <Grid container spacing={4} alignItems="flex-start">
           <Grid size={{ xs: 12, md: 7 }}>
-            <Typography variant="h3" fontWeight="800" gutterBottom>
-              {restaurant.name}
-            </Typography>
+            <Box sx={{ mb: 1, display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
+              <Typography variant="h3" fontWeight="800">
+                {restaurant.name}
+              </Typography>
+              <Chip
+                label={isOpen ? "OTVORENO" : "ZATVORENO - Van radnog vremena"}
+                color={isOpen ? "success" : "error"}
+                sx={{ fontWeight: 700, borderRadius: 2 }}
+              />
+            </Box>
             <Stack
               direction="row"
               alignItems="center"
@@ -238,6 +262,7 @@ export default async function RestaurantOfferPage({
           rating: ratingsMap.get(dish._id.toString()) || 0,
           isSubscribed: subscriptions.includes(dish._id.toString()),
         }))}
+        isOpen={isOpen}
       />
     </Container>
   );

@@ -143,7 +143,7 @@ describe("Create Dish Server Actions", () => {
   it("should fail with missing required fields", async () => {
     const formData = new FormData();
     formData.append("name", "Incomplete Dish");
-    // Missing description and category
+    // Missing description
     // Missing image
 
     const result = await createDish(formData);

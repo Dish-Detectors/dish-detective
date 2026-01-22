@@ -9,7 +9,10 @@ import {
   useMediaQuery,
   useTheme,
   Paper,
+  TextField,
+  InputAdornment,
 } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import WorkerNavbar, { navWidth } from "@/components/WorkerNavbar";
 import DishCard from "@/components/DishCard";
 import {
@@ -29,6 +32,7 @@ export default function Page() {
   const [dishes, setDishes] = useState<WorkerMenuItem[]>([]);
   const [todaysOfferDishIds, setTodaysOfferDishIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const todaysOfferDishIdSet = useMemo(
     () => new Set(todaysOfferDishIds),
@@ -36,14 +40,23 @@ export default function Page() {
   );
 
   const sortedDishes = useMemo(() => {
-    return [...dishes].sort((a, b) => {
+    const filtered = dishes.filter((dish) => {
+      const query = searchQuery.toLowerCase();
+      return (
+        dish.name.toLowerCase().includes(query) ||
+        dish.description.toLowerCase().includes(query) ||
+        dish.allergens.some((a) => a.toLowerCase().includes(query))
+      );
+    });
+
+    return [...filtered].sort((a, b) => {
       const aInOffer = todaysOfferDishIdSet.has(a.id) ? 1 : 0;
       const bInOffer = todaysOfferDishIdSet.has(b.id) ? 1 : 0;
 
       if (aInOffer !== bInOffer) return aInOffer - bInOffer;
       return a.name.localeCompare(b.name);
     });
-  }, [dishes, todaysOfferDishIdSet]);
+  }, [dishes, todaysOfferDishIdSet, searchQuery]);
 
   useEffect(() => {
     let cancelled = false;
@@ -103,9 +116,46 @@ export default function Page() {
 
         <Box
           sx={{
+            display: "flex",
+            gap: 2,
+            mb: 4,
+            maxWidth: { xs: "100%", sm: 600 },
+            flexShrink: 0,
+          }}
+        >
+          <TextField
+            fullWidth
+            placeholder="Pretraži jela..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: "#999" }} />
+                  </InputAdornment>
+                ),
+              },
+            }}
+            sx={{
+              bgcolor: "white",
+              borderRadius: 10,
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 10,
+                "& fieldset": {
+                  borderColor: "#e0e0e0",
+                },
+              },
+            }}
+          />
+        </Box>
+
+        <Box
+          sx={{
             flex: 1,
             overflowY: "auto",
             pr: 1,
+            pt: 1,
             pb: isMobile ? 6 : 4,
           }}
         >
@@ -181,7 +231,7 @@ export default function Page() {
                           );
 
                           void addDishToTodaysOffer({
-                            menuItemId: addedId,
+                            dishId: addedId,
                             updateDate: new Date(),
                           }).catch(async (err: any) => {
                             console.error(

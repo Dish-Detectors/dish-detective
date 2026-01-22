@@ -2,7 +2,8 @@
 
 import { Box, Stack, IconButton } from "@mui/material";
 import { usePathname, useRouter } from "next/navigation";
-import HomeFilledIcon from "@mui/icons-material/HomeFilled";
+import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
+import AddIcon from "@mui/icons-material/Add";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import NotificationCenter from "./NotificationCenter";
 import React from "react";
@@ -70,21 +71,21 @@ export default function WorkerNavbar({ isMobile = false }: WorkerNavbarProps) {
         position: "fixed",
         ...(isMobile
           ? {
-              top: "auto",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              width: "100%",
-              height: "64px",
-              boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
-            }
+            top: "auto",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            width: "100%",
+            height: "64px",
+            boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
+          }
           : {
-              top: `${headerHeight}px`,
-              left: 0,
-              bottom: 0,
-              width: `${navWidth}px`,
-              boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
-            }),
+            top: `${headerHeight}px`,
+            left: 0,
+            bottom: 0,
+            width: `${navWidth}px`,
+            boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
+          }),
         bgcolor: "common.white",
         display: "flex",
         flexDirection: isMobile ? "row" : "column",
@@ -105,9 +106,16 @@ export default function WorkerNavbar({ isMobile = false }: WorkerNavbarProps) {
         <IconButton
           onClick={() => router.push("/worker")}
           sx={getIconButtonStyle("/worker")}
-          aria-label="Home"
+          aria-label="Ponuda"
         >
-          <HomeFilledIcon />
+          <RestaurantMenuIcon />
+        </IconButton>
+        <IconButton
+          onClick={() => router.push("/worker/add")}
+          sx={getIconButtonStyle("/worker/add")}
+          aria-label="Dodaj jelo"
+        >
+          <AddIcon />
         </IconButton>
         <IconButton
           onClick={handleToggleNotif}

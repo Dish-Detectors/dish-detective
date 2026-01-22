@@ -26,6 +26,7 @@ interface DishData {
 interface RestaurantMenuTabsProps {
     offer: DishData[];
     otherDishes: DishData[];
+    isOpen: boolean;
 }
 
 interface TabPanelProps {
@@ -57,14 +58,37 @@ function CustomTabPanel(props: TabPanelProps) {
 export default function RestaurantMenuTabs({
     offer,
     otherDishes,
+    isOpen,
 }: RestaurantMenuTabsProps) {
-    const [value, setValue] = useState(0);
+    const [value, setValue] = useState(isOpen ? 0 : 1);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
 
     const renderDishGrid = (dishes: DishData[], emptyMessage: string, isOffer: boolean) => {
+        if (!isOpen && isOffer) {
+            return (
+                <Box
+                    sx={{
+                        textAlign: "center",
+                        py: 8,
+                        bgcolor: "grey.50",
+                        borderRadius: 4,
+                        border: "1px dashed",
+                        borderColor: "divider",
+                    }}
+                >
+                    <Typography variant="h6" color="error.main" sx={{ fontWeight: 600 }}>
+                        Van radnog vremena
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+                        Trenutna ponuda nije dostupna jer restoran ne radi.
+                    </Typography>
+                </Box>
+            );
+        }
+
         if (dishes.length === 0) {
             return (
                 <Box
@@ -122,6 +146,7 @@ export default function RestaurantMenuTabs({
                 >
                     <Tab
                         label="Trenutna ponuda"
+                        disabled={!isOpen}
                         sx={{ textTransform: "none", fontSize: "1.1rem", fontWeight: 600 }}
                     />
                     <Tab
@@ -130,6 +155,14 @@ export default function RestaurantMenuTabs({
                     />
                 </Tabs>
             </Box>
+
+            {!isOpen && value === 0 && (
+                <Box sx={{ p: 2, textAlign: "center", bgcolor: "error.light", borderRadius: 2, mb: 2 }}>
+                    <Typography variant="body2" color="error.contrastText" sx={{ fontWeight: 600 }}>
+                        RESTOREAN JE TRENUTNO ZATVOREN - Van radnog vremena
+                    </Typography>
+                </Box>
+            )}
 
             <CustomTabPanel value={value} index={0}>
                 <Box sx={{ mb: 3 }}>

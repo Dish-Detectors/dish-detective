@@ -91,6 +91,7 @@ export default function Page() {
             flex: 1,
             overflowY: "auto",
             pr: 1,
+            pt: 1,
             pb: isMobile ? 5 : 4,
           }}
         >
@@ -133,55 +134,66 @@ export default function Page() {
                 elevation={0}
                 sx={{
                   cursor: "pointer",
-                  borderRadius: 3,
-                  bgcolor: "white",
-                  border: "2px dashed #d0d0d0",
-                  transition: "all 0.2s ease-in-out",
+                  borderRadius: 4,
+                  bgcolor: "rgba(25, 118, 210, 0.04)",
+                  border: "2px dashed",
+                  borderColor: "primary.light",
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                   outline: "none",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  height: isMobile ? 96 : 380,
-                  minHeight: isMobile ? 96 : 380,
-                  maxHeight: isMobile ? 96 : 380,
+                  height: isMobile ? 96 : 417,
+                  minHeight: isMobile ? 96 : 417,
+                  maxHeight: isMobile ? 96 : 420,
                   "&:hover": {
-                    borderColor: theme.palette.primary.main,
-                    boxShadow: 2,
+                    borderColor: "primary.main",
+                    bgcolor: "rgba(25, 118, 210, 0.08)",
+                    transform: "translateY(-4px)",
+                    boxShadow: "0 12px 24px -10px rgba(0,0,0,0.15)",
+                    "& .add-icon": {
+                      transform: "scale(1.1) rotate(90deg)",
+                      color: "primary.main",
+                    },
+                    "& .add-text": {
+                      color: "primary.main",
+                    }
                   },
-                  "&:focus-visible": {
-                    borderColor: theme.palette.primary.main,
-                    boxShadow: `0 0 0 3px ${theme.palette.primary.light}`,
+                  "&:active": {
+                    transform: "translateY(0) scale(0.98)",
                   },
                 }}
               >
                 <Box
                   sx={{
                     display: "flex",
-                    flexDirection: "column",
+                    flexDirection: isMobile ? "row" : "column",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: 1.5,
-                    px: 2,
+                    gap: 2,
+                    px: 3,
                   }}
                 >
                   <AddIcon
+                    className="add-icon"
                     sx={{
-                      fontSize: isMobile ? 50 : 128,
-                      color: "grey.500",
+                      fontSize: isMobile ? 32 : 80,
+                      color: "primary.light",
+                      transition: "all 0.3s ease",
                     }}
                   />
-                  {!isMobile && (
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 700,
-                        color: "#212222",
-                        textAlign: "center",
-                      }}
-                    >
-                      Dodaj u ponudu
-                    </Typography>
-                  )}
+                  <Typography
+                    variant={isMobile ? "body1" : "h6"}
+                    className="add-text"
+                    sx={{
+                      fontWeight: 700,
+                      color: "text.secondary",
+                      textAlign: "center",
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    Dodaj u ponudu
+                  </Typography>
                 </Box>
               </Paper>
 
