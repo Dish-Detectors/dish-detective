@@ -37,6 +37,6 @@ export default async function RedirectAfterSignIn() {
       redirect("/worker");
     case "student":
     default:
-      redirect("/student");
+      redirect("/student/restaurants");
   }
 }

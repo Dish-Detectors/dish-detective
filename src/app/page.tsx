@@ -175,7 +175,7 @@ export default function Home() {
               router.push("/worker");
               return;
             case "student":
-              router.push("/student");
+              router.push("/student/restaurants");
               return;
           }
         }
