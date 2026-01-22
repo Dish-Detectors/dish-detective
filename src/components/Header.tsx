@@ -2,13 +2,11 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { UserButton, useUser } from "@clerk/nextjs"; // Import useUser
 import { getRestaurantName } from "@/app/admin/actions";
 import {
-  Menu,
-  MenuItem,
   Box,
   AppBar,
   Toolbar,
@@ -17,12 +15,9 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import RestaurantIcon from "@mui/icons-material/Restaurant";
-import SchoolIcon from "@mui/icons-material/School";
 
 export default function Header() {
   const pathname = usePathname();
-  const router = useRouter();
   const { user } = useUser(); // Get the user data from Clerk
 
   const isHomepage = pathname === "/";
@@ -31,17 +26,7 @@ export default function Header() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
 
-  // Header persists across route changes (in the root layout), so ensure any
-  // open menus are closed when navigating.
-  useEffect(() => {
-    setAnchorEl(null);
-  }, [pathname]);
 
   const [showHomepageHeader, setShowHomepageHeader] = useState(false);
 
@@ -179,46 +164,6 @@ export default function Header() {
 
           <Box sx={{ display: "flex", gap: { xs: 2, md: 3 } }}>
             <Button
-              variant="contained"
-              sx={{
-                display: { xs: "none", sm: "flex" },
-                bgcolor: "white",
-                color: "black",
-                fontSize: "0.9rem",
-                fontWeight: 600,
-                borderRadius: 2,
-                textTransform: "none",
-                "&:hover": {
-                  bgcolor: "grey.200",
-                },
-              }}
-            >
-              Kontakt
-            </Button>
-
-            <Button
-              aria-controls={open ? "prijava-menu" : undefined}
-              aria-haspopup="true"
-              aria-expanded={open ? "true" : undefined}
-              onClick={handleClick}
-              variant="contained"
-              sx={{
-                display: { xs: "none", sm: "flex" },
-                bgcolor: isMobile ? "#56aaf4" : "#ff8c00",
-                color: "white",
-                fontSize: "0.9rem",
-                fontWeight: 600,
-                borderRadius: 2,
-                textTransform: "none",
-                "&:hover": {
-                  bgcolor: isMobile ? "#4a94db" : "#f18501ff",
-                },
-              }}
-            >
-              Prijava
-            </Button>
-
-            <Button
               sx={{
                 display: { xs: "flex", sm: "none" },
                 minWidth: 0,
@@ -237,40 +182,6 @@ export default function Header() {
                 height={32}
               />
             </Button>
-
-            <Menu
-              id="prijava-menu"
-              anchorEl={anchorEl}
-              open={open}
-              onClose={() => setAnchorEl(null)}
-              slotProps={{
-                paper: {
-                  sx: { minWidth: 200, mt: 1, borderRadius: 2 },
-                },
-                list: {
-                  "aria-labelledby": "prijava-button",
-                },
-              }}
-            >
-              <MenuItem
-                onClick={() => {
-                  setAnchorEl(null);
-                  router.push("/login/employee");
-                }}
-              >
-                <RestaurantIcon fontSize="small" sx={{ mr: 1 }} /> Radnik u
-                menzi
-              </MenuItem>
-              <Box sx={{ borderBottom: "1px solid #e0e0e0", my: 0 }} />
-              <MenuItem
-                onClick={() => {
-                  setAnchorEl(null);
-                  router.push("/login/student");
-                }}
-              >
-                <SchoolIcon fontSize="small" sx={{ mr: 1 }} /> Student
-              </MenuItem>
-            </Menu>
           </Box>
         </Toolbar>
       </AppBar>

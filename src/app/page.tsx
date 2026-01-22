@@ -20,6 +20,7 @@ import PancakeStackLoader from "@/components/PancakeStackLoader";
 import HomeRevealAnimation from "@/components/HomeRevealAnimation";
 import HomeRevealGate from "@/components/HomeRevealGate";
 import CardSwap, { Card } from "@/components/CardSwap";
+import Aurora from "@/components/Aurora";
 import { getUserRole } from "./actions";
 
 export default function Home() {
@@ -222,12 +223,31 @@ export default function Home() {
           alignItems: "center",
           overflowY: "auto",
           WebkitOverflowScrolling: "touch",
-          backgroundImage: `url(/mobilebg.jpg)`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
+          bgcolor: "black",
         }}
       >
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            zIndex: 0,
+            overflow: "hidden",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Box sx={{ width: "200%", height: "200%", position: "relative" }}>
+            <Aurora
+              colorStops={["#0c7fdb", "#57aaf5", "#f8a44b"]}
+              amplitude={1.0}
+              blend={0.75}
+            />
+          </Box>
+        </Box>
         <Box
           sx={{
             backgroundColor: "rgba(255, 255, 255, 0.8)",
@@ -237,6 +257,7 @@ export default function Home() {
             boxShadow: 3,
             mt: 2,
             mb: 2,
+            zIndex: 1,
             "@media (max-height: 740px)": {
               mt: 5,
             },
@@ -317,7 +338,7 @@ export default function Home() {
             fullWidth
             sx={{
               fontWeight: 600,
-              borderRadius: 3,
+              borderRadius: 999,
               minHeight: 50,
               textTransform: "none",
             }}
@@ -379,13 +400,31 @@ export default function Home() {
         justifyContent: "center",
         alignItems: "flex-start",
         paddingLeft: 10,
-        backgroundImage: `url(/desktopbg.jpg)`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        opacity: 0.95,
+        bgcolor: "black",
       }}
     >
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          zIndex: 0,
+          overflow: "hidden",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Box sx={{ width: "100%", height: "100%", position: "relative" }}>
+          <Aurora
+            colorStops={["#0c7fdb", "#57aaf5", "#f8a44b"]}
+            amplitude={1.0}
+            blend={0.75}
+          />
+        </Box>
+      </Box>
       <HomeRevealGate>
         {/* This overlay box makes the background a bit darker */}
         <Box
@@ -452,7 +491,7 @@ export default function Home() {
                 onClick={(e) => setAnchorEl(e.currentTarget)}
                 sx={{
                   fontWeight: 600,
-                  borderRadius: 3,
+                  borderRadius: 999,
                   width: "25%",
                   minHeight: 45,
                   color: "white",

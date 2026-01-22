@@ -3,6 +3,14 @@ import { useEffect, useRef } from 'react';
 
 import './Aurora.css';
 
+interface AuroraProps {
+  colorStops?: string[];
+  amplitude?: number;
+  blend?: number;
+  time?: number;
+  speed?: number;
+}
+
 const VERT = `#version 300 es
 in vec2 position;
 void main() {
@@ -97,11 +105,12 @@ void main() {
   
   float height = snoise(vec2(uv.x * 2.0 + uTime * 0.1, uTime * 0.25)) * 0.5 * uAmplitude;
   height = exp(height);
-  height = (uv.y * 2.0 - height + 0.2);
+  // Adjusted height calculation to cover more area and be less restricted to the top
+  height = (uv.y * 1.2 - height + 0.8);
   float intensity = 0.6 * height;
   
-  float midPoint = 0.20;
-  float auroraAlpha = smoothstep(midPoint - uBlend * 0.5, midPoint + uBlend * 0.5, intensity);
+  float midPoint = 0.0;
+  float auroraAlpha = smoothstep(midPoint - uBlend, midPoint + uBlend, intensity);
   
   vec3 auroraColor = intensity * rampColor;
   
@@ -109,12 +118,12 @@ void main() {
 }
 `;
 
-export default function Aurora(props) {
+export default function Aurora(props: AuroraProps) {
   const { colorStops = ['#5227FF', '#7cff67', '#5227FF'], amplitude = 1.0, blend = 0.5 } = props;
-  const propsRef = useRef(props);
+  const propsRef = useRef<AuroraProps>(props);
   propsRef.current = props;
 
-  const ctnDom = useRef(null);
+  const ctnDom = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctn = ctnDom.current;
@@ -131,7 +140,7 @@ export default function Aurora(props) {
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     gl.canvas.style.backgroundColor = 'transparent';
 
-    let program;
+    let program: Program;
 
     function resize() {
       if (!ctn) return;
@@ -149,7 +158,7 @@ export default function Aurora(props) {
       delete geometry.attributes.uv;
     }
 
-    const colorStopsArray = colorStops.map(hex => {
+    const colorStopsArray = colorStops.map((hex: string) => {
       const c = new Color(hex);
       return [c.r, c.g, c.b];
     });
@@ -170,14 +179,14 @@ export default function Aurora(props) {
     ctn.appendChild(gl.canvas);
 
     let animateId = 0;
-    const update = t => {
+    const update = (t: number) => {
       animateId = requestAnimationFrame(update);
       const { time = t * 0.01, speed = 1.0 } = propsRef.current;
       program.uniforms.uTime.value = time * speed * 0.1;
-      program.uniforms.uAmplitude.value = propsRef.current.amplitude ?? 1.0;
+      program.uniforms.uAmplitude.value = propsRef.current.amplitude ?? amplitude;
       program.uniforms.uBlend.value = propsRef.current.blend ?? blend;
       const stops = propsRef.current.colorStops ?? colorStops;
-      program.uniforms.uColorStops.value = stops.map(hex => {
+      program.uniforms.uColorStops.value = stops.map((hex: string) => {
         const c = new Color(hex);
         return [c.r, c.g, c.b];
       });
