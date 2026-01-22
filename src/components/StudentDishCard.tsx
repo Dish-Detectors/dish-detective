@@ -11,9 +11,12 @@ import {
   Rating,
   Button,
   Divider,
+  Chip,
 } from "@mui/material";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import ScheduleIcon from "@mui/icons-material/Schedule";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import {
   subscribeToDishTopic,
   unsubscribeFromDishTopic,
@@ -157,18 +160,52 @@ export default function StudentDishCard({
           {description}
         </Typography>
 
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          noWrap
-          sx={{ mb: 0.5 }}
-        >
-          Alergeni: {allergens.join(", ") || "Nema"}
-        </Typography>
+        {/* Allergens: Styled as Chips */}
+        <Box sx={{ mb: 2, display: "flex", flexWrap: "wrap", gap: 0.8 }}>
+          {allergens.length > 0 ? (
+            allergens.map((allergen) => (
+              <Chip
+                key={allergen}
+                label={allergen}
+                size="small"
+                variant="outlined"
+                icon={<WarningAmberIcon sx={{ fontSize: "14px !important" }} />}
+                sx={{
+                  height: "24px",
+                  fontSize: "0.7rem",
+                  borderColor: "warning.light",
+                  color: "warning.dark",
+                  bgcolor: "warning.50",
+                  "& .MuiChip-icon": { color: "warning.main", ml: 0.5 },
+                }}
+              />
+            ))
+          ) : (
+            <Typography variant="caption" color="text.disabled">
+              Nema alergena
+            </Typography>
+          )}
+        </Box>
 
-        <Typography variant="body2" color="text.secondary" fontWeight="medium">
-          {isOffer ? `Dostupno od: ${lastServed}` : `Zadnje dostupno: ${lastServed}`}
-        </Typography>
+        {/* Availability Info Row */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            color: "text.secondary",
+            bgcolor: "grey.100",
+            py: 0.8,
+            px: 1.5,
+            borderRadius: 1.5,
+            width: "fit-content",
+          }}
+        >
+          <ScheduleIcon sx={{ fontSize: 18, color: "primary.main" }} />
+          <Typography variant="caption" fontWeight="700">
+            {isOffer ? `Dostupno od: ${lastServed}` : `Zadnje dostupno: ${lastServed}`}
+          </Typography>
+        </Box>
 
         {/* Action Box: Streamlined interactive elements */}
         <Box
