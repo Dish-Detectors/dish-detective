@@ -44,6 +44,237 @@ interface NotificationCenterProps {
   audience?: "student" | "worker";
 }
 
+const SwipeableNotificationItem = ({ notif, onDelete, onClick, setPreviewImage }: any) => {
+  const [startX, setStartX] = useState<number | null>(null);
+  const [offsetX, setOffsetX] = useState(0);
+  const [isSwiping, setIsSwiping] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
+  const handleStart = (e: React.TouchEvent | React.MouseEvent) => {
+    e.stopPropagation();
+    const x = "touches" in e ? e.touches[0].clientX : e.clientX;
+    setStartX(x);
+    setIsSwiping(true);
+  };
+
+  const handleMove = (e: React.TouchEvent | React.MouseEvent) => {
+    if (startX === null) return;
+    e.stopPropagation();
+
+    // Prevent scrolling during swipe
+    if ("touches" in e && Math.abs(offsetX) > 10) {
+      if (e.cancelable) e.preventDefault();
+    }
+
+    const x = "touches" in e ? e.touches[0].clientX : e.clientX;
+    const diff = x - startX;
+
+    // Prevent accidental clicks with a threshold
+    if (Math.abs(diff) > 5) {
+      setOffsetX(diff);
+    }
+  };
+
+  const handleEnd = (e: React.TouchEvent | React.MouseEvent) => {
+    if (startX === null) return;
+    e.stopPropagation();
+
+    const threshold = 150;
+    if (Math.abs(offsetX) > threshold) {
+      setIsClosing(true);
+      // Let the height animation play before removing from DOM
+      setTimeout(() => {
+        setIsDeleted(true);
+        onDelete(notif._id);
+      }, 300);
+    } else {
+      setOffsetX(0);
+    }
+
+    setStartX(null);
+    setIsSwiping(false);
+  };
+
+  if (isDeleted) return null;
+
+  return (
+    <ListItem
+      alignItems="flex-start"
+      onMouseDown={handleStart}
+      onMouseMove={handleMove}
+      onMouseUp={handleEnd}
+      onMouseLeave={handleEnd}
+      onTouchStart={handleStart}
+      onTouchMove={handleMove}
+      onTouchEnd={handleEnd}
+      onClick={(e) => {
+        // Only trigger click if no significant swipe happened
+        if (Math.abs(offsetX) < 10) {
+          onClick();
+        }
+      }}
+      sx={{
+        px: 2,
+        py: isClosing ? 0 : 2.5,
+        borderBottom: isClosing ? "0px solid transparent" : "1px solid rgba(0,0,0,0.04)",
+        maxHeight: isClosing ? 0 : 500,
+        bgcolor: "transparent",
+        transition: isSwiping ? "none" : "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+        cursor: "pointer",
+        transform: `translateX(${offsetX}px)`,
+        opacity: isClosing ? 0 : Math.max(0.3, 1 - Math.abs(offsetX) / 400),
+        "&:hover": {
+          bgcolor: "rgba(0,0,0,0.02)",
+        },
+        pr: 4,
+        position: "relative",
+        userSelect: "none",
+        borderLeft: notif.read ? "4px solid transparent" : "4px solid #56aaf5",
+        overflow: "hidden",
+      }}
+    >
+      {/* Background deletion indicator */}
+      {Math.abs(offsetX) > 20 && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: offsetX > 0 ? 0 : 'auto',
+            right: offsetX < 0 ? 0 : 'auto',
+            height: '100%',
+            width: Math.abs(offsetX),
+            bgcolor: 'error.main',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: offsetX > 0 ? 'flex-start' : 'flex-end',
+            px: 2,
+            transition: 'opacity 0.2s',
+            opacity: Math.min(1, Math.abs(offsetX) / 150),
+            zIndex: -1,
+          }}
+        >
+          <DeleteOutlineIcon sx={{ color: 'white' }} />
+        </Box>
+      )}
+
+      {notif.imageUrl && (
+        <Box
+          component="img"
+          src={notif.imageUrl}
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation();
+            setPreviewImage(notif.imageUrl || null);
+          }}
+          sx={{
+            width: 54,
+            height: 54,
+            borderRadius: 3,
+            objectFit: "cover",
+            mr: 2,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+            cursor: "pointer",
+            "&:hover": { transform: "scale(1.05)" },
+            transition: "transform 0.2s",
+          }}
+        />
+      )}
+
+      {/* Attachment Rendering */}
+      {notif.attachment && (
+        <Box sx={{ mr: 2 }}>
+          {notif.attachment.type.startsWith("image/") ? (
+            <Box
+              component="img"
+              src={notif.attachment.url}
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
+                setPreviewImage(notif.attachment?.url || null);
+              }}
+              sx={{
+                width: 54,
+                height: 54,
+                borderRadius: 3,
+                objectFit: "cover",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                cursor: "pointer",
+                "&:hover": { transform: "scale(1.05)" },
+                transition: "transform 0.2s",
+              }}
+            />
+          ) : (
+            <IconButton
+              component="a"
+              href={notif.attachment.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              sx={{
+                width: 54,
+                height: 54,
+                bgcolor: "grey.50",
+                borderRadius: 3,
+                border: "1px solid rgba(0,0,0,0.05)",
+                "&:hover": { bgcolor: "grey.100" },
+              }}
+            >
+              <DownloadIcon color="primary" />
+            </IconButton>
+          )}
+        </Box>
+      )}
+      <Box sx={{ flexGrow: 1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            mb: 0.5,
+          }}
+        >
+          <Typography
+            variant="subtitle2"
+            fontWeight={700}
+            sx={{
+              color: notif.read ? "text.primary" : "primary.main",
+              fontSize: "0.95rem",
+              lineHeight: 1.2
+            }}
+          >
+            {notif.title || "Obavijest"}
+          </Typography>
+        </Box>
+
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            mb: 1,
+            lineHeight: 1.4,
+            fontSize: "0.85rem",
+            display: "-webkit-box",
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden"
+          }}
+        >
+          {notif.description}
+        </Typography>
+
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Typography variant="caption" sx={{ color: "text.disabled", fontWeight: 500 }}>
+            {new Date(notif.createdAt).toLocaleString("hr-HR", {
+              day: "2-digit",
+              month: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </Typography>
+        </Box>
+      </Box>
+    </ListItem>
+  );
+};
+
 export default function NotificationCenter({
   open,
   anchorEl,
@@ -53,10 +284,24 @@ export default function NotificationCenter({
 }: NotificationCenterProps & { onRead?: () => void }) {
   const router = useRouter();
   const [notifications, setNotifications] = useState<INotification[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const notificationsRef = useRef(notifications);
+  const [lastPos, setLastPos] = useState({ top: 0, left: 90 });
+  const [shouldRender, setShouldRender] = useState(open);
+  const [dynamicHeight, setDynamicHeight] = useState<number | string>(300);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Adjust height when loading completes
+  useEffect(() => {
+    if (!loading && contentRef.current) {
+      const height = contentRef.current.offsetHeight;
+      setDynamicHeight(height);
+    } else if (loading) {
+      setDynamicHeight(300); // Fixed skeleton height
+    }
+  }, [loading, notifications]);
 
   useEffect(() => {
     notificationsRef.current = notifications;
@@ -64,10 +309,12 @@ export default function NotificationCenter({
 
   useEffect(() => {
     if (open) {
+      setShouldRender(true);
+      setLoading(true);
+      setNotifications([]);
+      setDynamicHeight(300);
       loadNotifications();
     } else {
-      // When closing, check if there are unread notifications and mark them
-      // Using ref to access latest state without adding dependency
       if (notificationsRef.current.some((n) => !n.read)) {
         handleMarkAllRead();
       }
@@ -119,8 +366,8 @@ export default function NotificationCenter({
     }
   };
 
-  const handleDelete = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleDelete = async (id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     try {
       const res = await deleteNotification(id);
       if (res.success) {
@@ -145,11 +392,11 @@ export default function NotificationCenter({
     }
   };
 
-  if (!anchorEl) return null;
+
 
   const handleClickAway = (event: MouseEvent | TouchEvent) => {
     const target = event.target as Node | null;
-    if (target && anchorEl.contains(target)) {
+    if (anchorEl && target && anchorEl.contains(target)) {
       return;
     }
     // Only close if dialog is not open
@@ -161,34 +408,100 @@ export default function NotificationCenter({
     }
   };
 
+  const handleNotificationClick = async (notif: any) => {
+    // Determine routing first
+    let targetUrl = "";
+    if (notif.pollId) {
+      targetUrl = `/student/polls/${notif.pollId}`;
+    } else if (notif.restaurantId) {
+      targetUrl = `/student/restaurants/${notif.restaurantId}`;
+    }
+
+    // Mark as read if unread
+    if (!notif.read) {
+      try {
+        await markNotificationAsRead(notif._id);
+        setNotifications((prev) =>
+          prev.map((n) => (n._id === notif._id ? { ...n, read: true } : n) as any),
+        );
+        if (onRead) onRead();
+      } catch (error) {
+        console.error("Failed to mark notification as read on click", error);
+      }
+    }
+
+    // Navigate if target exists
+    if (targetUrl) {
+      router.push(targetUrl);
+      onClose();
+    }
+  };
+
   const hasUnread = notifications.some((n) => !n.read);
+
+  const getPosition = () => {
+    // If we have an anchor, calculate fresh position
+    if (anchorEl) {
+      const rect = anchorEl.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+
+      // Calculate ideal top position to center it vertically with the button
+      let top = rect.top + rect.height / 2 - 275;
+
+      // Constrain to viewport
+      top = Math.max(80, Math.min(top, viewportHeight - 570));
+
+      const newPos = {
+        top: top,
+        left: 90,
+      };
+
+      // Update last known position if it changed significantly
+      if (Math.abs(newPos.top - lastPos.top) > 1) {
+        setLastPos(newPos);
+      }
+      return newPos;
+    }
+
+    // Return the last known position while animating out
+    return lastPos;
+  };
+
+  const pos = getPosition();
+
+  // Return null ONLY if we are not supposed to render anymore (after animation)
+  if (!shouldRender) return null;
 
   return (
     <>
-      <ClickAwayListener onClickAway={handleClickAway}>
-        <Fade in={open} timeout={300}>
+      <ClickAwayListener onClickAway={handleClickAway} mouseEvent="onMouseDown" touchEvent="onTouchStart">
+        <Fade in={open} timeout={400} onExited={() => setShouldRender(false)}>
           <Paper
-            elevation={6}
+            elevation={0}
             sx={{
               position: "fixed",
-              left: 90,
-              bottom: 20,
-              width: 380,
-              maxHeight: 550,
-              borderRadius: 4,
+              top: pos.top,
+              left: pos.left,
+              width: 400,
+              maxHeight: 600,
+              borderRadius: 5,
               overflow: "hidden",
               display: "flex",
               flexDirection: "column",
               zIndex: 1300,
-              bgcolor: "white",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
-              border: "1px solid rgba(0,0,0,0.04)",
-              transformOrigin: "bottom left",
+              bgcolor: "rgba(255, 255, 255, 0.8)",
+              backdropFilter: "blur(20px) saturate(180%)",
+              WebkitBackdropFilter: "blur(20px) saturate(180%)",
+              boxShadow: "0 20px 50px rgba(0,0,0,0.15)",
+              border: "1px solid rgba(255,255,255,0.4)",
+              transition: "top 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
               "@media (max-width: 600px)": {
-                left: "50%",
-                transform: "translateX(-50%)",
+                left: "4vw",
+                right: "4vw",
+                width: "auto",
                 bottom: 80,
-                width: "92vw",
+                top: "auto",
+                maxHeight: "70vh",
                 transformOrigin: "bottom center",
               },
             }}
@@ -223,219 +536,66 @@ export default function NotificationCenter({
 
             <Box
               sx={{
-                overflowY: "auto",
+                overflow: "hidden",
+                height: dynamicHeight,
+                transition: "height 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                 flexGrow: 1,
-                minHeight: 200,
-                maxHeight: 400,
               }}
             >
-              {loading ? (
-                <Stack spacing={2} sx={{ p: 2 }}>
-                  {[1, 2, 3].map((i) => (
-                    <Box key={i} sx={{ display: "flex", width: "100%" }}>
-                      <Skeleton
-                        variant="rectangular"
-                        width={48}
-                        height={48}
-                        sx={{ mr: 2, borderRadius: 2 }}
-                      />
-                      <Box sx={{ flexGrow: 1 }}>
+              <Box
+                ref={contentRef}
+                sx={{
+                  overflowY: "auto",
+                  maxHeight: 500,
+                  minHeight: 200,
+                }}
+              >
+                {loading ? (
+                  <Stack spacing={2} sx={{ p: 2 }}>
+                    {[1, 2, 3].map((i) => (
+                      <Box key={i} sx={{ display: "flex", width: "100%" }}>
                         <Skeleton
-                          variant="text"
-                          width="60%"
-                          height={24}
-                          sx={{ mb: 0.5 }}
+                          variant="rectangular"
+                          width={48}
+                          height={48}
+                          sx={{ mr: 2, borderRadius: 2 }}
                         />
-                        <Skeleton variant="text" width="90%" height={20} />
-                        <Skeleton variant="text" width="40%" height={16} />
-                      </Box>
-                    </Box>
-                  ))}
-                </Stack>
-              ) : notifications.length === 0 ? (
-                <Box sx={{ p: 4, textAlign: "center", opacity: 0.6 }}>
-                  <NotificationsNoneIcon
-                    sx={{ fontSize: 48, mb: 1, color: "text.disabled" }}
-                  />
-                  <Typography variant="body2" color="text.secondary">
-                    Nema novih obavijesti.
-                  </Typography>
-                </Box>
-              ) : (
-                <List sx={{ p: 0 }}>
-                  {notifications.map((notif: any) => (
-                    <ListItem
-                      key={notif._id}
-                      alignItems="flex-start"
-                      sx={{
-                        borderBottom: "1px solid #f5f5f5",
-                        bgcolor: notif.read ? "white" : "#f0f7ff",
-                        transition: "background-color 0.2s",
-                        "&:hover": {
-                          bgcolor: notif.read ? "#fafafa" : "#e6f2ff",
-                        },
-                        pr: 10, // Space for buttons
-                        position: "relative",
-                      }}
-                    >
-                      {notif.imageUrl && (
-                        <Box
-                          component="img"
-                          src={notif.imageUrl}
-                          onClick={(e: React.MouseEvent) => {
-                            e.stopPropagation();
-                            setPreviewImage(notif.imageUrl || null);
-                          }}
-                          sx={{
-                            width: 48,
-                            height: 48,
-                            borderRadius: 2,
-                            objectFit: "cover",
-                            mr: 2,
-                            mt: 0.5,
-                            boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-                            cursor: "pointer",
-                            "&:hover": { opacity: 0.9 },
-                          }}
-                        />
-                      )}
-
-                      {/* Attachment Rendering */}
-                      {notif.attachment && (
-                        <Box sx={{ mr: 2, mt: 0.5 }}>
-                          {notif.attachment.type.startsWith("image/") ? (
-                            <Box
-                              component="img"
-                              src={notif.attachment.url}
-                              onClick={(e: React.MouseEvent) => {
-                                e.stopPropagation();
-                                setPreviewImage(notif.attachment?.url || null);
-                              }}
-                              sx={{
-                                width: 48,
-                                height: 48,
-                                borderRadius: 2,
-                                objectFit: "cover",
-                                boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-                                cursor: "pointer",
-                                "&:hover": { opacity: 0.9 },
-                              }}
-                            />
-                          ) : (
-                            <IconButton
-                              component="a"
-                              href={notif.attachment.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              sx={{
-                                width: 48,
-                                height: 48,
-                                bgcolor: "grey.100",
-                                borderRadius: 2,
-                                "&:hover": { bgcolor: "grey.200" },
-                              }}
-                            >
-                              <DownloadIcon color="action" />
-                            </IconButton>
-                          )}
+                        <Box sx={{ flexGrow: 1 }}>
+                          <Skeleton
+                            variant="text"
+                            width="60%"
+                            height={24}
+                            sx={{ mb: 0.5 }}
+                          />
+                          <Skeleton variant="text" width="90%" height={20} />
+                          <Skeleton variant="text" width="40%" height={16} />
                         </Box>
-                      )}
-                      <Box sx={{ flexGrow: 1 }}>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            mb: 0.5,
-                          }}
-                        >
-                          <Typography
-                            variant="subtitle2"
-                            fontWeight={notif.read ? 600 : 700}
-                            color={notif.read ? "text.primary" : "primary.main"}
-                          >
-                            {notif.title || "Obavijest"}
-                          </Typography>
-                          {!notif.read && (
-                            <Box
-                              sx={{
-                                width: 8,
-                                height: 8,
-                                borderRadius: "50%",
-                                bgcolor: "primary.main",
-                                mt: 0.8,
-                              }}
-                            />
-                          )}
-                        </Box>
-
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ mb: 0.5, lineHeight: 1.4 }}
-                        >
-                          {notif.description}
-                        </Typography>
-                        <Typography variant="caption" color="text.disabled">
-                          {new Date(notif.createdAt).toLocaleString("hr-HR", {
-                            day: "2-digit",
-                            month: "2-digit",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </Typography>
-
-                        {notif.pollId && (
-                          <Button
-                            variant="contained"
-                            size="small"
-                            sx={{
-                              mt: 1,
-                              display: "block",
-                              borderRadius: 4,
-                              textTransform: "none",
-                              fontSize: "0.8rem",
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              router.push(`/student/polls/${notif.pollId}`);
-                              if (onClose) onClose();
-                            }}
-                          >
-                            Ispuni anketu
-                          </Button>
-                        )}
                       </Box>
-
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          top: 8,
-                          right: 8,
-                          display: "flex",
-                          gap: 0.5,
-                        }}
-                      >
-                        <Tooltip title="Obriši">
-                          <IconButton
-                            size="small"
-                            onClick={(e) => handleDelete(notif._id, e)}
-                            sx={{
-                              color: "text.disabled",
-                              "&:hover": {
-                                color: "error.main",
-                                bgcolor: "error.lighter",
-                              },
-                            }}
-                          >
-                            <DeleteOutlineIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    </ListItem>
-                  ))}
-                </List>
-              )}
+                    ))}
+                  </Stack>
+                ) : notifications.length === 0 ? (
+                  <Box sx={{ p: 4, textAlign: "center", opacity: 0.6 }}>
+                    <NotificationsNoneIcon
+                      sx={{ fontSize: 48, mb: 1, color: "text.disabled" }}
+                    />
+                    <Typography variant="body2" color="text.secondary">
+                      Nema novih obavijesti.
+                    </Typography>
+                  </Box>
+                ) : (
+                  <List sx={{ p: 0 }}>
+                    {notifications.map((notif: any) => (
+                      <SwipeableNotificationItem
+                        key={notif._id}
+                        notif={notif}
+                        onDelete={(id: string) => handleDelete(id, null as any)}
+                        onClick={() => handleNotificationClick(notif)}
+                        setPreviewImage={setPreviewImage}
+                      />
+                    ))}
+                  </List>
+                )}
+              </Box>
             </Box>
           </Paper>
         </Fade>

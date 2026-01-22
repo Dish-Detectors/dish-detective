@@ -14,6 +14,7 @@ import {
     Alert,
     CircularProgress,
     Snackbar,
+    Divider,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -21,6 +22,7 @@ import SendIcon from "@mui/icons-material/Send";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useRouter } from "next/navigation";
 import { createPoll, getEligibleStudentCount } from "../actions";
+import SuccessScreen from "@/components/SuccessScreen";
 
 export default function ManagerPollsPage() {
     const router = useRouter();
@@ -35,6 +37,7 @@ export default function ManagerPollsPage() {
         message: string;
         severity: "success" | "error";
     }>({ open: false, message: "", severity: "success" });
+    const [showSuccessScreen, setShowSuccessScreen] = useState(false);
 
     useEffect(() => {
         async function loadCount() {
@@ -104,16 +107,8 @@ export default function ManagerPollsPage() {
             if (res.error) {
                 setSnackbar({ open: true, message: res.error, severity: "error" });
             } else {
-                setSnackbar({
-                    open: true,
-                    message: `Anketa uspješno poslana na ${res.count} studenata!`,
-                    severity: "success",
-                });
-                // Reset form
-                setTitle("");
-                setQuestions([""]);
-                setPercentage(25);
-                // Redirect after a short delay
+                setShowSuccessScreen(true);
+                // Redirect after showing success screen
                 setTimeout(() => {
                     router.push("/manager/polls");
                 }, 2000);
@@ -133,6 +128,10 @@ export default function ManagerPollsPage() {
         if (eligibleCount === null) return 0;
         return Math.max(1, Math.ceil(eligibleCount * (percentage / 100)));
     };
+
+    if (showSuccessScreen) {
+        return <SuccessScreen message="Anketa uspješno poslana!" />;
+    }
 
     return (
         <Box
@@ -322,6 +321,4 @@ export default function ManagerPollsPage() {
     );
 }
 
-function Divider() {
-    return <Box sx={{ height: 1, bgcolor: "divider", my: 2 }} />;
-}
+

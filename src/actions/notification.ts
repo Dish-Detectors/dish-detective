@@ -178,6 +178,8 @@ export async function sendDishNotification(
         type: "student",
         postedBy: userId,
         targetUserId: sub.userId,
+        restaurantId: (restaurant as any)._id.toString(),
+        dishId: (dish as any)._id.toString(),
       }),
     );
     await Promise.all(notificationPromises);

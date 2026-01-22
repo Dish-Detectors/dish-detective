@@ -95,6 +95,8 @@ export async function createPoll(formData: {
             postedBy: userId,
             targetUserId: targetUserId,
             pollId: pollIdStr,
+            restaurantId: restaurantId,
+            imageUrl: restaurant.imageUrl,
             read: false,
         }));
 
