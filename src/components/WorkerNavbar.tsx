@@ -111,13 +111,6 @@ export default function WorkerNavbar({ isMobile = false }: WorkerNavbarProps) {
           <RestaurantMenuIcon />
         </IconButton>
         <IconButton
-          onClick={() => router.push("/worker/add")}
-          sx={getIconButtonStyle("/worker/add")}
-          aria-label="Dodaj jelo"
-        >
-          <AddIcon />
-        </IconButton>
-        <IconButton
           onClick={handleToggleNotif}
           sx={{
             bgcolor: "transparent",
@@ -157,6 +150,6 @@ export default function WorkerNavbar({ isMobile = false }: WorkerNavbarProps) {
         audience="worker"
         onRead={fetchUnreadCount}
       />
-    </Box>
+    </Box >
   );
 }

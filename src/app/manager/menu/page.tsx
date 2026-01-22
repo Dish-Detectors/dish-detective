@@ -249,6 +249,18 @@ export default function DailyMenuPage() {
                 onDelete={() => handleRemoveDish(item.menuItemId)}
                 actionMode="delete"
                 actionDisabled={actionInProgress === item.menuItemId}
+                extraInfo={
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 700,
+                      color: item.available ? "success.main" : "error.main",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {item.available ? "Dostupno" : "Nedostupno"}
+                  </Typography>
+                }
               />
             ))}
           </Box>
