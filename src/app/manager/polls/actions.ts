@@ -21,50 +21,16 @@ export async function getEligibleStudentCount() {
         if (!restaurantId) return { count: 0, error: "Manager not assigned to any restaurant" };
 
         await dbConnect();
-        // Determine if we really need to fetch the restaurant object or just verify ID?
-        // Let's verify it exists to be safe.
         const restaurant = await Restaurant.findById(restaurantId);
         if (!restaurant) return { count: 0, error: "Restaurant not found" };
 
-        // 1. Get all menus for this restaurant
-        const menus = await Menu.find({ restaurantId });
-        const menuIds = menus.map((m) => m._id);
+        const availableDishIds = restaurant.availableDishes.map(id => id.toString());
 
-        const count = await Subscription.aggregate([
-            {
-                $lookup: {
-                    from: "menuitems", // assuming collection name
-                    localField: "menuItemId",
-                    foreignField: "_id",
-                    as: "menuItem"
-                }
-            },
-            { $unwind: "$menuItem" },
-            {
-                $lookup: {
-                    from: "menus",
-                    localField: "menuItem.menuId",
-                    foreignField: "_id",
-                    as: "menu"
-                }
-            },
-            { $unwind: "$menu" },
-            {
-                $match: {
-                    "menu.restaurantId": new mongoose.Types.ObjectId(restaurantId)
-                }
-            },
-            {
-                $group: {
-                    _id: "$userId"
-                }
-            },
-            {
-                $count: "total"
-            }
-        ]);
+        const eligibleUsers = await Subscription.distinct("userId", {
+            dishId: { $in: availableDishIds }
+        });
 
-        return { count: count[0]?.total || 0 };
+        return { count: eligibleUsers.length };
 
     } catch (error) {
         console.error("Error getting eligible count:", error);
@@ -90,39 +56,12 @@ export async function createPoll(formData: {
         const restaurant = await Restaurant.findById(restaurantId);
         if (!restaurant) return { error: "Restaurant not found" };
 
-        // 1. Get distinct eligible users
-        const eligibleUsers = await Subscription.aggregate([
-            {
-                $lookup: {
-                    from: "menuitems",
-                    localField: "menuItemId",
-                    foreignField: "_id",
-                    as: "menuItem"
-                }
-            },
-            { $unwind: "$menuItem" },
-            {
-                $lookup: {
-                    from: "menus",
-                    localField: "menuItem.menuId",
-                    foreignField: "_id",
-                    as: "menu"
-                }
-            },
-            { $unwind: "$menu" },
-            {
-                $match: {
-                    "menu.restaurantId": new mongoose.Types.ObjectId(restaurantId)
-                }
-            },
-            {
-                $group: {
-                    _id: "$userId"
-                }
-            }
-        ]);
+        const availableDishIds = restaurant.availableDishes.map(id => id.toString());
 
-        const userIds = eligibleUsers.map(u => u._id);
+        // 1. Get distinct eligible users based on dish subscriptions
+        const userIds = await Subscription.distinct("userId", {
+            dishId: { $in: availableDishIds }
+        });
 
         if (userIds.length === 0) {
             return { error: "No eligible students found" };

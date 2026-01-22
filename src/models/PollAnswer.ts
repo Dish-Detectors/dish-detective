@@ -3,7 +3,10 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 export interface IAnswers extends Document {
   userId: string;
   pollId: string;
-  answers: number[];
+  answers: {
+    question: string;
+    rating: number;
+  }[];
 }
 
 const answerSchema = new Schema<IAnswers>(
@@ -18,11 +21,12 @@ const answerSchema = new Schema<IAnswers>(
       required: [true, "Poll ID is required"],
       trim: true,
     },
-    answers: {
-      type: [Number],
-      required: [true, "Answers are required"],
-      trim: true,
-    },
+    answers: [
+      {
+        question: { type: String, required: true },
+        rating: { type: Number, required: true, min: 1, max: 5 },
+      },
+    ],
   },
   {
     timestamps: true,
