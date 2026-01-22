@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import Menu, { MenuItem } from "@/models/Menu";
 import Dish from "@/models/Dish";
+import Allergen from "@/models/Allergen";
 import DishRating from "@/models/DishRating";
 import dbConnect from "@/utils/dbConnect";
 

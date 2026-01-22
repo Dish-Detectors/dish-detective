@@ -18,7 +18,10 @@ import DishCard from "@/components/DishCard";
 import StatDishCard from "@/components/StatDishCard";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
 import { getAllDishes, getManagerRestaurant } from "@/app/manager/menu/actions";
-import { getSubscriptionCountsForMenuItems } from "@/app/manager/stats/actions";
+import {
+  getSubscriptionCountsForMenuItems,
+  getManagerSubscriptionCounts,
+} from "@/app/manager/stats/actions";
 import { BarChart } from "@mui/x-charts/BarChart";
 
 type SortMode = "alpha" | "subcount";
@@ -52,23 +55,20 @@ export default function ManagerStatsPage() {
       const id = restaurantRes?.success
         ? (restaurantRes.data?._id as string)
         : "";
-      const result = id ? ((await getAllDishes()) as ManagerDish[]) : [];
 
-      // Fetch subscription counts (server placeholder for now)
-      let counts: Record<string, number> = {};
-      if (result.length > 0) {
-        try {
-          counts = await getSubscriptionCountsForMenuItems(
-            result.map((d) => d._id),
-          );
-        } catch (err) {
-          console.error("Failed to load subscription counts", err);
-        }
+      if (!id) {
+        setLoading(false);
+        return;
       }
 
+      const [dishesResult, counts] = await Promise.all([
+        getAllDishes(),
+        getManagerSubscriptionCounts(id)
+      ]);
+
       if (cancelled) return;
-      setMenzaId(id || null);
-      setDishes(result);
+      setMenzaId(id);
+      setDishes(dishesResult as ManagerDish[]);
       setSubCounts(counts);
       setLoading(false);
     }

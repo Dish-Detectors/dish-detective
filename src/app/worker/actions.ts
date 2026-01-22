@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import Restaurant from "@/models/Restaurant";
 import Menu, { MenuItem } from "@/models/Menu";
 import Dish from "@/models/Dish";
+import Allergen from "@/models/Allergen";
 import dbConnect from "@/utils/dbConnect";
 
 export interface WorkerMenuItem {

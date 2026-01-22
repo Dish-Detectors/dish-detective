@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
+import "./Allergen"; // Ensure Allergen schema is registered before Dish is used
 
 // Dish document interface
 export interface IDish extends Document {

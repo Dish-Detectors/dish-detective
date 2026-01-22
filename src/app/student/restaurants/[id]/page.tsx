@@ -17,6 +17,7 @@ import StudentDishCard from "@/components/StudentDishCard";
 import RestaurantMenuTabs from "@/components/RestaurantMenuTabs";
 import Restaurant, { IRestaurant, IWorkingDay } from "@/models/Restaurant";
 import Dish from "@/models/Dish";
+import Allergen from "@/models/Allergen";
 import Menu, { MenuItem } from "@/models/Menu";
 import DishRating from "@/models/DishRating";
 import dbConnect from "@/utils/dbConnect";
