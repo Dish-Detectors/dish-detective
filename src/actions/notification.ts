@@ -191,6 +191,7 @@ export async function sendDishNotification(
 
 export async function sendPollNotifications(params: {
   pollId: string;
+  pollTitle: string;
   targetUserIds: string[];
   restaurantName: string;
 }) {
@@ -201,7 +202,7 @@ export async function sendPollNotifications(params: {
 
   try {
     const title = "Nova anketa dostupna! 📊";
-    const body = `Imamo nekoliko pitanja o hrani u restoranu ${params.restaurantName}.`;
+    const body = `Imamo nekoliko pitanja o hrani u restoranu ${params.restaurantName}: "${params.pollTitle}"`;
     const pollLink = `/student/polls/${params.pollId}`;
 
     const messages = params.targetUserIds.map((targetUserId) => ({

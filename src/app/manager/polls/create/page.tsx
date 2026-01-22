@@ -135,135 +135,174 @@ export default function ManagerPollsPage() {
     };
 
     return (
-        <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 800, mx: "auto" }}>
-            <Button
-                startIcon={<ArrowBackIcon />}
-                onClick={() => router.push("/manager/polls")}
-                sx={{ mb: 2 }}
+        <Box
+            sx={{
+                height: "100vh",
+                bgcolor: "#f5f5f5",
+                display: "flex",
+                flexDirection: "column",
+                px: { xs: 2, md: 4 },
+                py: { xs: 2, md: 4 },
+                pt: 0,
+                pb: 0,
+                overflow: "hidden",
+            }}
+        >
+            <Box
+                sx={{
+                    flex: 1,
+                    overflowY: "auto",
+                    width: "100%",
+                    maxWidth: 800,
+                    mx: "auto",
+                    pr: { xs: 0, sm: 1 },
+                    pb: { xs: "100px", sm: 10 },
+                    scrollbarGutter: "stable",
+                }}
             >
-                Povratak na povijest
-            </Button>
-            <Typography variant="h4" fontWeight={700} gutterBottom>
-                Kreiraj novu anketu
-            </Typography>
-            <Typography color="text.secondary" sx={{ mb: 4 }}>
-                Pošaljite anketu studentima koji su pretplaćeni na vaša jela.
-            </Typography>
+                <Button
+                    startIcon={<ArrowBackIcon />}
+                    onClick={() => router.push("/manager/polls")}
+                    sx={{ mb: 2, mt: 2 }}
+                >
+                    Povratak na povijest
+                </Button>
+                <Typography variant="h4" fontWeight={700} gutterBottom sx={{ color: "#212222" }}>
+                    Kreiraj novu anketu
+                </Typography>
+                <Typography color="text.secondary" sx={{ mb: 4 }}>
+                    Pošaljite anketu studentima koji su pretplaćeni na vaša jela.
+                </Typography>
 
-            <Paper sx={{ p: 4, borderRadius: 3 }}>
-                <Stack spacing={4}>
-                    <Box>
-                        <Typography variant="h6" gutterBottom>
-                            Osnovne informacije
-                        </Typography>
-                        <TextField
-                            fullWidth
-                            label="Naslov ankete"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            placeholder="npr. Anketa o zadovoljstvu hranom - Siječanj"
-                            sx={{ mb: 2 }}
-                        />
-                    </Box>
-
-                    <Divider />
-
-                    <Box>
-                        <Typography variant="h6" gutterBottom>
-                            Pitanja
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 2 }}>
-                            Studenti će za svako pitanje moći odabrati ocjenu od "U potpunosti se ne slažem" do "U potpunosti se slažem".
-                        </Typography>
-
-                        <Stack spacing={2}>
-                            {questions.map((q, index) => (
-                                <Box key={index} sx={{ display: "flex", gap: 1 }}>
-                                    <TextField
-                                        fullWidth
-                                        label={`Pitanje ${index + 1}`}
-                                        value={q}
-                                        onChange={(e) => handleQuestionChange(index, e.target.value)}
-                                        placeholder="npr. Jeste li zadovoljni veličinom porcije?"
-                                    />
-                                    {questions.length > 1 && (
-                                        <IconButton
-                                            color="error"
-                                            onClick={() => handleRemoveQuestion(index)}
-                                        >
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    )}
-                                </Box>
-                            ))}
-                            <Button
-                                startIcon={<AddIcon />}
-                                onClick={handleAddQuestion}
-                                sx={{ alignSelf: "flex-start" }}
-                            >
-                                Dodaj pitanje
-                            </Button>
-                        </Stack>
-                    </Box>
-
-                    <Divider />
-
-                    <Stack direction={{ xs: "column", md: "row" }} spacing={4}>
-                        <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" gutterBottom>
-                                Dostupni studenti
+                <Paper sx={{ p: 4, borderRadius: 3, mb: 2 }}>
+                    <Stack spacing={4}>
+                        <Box>
+                            <Typography variant="h6" gutterBottom fontWeight={600}>
+                                Osnovne informacije
                             </Typography>
-                            {loadingCount ? (
-                                <CircularProgress size={24} />
-                            ) : eligibleCount !== null ? (
-                                <Box>
-                                    <Typography variant="body1">
-                                        Ukupno pretplaćenih studenata: <strong>{eligibleCount}</strong>
-                                    </Typography>
-                                    <Alert severity="info" sx={{ mt: 2 }}>
-                                        Odabrali ste <strong>{percentage}%</strong> uzorka. Anketa će
-                                        biti poslana na približno{" "}
-                                        <strong>{calculateTargetCount()}</strong> studenata.
-                                    </Alert>
-                                </Box>
-                            ) : (
-                                <Alert severity="error">Neuspješno dohvaćanje broja studenata.</Alert>
-                            )}
+                            <TextField
+                                fullWidth
+                                label="Naslov ankete"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                placeholder="npr. Anketa o zadovoljstvu hranom - Siječanj"
+                                sx={{ mb: 2 }}
+                            />
                         </Box>
 
-                        <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" gutterBottom>
-                                Uzorak studenata
+                        <Divider />
+
+                        <Box>
+                            <Typography variant="h6" gutterBottom fontWeight={600}>
+                                Pitanja
                             </Typography>
-                            <ToggleButtonGroup
-                                value={percentage}
-                                exclusive
-                                onChange={handlePercentageChange}
-                                fullWidth
-                                sx={{ mt: 1 }}
+                            <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 2 }}>
+                                Studenti će za svako pitanje moći odabrati ocjenu od "U potpunosti se ne slažem" do "U potpunosti se slažem".
+                            </Typography>
+
+                            <Stack spacing={2}>
+                                {questions.map((q, index) => (
+                                    <Box key={index} sx={{ display: "flex", gap: 1 }}>
+                                        <TextField
+                                            fullWidth
+                                            label={`Pitanje ${index + 1}`}
+                                            value={q}
+                                            onChange={(e) => handleQuestionChange(index, e.target.value)}
+                                            placeholder="npr. Jeste li zadovoljni veličinom porcije?"
+                                        />
+                                        {questions.length > 1 && (
+                                            <IconButton
+                                                color="error"
+                                                onClick={() => handleRemoveQuestion(index)}
+                                            >
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        )}
+                                    </Box>
+                                ))}
+                                <Button
+                                    startIcon={<AddIcon />}
+                                    onClick={handleAddQuestion}
+                                    sx={{ alignSelf: "flex-start" }}
+                                >
+                                    Dodaj pitanje
+                                </Button>
+                            </Stack>
+                        </Box>
+
+                        <Divider />
+
+                        <Stack direction={{ xs: "column", md: "row" }} spacing={4}>
+                            <Box sx={{ flex: 1 }}>
+                                <Typography variant="h6" gutterBottom fontWeight={600}>
+                                    Dostupni studenti
+                                </Typography>
+                                {loadingCount ? (
+                                    <CircularProgress size={24} />
+                                ) : eligibleCount !== null ? (
+                                    <Box>
+                                        <Typography variant="body1">
+                                            Ukupno pretplaćenih studenata: <strong>{eligibleCount}</strong>
+                                        </Typography>
+                                        <Alert severity="info" sx={{ mt: 2, borderRadius: 2 }}>
+                                            Odabrali ste <strong>{percentage}%</strong> uzorka. Anketa će
+                                            biti poslana na približno{" "}
+                                            <strong>{calculateTargetCount()}</strong> studenata.
+                                        </Alert>
+                                    </Box>
+                                ) : (
+                                    <Alert severity="error" sx={{ borderRadius: 2 }}>Neuspješno dohvaćanje broja studenata.</Alert>
+                                )}
+                            </Box>
+
+                            <Box sx={{ flex: 1 }}>
+                                <Typography variant="h6" gutterBottom fontWeight={600}>
+                                    Uzorak studenata
+                                </Typography>
+                                <ToggleButtonGroup
+                                    value={percentage}
+                                    exclusive
+                                    onChange={handlePercentageChange}
+                                    fullWidth
+                                    sx={{
+                                        mt: 1,
+                                        "& .MuiToggleButton-root": {
+                                            borderRadius: 2,
+                                            mx: 0.5,
+                                            border: "1px solid #e0e0e0 !important",
+                                            "&.Mui-selected": {
+                                                bgcolor: "primary.main",
+                                                color: "white",
+                                                "&:hover": {
+                                                    bgcolor: "primary.dark",
+                                                },
+                                            },
+                                        },
+                                    }}
+                                >
+                                    <ToggleButton value={25}>25%</ToggleButton>
+                                    <ToggleButton value={50}>50%</ToggleButton>
+                                    <ToggleButton value={75}>75%</ToggleButton>
+                                    <ToggleButton value={100}>100%</ToggleButton>
+                                </ToggleButtonGroup>
+                            </Box>
+                        </Stack>
+
+                        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+                            <Button
+                                variant="contained"
+                                size="large"
+                                startIcon={sending ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
+                                onClick={handleSubmit}
+                                disabled={sending || loadingCount || eligibleCount === 0}
+                                sx={{ borderRadius: 2, px: 4, py: 1.5, boxShadow: "none", fontWeight: 600 }}
                             >
-                                <ToggleButton value={25}>25%</ToggleButton>
-                                <ToggleButton value={50}>50%</ToggleButton>
-                                <ToggleButton value={75}>75%</ToggleButton>
-                                <ToggleButton value={100}>100%</ToggleButton>
-                            </ToggleButtonGroup>
+                                Pošalji anketu
+                            </Button>
                         </Box>
                     </Stack>
-
-                    <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
-                        <Button
-                            variant="contained"
-                            size="large"
-                            startIcon={sending ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
-                            onClick={handleSubmit}
-                            disabled={sending || loadingCount || eligibleCount === 0}
-                            sx={{ borderRadius: 2, px: 4, py: 1.5 }}
-                        >
-                            Pošalji anketu
-                        </Button>
-                    </Box>
-                </Stack>
-            </Paper>
+                </Paper>
+            </Box>
 
             <Snackbar
                 open={snackbar.open}
@@ -274,7 +313,7 @@ export default function ManagerPollsPage() {
                 <Alert
                     onClose={() => setSnackbar({ ...snackbar, open: false })}
                     severity={snackbar.severity}
-                    sx={{ width: "100%" }}
+                    sx={{ width: "100%", borderRadius: 2 }}
                 >
                     {snackbar.message}
                 </Alert>

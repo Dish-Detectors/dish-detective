@@ -90,10 +90,10 @@ export async function createPoll(formData: {
         // 4. Create Notifications (Database)
         const dbNotifications = selectedUsers.map(targetUserId => ({
             title: "Nova anketa dostupna!",
-            description: `Imamo nekoliko pitanja o hrani u restoranu ${restaurant.name}.`,
+            description: `Imamo nekoliko pitanja o hrani u restoranu ${restaurant.name}: "${formData.title}"`,
             type: "student",
             postedBy: userId,
-            targetUserId,
+            targetUserId: targetUserId,
             pollId: pollIdStr,
             read: false,
         }));
@@ -104,6 +104,7 @@ export async function createPoll(formData: {
         try {
             await sendPollNotifications({
                 pollId: pollIdStr,
+                pollTitle: formData.title,
                 targetUserIds: selectedUsers,
                 restaurantName: restaurant.name
             });
