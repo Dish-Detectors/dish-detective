@@ -21,6 +21,7 @@ import {
   Skeleton,
   Stack,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
@@ -50,6 +51,7 @@ export default function NotificationCenter({
   audience = "student",
   onRead,
 }: NotificationCenterProps & { onRead?: () => void }) {
+  const router = useRouter();
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [loading, setLoading] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -382,6 +384,27 @@ export default function NotificationCenter({
                             minute: "2-digit",
                           })}
                         </Typography>
+
+                        {notif.pollId && (
+                          <Button
+                            variant="contained"
+                            size="small"
+                            sx={{
+                              mt: 1,
+                              display: "block",
+                              borderRadius: 4,
+                              textTransform: "none",
+                              fontSize: "0.8rem",
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push(`/student/polls/${notif.pollId}`);
+                              if (onClose) onClose();
+                            }}
+                          >
+                            Ispuni anketu
+                          </Button>
+                        )}
                       </Box>
 
                       <Box
