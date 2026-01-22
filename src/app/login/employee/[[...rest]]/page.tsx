@@ -56,6 +56,19 @@ export default function Page() {
       }
     } catch (err: any) {
       console.error("Login error:", err);
+
+      // Check for specific Clerk error "You're already signed in."
+      const errors = err.errors || [];
+      const alreadySignedIn = errors.some(
+        (e: any) => e.message === "You're already signed in.",
+      );
+
+      if (alreadySignedIn) {
+        // If they are already signed in, redirect them to the role-based redistribution page
+        router.push("/auth/redirect");
+        return;
+      }
+
       setError("Neispravno korisničko ime ili lozinka");
     } finally {
       setLoading(false);
