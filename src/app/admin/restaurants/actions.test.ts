@@ -26,12 +26,19 @@ describe("Restaurant Server Actions", () => {
     delete process.env.MONGODB_TEST_URI;
   });
 
+  let consoleSpy: jest.SpyInstance;
+
   // Clear database after each test
+  beforeEach(() => {
+    consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+  });
+
   afterEach(async () => {
     const collections = mongoose.connection.collections;
     for (const key in collections) {
       await collections[key].deleteMany({});
     }
+    consoleSpy.mockRestore();
   });
 
   it("should create, modify, retrieve, and delete restaurants", async () => {
