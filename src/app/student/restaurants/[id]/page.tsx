@@ -14,6 +14,7 @@ import { getRestaurantOffer } from "@/app/student/action";
 import { getUserSubscriptions } from "@/actions/notification";
 import StudentDishCard from "@/components/StudentDishCard";
 import Restaurant, { IRestaurant, IWorkingDay } from "@/models/Restaurant";
+import Dish from "@/models/Dish";
 import dbConnect from "@/utils/dbConnect";
 import NavigationIcon from "@mui/icons-material/Navigation";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -40,8 +41,16 @@ export default async function RestaurantOfferPage({
   const restaurant = (await Restaurant.findById(
     id,
   ).lean()) as unknown as IRestaurant;
+
   const offer = await getRestaurantOffer(id);
   const subscriptions = await getUserSubscriptions();
+
+  let otherDishes: any[] = [];
+  if (restaurant && restaurant.availableDishes && restaurant.availableDishes.length > 0) {
+    const dishes = await Dish.find({ _id: { $in: restaurant.availableDishes } }).lean();
+    const offerDishIds = new Set(offer.map((item: any) => item.dishId.toString()));
+    otherDishes = dishes.filter((dish: any) => !offerDishIds.has(dish._id.toString()));
+  }
 
   if (!restaurant) {
     return (
@@ -222,12 +231,62 @@ export default async function RestaurantOfferPage({
                 allergens={item.allergens}
                 lastServed={item.lastServed}
                 rating={item.rating}
-                isInitiallySubscribed={subscriptions.includes(item.id)}
+                isInitiallySubscribed={subscriptions.includes(item.dishId)}
               />
             </Grid>
           ))}
         </Grid>
       )}
-    </Container>
+
+
+      {/* All Dishes Section */}
+      <Box sx={{ mb: 4, mt: 8 }}>
+        <Typography variant="h4" fontWeight="bold" gutterBottom>
+          Sva jela
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Ostala jela koja se povremeno poslužuju. Pretplatite se na obavijesti.
+        </Typography>
+      </Box>
+
+      {
+        otherDishes.length === 0 ? (
+          <Box
+            sx={{
+              textAlign: "center",
+              py: 8,
+              bgcolor: "grey.50",
+              borderRadius: 4,
+              border: "1px dashed",
+              borderColor: "divider",
+            }}
+          >
+            <Typography variant="h6" color="text.secondary">
+              Nema ostalih jela.
+            </Typography>
+          </Box>
+        ) : (
+          <Grid container spacing={3}>
+            {otherDishes.map((dish: any) => (
+              <Grid
+                size={{ xs: 12, sm: 6, md: 4 }}
+                key={dish._id}
+                sx={{ display: "flex" }}
+              >
+                <StudentDishCard
+                  dishId={dish._id}
+                  name={dish.name}
+                  description={dish.description}
+                  imageUrl={dish.imageUrl}
+                  allergens={dish.allergens || []}
+                  lastServed={dish.updatedAt ? new Date(dish.updatedAt).toLocaleDateString("hr-HR") : "Nije dostupno"}
+                  isInitiallySubscribed={subscriptions.includes(dish._id)}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        )
+      }
+    </Container >
   );
 }

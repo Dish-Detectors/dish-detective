@@ -19,8 +19,8 @@ export interface IRestaurant extends Document {
   name: string;
   address: string;
   imageUrl: string;
-  manager?: string;
   workingHours: IWorkingDay[];
+  availableDishes: mongoose.Types.ObjectId[];
   location: Location;
   createdAt: Date;
   updatedAt: Date;
@@ -51,10 +51,13 @@ const restaurantSchema = new Schema<IRestaurant>(
       required: [true, "Restaurant name is required"],
       trim: true,
     },
-    manager: {
-      type: String,
-      trim: true,
-    },
+    availableDishes: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Dish",
+        default: [],
+      },
+    ],
     address: {
       type: String,
       required: [true, "Address is required"],

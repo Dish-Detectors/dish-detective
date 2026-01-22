@@ -20,7 +20,7 @@ interface EmployeeCardProps {
   firstName: string;
   lastName: string;
   restaurantName: string;
-  role: "manager" | "worker";
+  role: "manager" | "worker" | null;
   imageUrl?: string;
   restaurantImage?: string;
   onEdit: (id: string) => void;
@@ -38,7 +38,9 @@ export default function EmployeeCard({
   onEdit,
   onDelete,
 }: EmployeeCardProps) {
-  const displayRole = role === "manager" ? "Voditelj" : "Radnik";
+  let displayRole = "Nije pridodijeljen";
+  if (role === "manager") displayRole = "Voditelj";
+  if (role === "worker") displayRole = "Radnik";
 
   const buttonStyle = {
     flex: 1,

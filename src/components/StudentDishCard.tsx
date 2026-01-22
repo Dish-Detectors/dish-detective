@@ -21,7 +21,7 @@ import { toggleSubscription } from "@/actions/notification";
 import { rateDish } from "@/app/student/action";
 
 interface StudentDishCardProps {
-  menuItemId: string;
+  menuItemId?: string;
   dishId: string;
   name: string;
   description: string;
@@ -57,17 +57,17 @@ export default function StudentDishCard({
 
     try {
       if (isSubscribed) {
-        success = await unsubscribeFromDishTopic(menuItemId);
+        success = await unsubscribeFromDishTopic(dishId);
         if (success) {
-          const res = await toggleSubscription(menuItemId);
+          const res = await toggleSubscription(dishId);
           if (res.success) {
             setIsSubscribed(false);
           }
         }
       } else {
-        success = await subscribeToDishTopic(menuItemId);
+        success = await subscribeToDishTopic(dishId);
         if (success) {
-          const res = await toggleSubscription(menuItemId);
+          const res = await toggleSubscription(dishId);
           if (res.success) {
             setIsSubscribed(true);
           }

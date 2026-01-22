@@ -14,6 +14,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogContentText,
   DialogActions,
   TextField,
   MenuItem,
@@ -118,6 +119,8 @@ export default function StaffAssignment({
     }
   }, [openAddDialog]);
 
+  const [userToDelete, setUserToDelete] = useState<string | null>(null);
+
   const handleAdd = async () => {
     if (!selectedUser) return;
 
@@ -166,9 +169,13 @@ export default function StaffAssignment({
     }
   };
 
-  const handleRemove = async (userId: string) => {
-    if (!confirm("Jeste li sigurni da želite ukloniti ovog zaposlenika?"))
-      return;
+  const handleRemove = (userId: string) => {
+    setUserToDelete(userId);
+  };
+
+  const confirmRemove = async () => {
+    if (!userToDelete) return;
+    const userId = userToDelete;
 
     if (restaurantId) {
       // Server Mode
@@ -187,6 +194,7 @@ export default function StaffAssignment({
         setInternalStaff(newStaffList);
       }
     }
+    setUserToDelete(null);
   };
 
   const managers = staff.filter((s) => s.role === "manager");
@@ -322,9 +330,7 @@ export default function StaffAssignment({
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3, pt: 1 }}>
             <Autocomplete
               options={availableUsers}
-              getOptionLabel={(option) =>
-                `${option.name} (${option.username || option.email})`
-              }
+              getOptionLabel={(option) => option.name}
               loading={searching}
               inputValue={inputValue}
               onInputChange={(_, newVal) => setInputValue(newVal)}
@@ -385,6 +391,29 @@ export default function StaffAssignment({
             disabled={!selectedUser || actionLoading}
           >
             {actionLoading ? "Dodavanje..." : "Dodaj"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={!!userToDelete}
+        onClose={() => setUserToDelete(null)}
+      >
+        <DialogTitle>Potvrda brisanja</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Jeste li sigurni da želite ukloniti ovog zaposlenika?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setUserToDelete(null)}>Odustani</Button>
+          <Button
+            onClick={confirmRemove}
+            color="error"
+            variant="contained"
+            autoFocus
+          >
+            Obriši
           </Button>
         </DialogActions>
       </Dialog>

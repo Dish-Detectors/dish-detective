@@ -29,7 +29,7 @@ type EmployeeData = {
   firstName: string;
   lastName: string;
   restaurantName: string;
-  role: "manager" | "worker";
+  role: "manager" | "worker" | null;
   imageUrl?: string;
   restaurantImage?: string;
 };
@@ -76,7 +76,7 @@ export default function WorkerManagerAccountsPage() {
           emp.firstName.toLowerCase().includes(query) ||
           emp.lastName.toLowerCase().includes(query) ||
           emp.restaurantName.toLowerCase().includes(query) ||
-          emp.role.toLowerCase().includes(query),
+          emp.role?.toLowerCase().includes(query),
       );
       setFilteredEmployees(filtered);
     }

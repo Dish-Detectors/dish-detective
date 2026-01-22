@@ -99,12 +99,18 @@ export async function getRestaurantOffer(restaurantId: string) {
       allergens: dishDetails?.allergens || [],
       lastServed: item.lastServed
         ? new Date(item.lastServed).toLocaleTimeString("hr-HR", {
-            hour: "2-digit",
-            minute: "2-digit",
-          })
+          hour: "2-digit",
+          minute: "2-digit",
+        })
         : "--:--",
       available: item.available,
       rating: averageRating,
     };
   });
+}
+
+export async function getAllDishes() {
+  await dbConnect();
+  const dishes = await Dish.find({}).lean();
+  return JSON.parse(JSON.stringify(dishes));
 }

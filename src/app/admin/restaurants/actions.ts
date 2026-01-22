@@ -19,6 +19,26 @@ export async function deleteRestaurant(
   try {
     await dbConnect();
 
+    await dbConnect();
+    const client = await clerkClient();
+
+    // Find and unassign all staff
+    const users = await client.users.getUserList({ limit: 499 });
+    const staff = users.data.filter(
+      (user) => user.publicMetadata.restaurantId === restaurantId,
+    );
+
+    await Promise.all(
+      staff.map((user) =>
+        client.users.updateUserMetadata(user.id, {
+          publicMetadata: {
+            restaurantId: null,
+            role: null,
+          },
+        }),
+      ),
+    );
+
     const deletedRestaurant = await Restaurant.findByIdAndDelete(restaurantId);
 
     if (!deletedRestaurant) {
@@ -61,8 +81,30 @@ export async function getAllRestaurants(): Promise<ActionResponse> {
       .lean()
       .exec();
 
-    // Sanitize to remove Mongoose special objects (Buffers, etc.)
-    const serializedRestaurants = JSON.parse(JSON.stringify(restaurants));
+    // Fetch all users to find managers
+    const client = await clerkClient();
+    const users = await client.users.getUserList({ limit: 499 });
+
+    // Create a map of restaurantId -> managerName
+    const managerMap = new Map<string, string>();
+    users.data.forEach((user) => {
+      const rid = user.publicMetadata.restaurantId as string;
+      const role = user.publicMetadata.role as string;
+      if (rid && role === "manager") {
+        const name = user.firstName
+          ? `${user.firstName} ${user.lastName || ""}`
+          : user.username || "Unknown";
+        managerMap.set(rid, name);
+      }
+    });
+
+    // Attach manager name to each restaurant
+    const serializedRestaurants = JSON.parse(JSON.stringify(restaurants)).map(
+      (r: any) => ({
+        ...r,
+        manager: managerMap.get(r._id) || null,
+      }),
+    );
 
     return {
       success: true,
@@ -180,18 +222,18 @@ export async function assignEmployee(
       },
     });
 
-    // 2. If Manager, update Restaurant model string
-    if (role === "manager") {
-      await dbConnect();
-      const user = await client.users.getUser(userId);
-      const managerName = user.firstName
-        ? `${user.firstName} ${user.lastName || ""}`
-        : user.username || "Unknown";
+    // 2. If Manager, update Restaurant model string - REMOVED (manager field deprecated)
+    // if (role === "manager") {
+    //   await dbConnect();
+    //   const user = await client.users.getUser(userId);
+    //   const managerName = user.firstName
+    //     ? `${user.firstName} ${user.lastName || ""}`
+    //     : user.username || "Unknown";
 
-      await Restaurant.findByIdAndUpdate(restaurantId, {
-        manager: managerName,
-      });
-    }
+    //   await Restaurant.findByIdAndUpdate(restaurantId, {
+    //     manager: managerName,
+    //   });
+    // }
 
     return { success: true, message: "User assigned successfully" };
   } catch (error) {
@@ -218,30 +260,30 @@ export async function removeEmployee(userId: string, restaurantId: string) {
       },
     });
 
-    if (user.publicMetadata.role === "manager") {
-      // Wait for propagation or just re-fetch lists
-      // Fetch remaining staff
-      const allUsers = await client.users.getUserList({ limit: 499 });
-      const managers = allUsers.data.filter(
-        (u) =>
-          u.publicMetadata.restaurantId === restaurantId &&
-          u.publicMetadata.role === "manager" &&
-          u.id !== userId,
-      );
+    // if (user.publicMetadata.role === "manager") {
+    //   // Wait for propagation or just re-fetch lists
+    //   // Fetch remaining staff
+    //   const allUsers = await client.users.getUserList({ limit: 499 });
+    //   const managers = allUsers.data.filter(
+    //     (u) =>
+    //       u.publicMetadata.restaurantId === restaurantId &&
+    //       u.publicMetadata.role === "manager" &&
+    //       u.id !== userId,
+    //   );
 
-      let nextManagerName = "";
-      if (managers.length > 0) {
-        const m = managers[0];
-        nextManagerName = m.firstName
-          ? `${m.firstName} ${m.lastName || ""}`
-          : m.username || "";
-      }
+    //   let nextManagerName = "";
+    //   if (managers.length > 0) {
+    //     const m = managers[0];
+    //     nextManagerName = m.firstName
+    //       ? `${m.firstName} ${m.lastName || ""}`
+    //       : m.username || "";
+    //   }
 
-      await dbConnect();
-      await Restaurant.findByIdAndUpdate(restaurantId, {
-        manager: nextManagerName, // Will be empty string if no other manager
-      });
-    }
+    //   await dbConnect();
+    //   await Restaurant.findByIdAndUpdate(restaurantId, {
+    //     manager: nextManagerName, // Will be empty string if no other manager
+    //   });
+    // }
 
     return { success: true, message: "User removed successfully" };
   } catch (error) {

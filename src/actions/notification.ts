@@ -155,14 +155,14 @@ export async function sendDishNotification(
         menuItemId: menuItemId,
         availableFrom: availableFrom,
       },
-      topic: `dish_notify_${menuItemId}`,
+      topic: `dish_notify_${(dish as any)._id.toString()}`,
     };
 
     const response = await messaging.send(message);
     console.log("Successfully sent message:", response);
 
-    // Find all subscribers
-    const subscribers = await Subscription.find({ menuItemId });
+    // Find all subscribers (by dishId)
+    const subscribers = await Subscription.find({ dishId: (dish as any)._id });
 
     // Save to database for each subscribed student
     const notificationPromises = subscribers.map((sub) =>
@@ -214,18 +214,18 @@ export async function unsubscribeTokenFromTopic(token: string, topic: string) {
   }
 }
 
-export async function toggleSubscription(menuItemId: string) {
+export async function toggleSubscription(dishId: string) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
   await dbConnect();
 
-  const existing = await Subscription.findOne({ userId, menuItemId });
+  const existing = await Subscription.findOne({ userId, dishId });
   if (existing) {
     await Subscription.findByIdAndDelete(existing._id);
     return { success: true, subscribed: false };
   } else {
-    await Subscription.create({ userId, menuItemId });
+    await Subscription.create({ userId, dishId });
     return { success: true, subscribed: true };
   }
 }
@@ -236,7 +236,7 @@ export async function getUserSubscriptions() {
 
   await dbConnect();
   const subs = await Subscription.find({ userId });
-  return subs.map((sub) => sub.menuItemId.toString());
+  return subs.map((sub) => sub.dishId.toString());
 }
 
 export async function syncDeviceSubscriptions(token: string) {
@@ -250,7 +250,7 @@ export async function syncDeviceSubscriptions(token: string) {
 
     // Subscribe token to all topics the user has in DB
     const syncPromises = subs.map((sub) =>
-      messaging.subscribeToTopic(token, `dish_notify_${sub.menuItemId}`),
+      messaging.subscribeToTopic(token, `dish_notify_${sub.dishId}`),
     );
 
     // Also subscribe to general public announcements

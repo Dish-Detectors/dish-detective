@@ -6,13 +6,14 @@ import Restaurant, {
 } from "../../../../models/Restaurant";
 import dbConnect from "../../../../utils/dbConnect";
 import { Types } from "mongoose";
+import Dish from "../../../../models/Dish";
 
 type RestaurantInput = {
   name: string;
   address: string;
-  manager?: string;
   imageUrl: string;
   workingHours: IWorkingDay[];
+  availableDishes: string[];
   location: Location;
   initialStaff?: {
     id: string;
@@ -60,7 +61,8 @@ export async function updateRestaurant(
       updateData.workingHours = input.workingHours;
     if (input.imageUrl !== undefined)
       updateData.imageUrl = input.imageUrl.trim();
-    if (input.manager !== undefined) updateData.manager = input.manager.trim();
+    if (input.availableDishes !== undefined)
+      updateData.availableDishes = input.availableDishes;
     if (input.location !== undefined) updateData.location = input.location;
 
     const updatedRest = await Restaurant.findByIdAndUpdate(restId, updateData, {
@@ -118,5 +120,20 @@ export async function updateRestaurant(
       success: false,
       message: "Failed to update restaurant. Please try again.",
     };
+  }
+}
+
+export async function getAllDishes(): Promise<ActionResponse> {
+  try {
+    await dbConnect();
+    const dishes = await Dish.find({}).select("name description imageUrl").lean();
+    return {
+      success: true,
+      message: "Dishes retrieved",
+      data: JSON.parse(JSON.stringify(dishes)),
+    };
+  } catch (error) {
+    console.error("Error fetching dishes:", error);
+    return { success: false, message: "Failed to fetch dishes" };
   }
 }

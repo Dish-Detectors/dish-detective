@@ -25,6 +25,7 @@ import { getRestaurant, updateRestaurant } from "../actions";
 import { uploadAttachment } from "@/app/manager/announcements/uploadAction";
 import { IWorkingDay, IShift } from "@/models/Restaurant";
 import StaffAssignment from "@/components/StaffAssignment";
+import RestaurantDishSelector from "@/components/RestaurantDishSelector";
 
 export default function EditRestaurantPage({
   params,
@@ -48,6 +49,7 @@ export default function EditRestaurantPage({
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
     null,
   );
+  const [availableDishes, setAvailableDishes] = useState<string[]>([]);
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -85,6 +87,9 @@ export default function EditRestaurantPage({
 
           if (rest.workingHours) {
             setInitialHours(rest.workingHours);
+          }
+          if (rest.availableDishes) {
+            setAvailableDishes(rest.availableDishes);
           }
         } else {
           setError("Restoran nije pronađen.");
@@ -172,6 +177,7 @@ export default function EditRestaurantPage({
           type: "Point",
           coordinates: [location.lng, location.lat],
         },
+        availableDishes: availableDishes,
       });
 
       if (!res.success) {
@@ -563,6 +569,19 @@ export default function EditRestaurantPage({
                   onChange={setWorkingHoursRaw}
                 />
               </Box>
+            </Box>
+
+            <Box sx={{ mt: 4 }}>
+              <Typography variant="h6" sx={{ mb: 1.5, fontWeight: 600 }}>
+                Dostupna jela
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Odaberite sva jela koja ovaj restoran može ponuditi. Ova lista će se koristiti za filtriranje "Sva jela" na studentskoj stranici.
+              </Typography>
+              <RestaurantDishSelector
+                initialSelectedIds={availableDishes}
+                onChange={setAvailableDishes}
+              />
             </Box>
 
             <Button

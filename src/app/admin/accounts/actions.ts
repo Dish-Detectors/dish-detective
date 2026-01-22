@@ -9,7 +9,7 @@ type EmployeeData = {
   firstName: string;
   lastName: string;
   restaurantName: string;
-  role: "manager" | "worker";
+  role: "manager" | "worker" | null;
   imageUrl?: string;
   restaurantImage?: string;
 };
@@ -47,7 +47,8 @@ export async function getAllEmployees(): Promise<ActionResponse> {
     const employees = clerkUsersResponse.data.filter(
       (user) =>
         user.publicMetadata.role === "manager" ||
-        user.publicMetadata.role === "worker",
+        user.publicMetadata.role === "worker" ||
+        user.publicMetadata.role === null,
     );
 
     if (employees.length === 0) {
@@ -69,8 +70,10 @@ export async function getAllEmployees(): Promise<ActionResponse> {
 
         if (restaurantId) {
           const restaurant = await Restaurant.findById(restaurantId).lean();
-          restaurantName = restaurant?.name || "Unknown";
+          restaurantName = restaurant?.name || "Nije pridodijeljen";
           restaurantImage = restaurant?.imageUrl;
+        } else {
+          restaurantName = "Nije pridodijeljen";
         }
 
         return {
@@ -91,7 +94,7 @@ export async function getAllEmployees(): Promise<ActionResponse> {
           id: clerkUser.id,
           firstName: clerkUser.firstName || "Unknown",
           lastName: clerkUser.lastName || "Unknown",
-          restaurantName: "Unknown",
+          restaurantName: "Nije pridodijeljen",
           role: clerkUser.publicMetadata.role as "manager" | "worker",
         };
       }
@@ -134,10 +137,15 @@ export async function deleteEmployee(clerkId: string): Promise<ActionResponse> {
     const userToDelete = await client.users.getUser(clerkId);
     const role = userToDelete.publicMetadata.role;
 
-    if (role !== "manager" && role !== "worker") {
+    if (
+      role !== "manager" &&
+      role !== "worker" &&
+      role !== null &&
+      role !== undefined
+    ) {
       return {
         success: false,
-        error: "Can only delete manager or worker accounts",
+        error: "Can only delete manager, worker, or unassigned accounts",
       };
     }
 

@@ -2,7 +2,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface ISubscription extends Document {
   userId: string; // Clerk ID
-  menuItemId: mongoose.Types.ObjectId;
+  dishId: mongoose.Types.ObjectId;
   createdAt: Date;
 }
 
@@ -12,9 +12,9 @@ const subscriptionSchema = new Schema<ISubscription>(
       type: String,
       required: true,
     },
-    menuItemId: {
+    dishId: {
       type: Schema.Types.ObjectId,
-      ref: "MenuItem",
+      ref: "Dish",
       required: true,
     },
     createdAt: {
@@ -28,7 +28,7 @@ const subscriptionSchema = new Schema<ISubscription>(
 );
 
 // Compound index to ensure a user is only subscribed once to a specific item
-subscriptionSchema.index({ userId: 1, menuItemId: 1 }, { unique: true });
+subscriptionSchema.index({ userId: 1, dishId: 1 }, { unique: true });
 
 if (process.env.NODE_ENV === "development") {
   delete mongoose.models.Subscription;
