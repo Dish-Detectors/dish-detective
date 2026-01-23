@@ -8,6 +8,7 @@ import {
   InputAdornment,
   IconButton,
   Typography,
+  Divider,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -161,70 +162,104 @@ export default function WorkerManagerAccountsPage() {
         overflow: "hidden",
       }}
     >
-      <Typography
-        variant="h4"
-        sx={{
-          fontWeight: 780,
-          mb: 4,
-          color: "#212222",
-          flexShrink: 0,
-        }}
-      >
-        {t("manageAccountsTitle")}
-      </Typography>
-
       <Box
         sx={{
-          display: "flex",
-          gap: 2,
-          mb: 4,
-          maxWidth: { xs: "100%", sm: 600 },
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", sm: "1fr auto 1fr" },
+          alignItems: "center",
+          columnGap: 3,
+          rowGap: 2,
+          mb: 2,
           flexShrink: 0,
         }}
       >
-        <TextField
-          fullWidth
-          placeholder={t("search")}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ color: "#999" }} />
-                </InputAdornment>
-              ),
-            },
-          }}
+        <Typography
+          variant="h4"
           sx={{
-            bgcolor: "white",
-            borderRadius: 10,
-            "& .MuiOutlinedInput-root": {
-              borderRadius: 10,
-              "& fieldset": {
-                borderColor: "#e0e0e0",
-              },
-            },
+            fontWeight: 780,
+            color: "#212222",
+            flexShrink: 0,
+            lineHeight: 1.2,
+            justifySelf: "start",
+          }}
+        >
+          {t("manageAccountsTitle")}
+        </Typography>
+
+        <Divider
+          sx={{
+            display: { xs: "block", sm: "none" },
+            mb: 1,
+            borderBottomWidth: 2,
           }}
         />
 
-        <IconButton
-          onClick={handleAddNew}
+        <Box
           sx={{
-            bgcolor: "white",
-            border: "1px solid #e0e0e0",
-            width: 56,
-            height: 56,
-            borderRadius: "50%",
-            "&:hover": {
-              bgcolor: "#e0e0e0",
-            },
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            width: { xs: "100%", sm: "auto" },
+            justifySelf: { xs: "stretch", sm: "center" },
           }}
-          aria-label={t("addEmployeeAria")}
         >
-          <AddIcon />
-        </IconButton>
+          <TextField
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={t("search")}
+            size="small"
+            sx={{
+              width: { xs: "100%", sm: 340, md: 440 },
+              maxWidth: "100%",
+              bgcolor: "white",
+              borderRadius: 999,
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 999,
+                "& fieldset": {
+                  borderColor: "#e0e0e0",
+                },
+                "&:hover fieldset": {
+                  borderColor: "primary.main",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "primary.main",
+                },
+              },
+            }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: "#999" }} />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+
+          <IconButton
+            onClick={handleAddNew}
+            sx={{
+              bgcolor: "white",
+              border: "1px solid #e0e0e0",
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
+              flexShrink: 0,
+              "&:hover": {
+                bgcolor: "#e0e0e0",
+              },
+            }}
+            aria-label={t("addEmployeeAria")}
+          >
+            <AddIcon />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ display: { xs: "none", sm: "block" } }} />
       </Box>
+
+      <Divider sx={{ display: { xs: "none", sm: "block" }, mb: 4 }} />
 
       <Box
         sx={{
