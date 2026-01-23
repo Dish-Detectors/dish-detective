@@ -1,6 +1,6 @@
 import RestaurantList from "@/components/RestaurantList";
 import StudentRestaurantsTitle from "@/components/StudentRestaurantsTitle";
-import { Box } from "@mui/material";
+import { Box, Divider } from "@mui/material";
 import Restaurant, { IRestaurant } from "@/models/Restaurant";
 import dbConnect from "@/utils/dbConnect";
 import { clerkClient } from "@clerk/nextjs/server";
@@ -48,13 +48,19 @@ export default async function StudentRestaurantsPage() {
         p: 3,
         display: "flex",
         flexDirection: "column",
-        minHeight: "100%",
+        height: "100%",
+        minHeight: 0,
         boxSizing: "border-box",
+        overflow: "hidden",
       }}
     >
       <StudentRestaurantsTitle />
+      <Divider sx={{ mb: { xs: 1.5, sm: 3 } }} />
       <Box
         sx={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: "auto",
           maxWidth: "100%",
           width: "100%",
         }}
