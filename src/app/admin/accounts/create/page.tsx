@@ -200,14 +200,17 @@ export default function EmployeeCreatePage() {
         <AdminNavbar isMobile={isMobile} />
         <Box
           sx={{
-            minHeight: "100vh",
+            height: "100%",
+            minHeight: 0,
             bgcolor: "#f5f5f5",
             display: "flex",
             flexDirection: "column",
+            overflow: "hidden",
+            boxSizing: "border-box",
             pb: "134px", // Space for button (70px) + navbar (64px)
           }}
         >
-          <Box sx={{ p: 3, flexGrow: 1 }}>
+          <Box sx={{ p: 3, flex: 1, minHeight: 0, overflowY: "auto" }}>
             {/* Image Upload (Mobile) */}
             <Box sx={{ display: "flex", justifyContent: "center", mb: 4 }}>
               <Badge

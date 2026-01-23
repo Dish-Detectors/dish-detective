@@ -151,7 +151,8 @@ export default function Page() {
     return (
       <Box
         sx={{
-          height: "100vh",
+          height: "100%",
+          minHeight: 0,
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -168,12 +169,15 @@ export default function Page() {
       <Box
         sx={{
           flexGrow: 1,
-          minHeight: "100vh",
+          height: "100%",
+          minHeight: 0,
           display: "flex",
           flexDirection: "column",
           bgcolor: "#f5f5f5",
           justifyContent: "flex-start",
           p: 3,
+          boxSizing: "border-box",
+          overflow: "hidden",
         }}
       >
         <Typography
@@ -190,7 +194,9 @@ export default function Page() {
 
         <Box
           sx={{
-            flexGrow: 1,
+            flex: 1,
+            minHeight: 0,
+            overflowY: "auto",
             py: 4,
             display: "grid",
             gridTemplateColumns: "repeat(2, 1fr)",
@@ -231,9 +237,14 @@ export default function Page() {
   return (
     <Box
       sx={{
-        height: "100vh",
+        height: "100%",
+        minHeight: 0,
         bgcolor: "#f5f5f5",
         p: 5,
+        display: "flex",
+        flexDirection: "column",
+        boxSizing: "border-box",
+        overflow: "hidden",
       }}
     >
       <Typography
@@ -251,6 +262,8 @@ export default function Page() {
       <Box
         sx={{
           flex: 1,
+          minHeight: 0,
+          overflowY: "auto",
           px: { xs: 2, sm: 5 },
           display: "flex",
           alignItems: "center",

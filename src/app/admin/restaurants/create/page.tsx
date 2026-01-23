@@ -287,11 +287,13 @@ export default function CreateRestaurantPage() {
     return (
       <Box
         sx={{
-          height: "100vh",
+          height: "100%",
+          minHeight: 0,
           bgcolor: "#f5f5f5",
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
+          boxSizing: "border-box",
         }}
       >
         <Box sx={{ p: 3, flexGrow: 1, overflowY: "auto", pb: "300px" }}>
@@ -362,14 +364,17 @@ export default function CreateRestaurantPage() {
   return (
     <Box
       sx={{
-        minHeight: "100vh",
+        height: "100%",
+        minHeight: 0,
         bgcolor: "#f5f5f5",
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "center",
         px: { xs: 2, sm: 3 },
         pt: 4, // Reduced from 12
-        pb: 4, // Reduced from 15
+        pb: { xs: 4, md: 8 },
+        boxSizing: "border-box",
+        overflow: "hidden",
       }}
     >
       <Box
@@ -379,10 +384,11 @@ export default function CreateRestaurantPage() {
           bgcolor: "white",
           borderRadius: 3,
           boxShadow: 2,
-          maxHeight: "calc(100vh - 100px)", // Increased visible area
+          maxHeight: "100%",
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
+          minHeight: 0,
         }}
       >
         <Box sx={{ p: 4, pb: 0, flexShrink: 0 }}>
@@ -419,7 +425,15 @@ export default function CreateRestaurantPage() {
           )}
         </Box>
 
-        <Box sx={{ px: 4, pb: 4, flexGrow: 1, overflowY: "auto" }}>
+        <Box
+          sx={{
+            px: 4,
+            pb: { xs: 6, md: 8 },
+            flexGrow: 1,
+            minHeight: 0,
+            overflowY: "auto",
+          }}
+        >
           <Box component="form" onSubmit={handleSubmit}>
             <Box
               sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3 }}
@@ -427,7 +441,7 @@ export default function CreateRestaurantPage() {
               {/* Left Column: Image, Location */}
               <Box>
                 <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-                  {t("basicInfoTitle")}
+                  {t("imageTitle")}
                 </Typography>
                 {renderImageUpload()}
 
