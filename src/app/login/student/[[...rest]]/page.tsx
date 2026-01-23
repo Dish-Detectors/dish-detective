@@ -151,26 +151,26 @@ export default function Page() {
             transition: "all 0.2s ease",
             ...(isDarkMode
               ? {
-                // Dark Mode Google Button Styles
-                bgcolor: "#131314",
-                borderColor: "#8e918f",
-                color: "#e3e3e3",
-                "&:hover": {
-                  bgcolor: "#131314", // Keep generic background, lighten via opacity or overlay in real implementations, but here simple
-                  borderColor: "#d2e3fc",
-                  backgroundImage:
-                    "linear-gradient(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08))",
-                },
-              }
+                  // Dark Mode Google Button Styles
+                  bgcolor: "#131314",
+                  borderColor: "#8e918f",
+                  color: "#e3e3e3",
+                  "&:hover": {
+                    bgcolor: "#131314", // Keep generic background, lighten via opacity or overlay in real implementations, but here simple
+                    borderColor: "#d2e3fc",
+                    backgroundImage:
+                      "linear-gradient(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08))",
+                  },
+                }
               : {
-                // Light Mode Google Button Styles
-                borderColor: "#dadce0",
-                color: "#3c4043",
-                "&:hover": {
-                  bgcolor: "#f8f9fa",
+                  // Light Mode Google Button Styles
                   borderColor: "#dadce0",
-                },
-              }),
+                  color: "#3c4043",
+                  "&:hover": {
+                    bgcolor: "#f8f9fa",
+                    borderColor: "#dadce0",
+                  },
+                }),
           }}
         >
           {loading ? "Prijava..." : "Prijavi se s Google računom"}

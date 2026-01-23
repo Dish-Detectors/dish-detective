@@ -28,29 +28,39 @@ export default function StudentLayoutClient({
 
   if (!mounted) {
     return (
-      <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "background.default" }}>
+      <Box
+        sx={{
+          display: "flex",
+          minHeight: "100vh",
+          bgcolor: "background.default",
+        }}
+      >
         {/* Navbar Skeleton */}
-        <Box sx={{
-          width: { xs: "100%", sm: navWidth },
-          height: { xs: 64, sm: "100vh" },
-          position: "fixed",
-          [isMobile ? "bottom" : "top"]: 0,
-          left: 0,
-          bgcolor: "background.paper",
-          borderRight: isMobile ? 0 : 1,
-          borderTop: isMobile ? 1 : 0,
-          borderColor: "divider",
-          zIndex: 1200
-        }} />
+        <Box
+          sx={{
+            width: { xs: "100%", sm: navWidth },
+            height: { xs: 64, sm: "100vh" },
+            position: "fixed",
+            [isMobile ? "bottom" : "top"]: 0,
+            left: 0,
+            bgcolor: "background.paper",
+            borderRight: isMobile ? 0 : 1,
+            borderTop: isMobile ? 1 : 0,
+            borderColor: "divider",
+            zIndex: 1200,
+          }}
+        />
 
         {/* Main Content Skeleton */}
-        <Box sx={{
-          flexGrow: 1,
-          ml: { xs: 0, sm: `${navWidth}px` },
-          mb: { xs: 8, sm: 0 },
-          height: "100vh",
-          overflow: "hidden"
-        }}>
+        <Box
+          sx={{
+            flexGrow: 1,
+            ml: { xs: 0, sm: `${navWidth}px` },
+            mb: { xs: 8, sm: 0 },
+            height: "100vh",
+            overflow: "hidden",
+          }}
+        >
           <RestaurantSkeletonGrid />
         </Box>
       </Box>

@@ -27,7 +27,6 @@ export async function getAllWorkerNotifications(): Promise<any[]> {
 
   const populatedNotifications = await Promise.all(
     notifications.map(async (notif: any) => {
-
       const isRead = notif.targetUserId
         ? notif.read
         : readSet.has(notif._id.toString());
@@ -74,7 +73,6 @@ export async function getAllStudentNotifications(): Promise<any[]> {
 
   const populatedNotifications = await Promise.all(
     notifications.map(async (notif: any) => {
-
       const isBroadcast = !notif.targetUserId;
       const isRead = isBroadcast
         ? readSet.has(notif._id.toString())
@@ -350,7 +348,6 @@ export async function markAllNotificationsAsRead() {
 
     const role = sessionClaims?.metadata?.role || "student";
 
-
     const typeFilter =
       role === "worker" || role === "manager" ? "worker" : "student";
 
@@ -400,7 +397,6 @@ export async function getUnreadNotificationCount() {
     };
 
     const totalBroadcasts = await Notification.countDocuments(broadcastQuery);
-
 
     const allBroadcasts = await Notification.find(broadcastQuery)
       .select("_id")

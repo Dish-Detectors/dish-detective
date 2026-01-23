@@ -108,12 +108,11 @@ const SwipeableNotificationItem = ({
       alignItems="flex-start"
       sx={{
         p: 0, // Remove padding from ListItem, move to content
-        borderBottom: isClosing
-          ? "0px solid transparent"
-          : "1px solid", // Use divider color logic via theme usually, but keeping simple for now
+        borderBottom: isClosing ? "0px solid transparent" : "1px solid", // Use divider color logic via theme usually, but keeping simple for now
         borderColor: "divider",
         maxHeight: isClosing ? 0 : 500,
-        transition: "max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s",
+        transition:
+          "max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s",
         opacity: isClosing ? 0 : 1, // Opacity fade on close
         position: "relative",
         overflow: "hidden", // Ensure background doesn't spill
@@ -164,7 +163,9 @@ const SwipeableNotificationItem = ({
             : "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
           position: "relative",
           zIndex: 1,
-          borderLeft: notif.read ? "4px solid transparent" : "4px solid #56aaf5", // Keep read indicator
+          borderLeft: notif.read
+            ? "4px solid transparent"
+            : "4px solid #56aaf5", // Keep read indicator
           display: "flex",
           alignItems: "flex-start",
           "&::after": {
@@ -457,7 +458,10 @@ export default function NotificationCenter({
         );
         if (onRead) onRead();
       } catch (error) {
-        console.error("Failed to delete restaurant notification on click", error);
+        console.error(
+          "Failed to delete restaurant notification on click",
+          error,
+        );
       }
     } else if (!notif.read) {
       try {
