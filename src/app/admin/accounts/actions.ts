@@ -67,10 +67,10 @@ export async function getAllEmployees(): Promise<ActionResponse> {
 
         if (restaurantId) {
           const restaurant = await Restaurant.findById(restaurantId).lean();
-          restaurantName = restaurant?.name || "Nije pridodijeljen";
+          restaurantName = restaurant?.name || "";
           restaurantImage = restaurant?.imageUrl;
         } else {
-          restaurantName = "Nije pridodijeljen";
+          restaurantName = "";
         }
 
         return {
@@ -91,7 +91,7 @@ export async function getAllEmployees(): Promise<ActionResponse> {
           id: clerkUser.id,
           firstName: clerkUser.firstName || "Unknown",
           lastName: clerkUser.lastName || "Unknown",
-          restaurantName: "Nije pridodijeljen",
+          restaurantName: "",
           role: clerkUser.publicMetadata.role as "manager" | "worker",
         };
       }
