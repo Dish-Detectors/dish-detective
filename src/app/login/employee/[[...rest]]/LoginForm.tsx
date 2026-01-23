@@ -62,7 +62,10 @@ export default function LoginForm() {
       // Check for specific Clerk error "You're already signed in."
       const errors = err.errors || [];
       const alreadySignedIn = errors.some(
-        (e: any) => e.message === "You're already signed in.",
+        (e: any) =>
+          e.code === "session_exists" ||
+          e.message === "You're already signed in." ||
+          e.longMessage?.includes("already signed in"),
       );
 
       if (alreadySignedIn) {

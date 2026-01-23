@@ -436,7 +436,8 @@ export default function Home() {
               width: cardSwapLayout.wrapperWidth,
               height: cardSwapLayout.wrapperHeight,
               display: { xs: "none", lg: "block" },
-              mx: "auto",
+              ml: "auto", // Align to right
+              mr: 0,
               mt: { xs: 8, lg: 0 }, // Verified gap on mobile
             }}
             aria-hidden="true"
