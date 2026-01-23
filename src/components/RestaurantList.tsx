@@ -69,7 +69,8 @@ export default function RestaurantList({ restaurants }: RestaurantListProps) {
                 bgcolor: "background.paper",
                 borderRadius: 4,
                 boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-                transition: "transform 0.2s, box-shadow 0.2s",
+                transition:
+                  "transform 0.2s, box-shadow 0.2s, background-color 0.3s ease, color 0.3s ease",
                 "&:hover": {
                   transform: "translateY(-4px)",
                   boxShadow: "0 8px 24px rgba(0,0,0,0.12)",

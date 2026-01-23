@@ -174,6 +174,7 @@ export default async function RestaurantOfferPage({
           bgcolor: "background.paper", // Changed from "white"
           border: "1px solid",
           borderColor: "divider",
+          transition: "background-color 0.3s ease, color 0.3s ease",
         }}
       >
         <Grid container spacing={4} alignItems="flex-start">
@@ -237,6 +238,7 @@ export default async function RestaurantOfferPage({
                 borderRadius: 3,
                 border: "1px solid",
                 borderColor: "divider",
+                transition: "background-color 0.3s ease, color 0.3s ease",
               }}
             >
               <Stack
