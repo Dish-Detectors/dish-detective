@@ -184,6 +184,11 @@ export default function EditWorkerManagerAccountPage({
     if (e) e.preventDefault();
     if (!id) return;
 
+    if (!formData.name.trim() || !formData.lastName.trim()) {
+      setError("Ime i prezime su obavezni");
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setSuccess(null);
@@ -465,9 +470,9 @@ export default function EditWorkerManagerAccountPage({
                       transition: "all 0.2s",
                       "&:hover": formData.restaurantId
                         ? {
-                            bgcolor: "rgba(0, 0, 0, 0.05)",
-                            borderColor: "primary.main",
-                          }
+                          bgcolor: "rgba(0, 0, 0, 0.05)",
+                          borderColor: "primary.main",
+                        }
                         : {},
                     }}
                   >
@@ -804,9 +809,9 @@ export default function EditWorkerManagerAccountPage({
                   transition: "all 0.2s",
                   "&:hover": formData.restaurantId
                     ? {
-                        bgcolor: "rgba(0, 0, 0, 0.05)",
-                        borderColor: "primary.main",
-                      }
+                      bgcolor: "rgba(0, 0, 0, 0.05)",
+                      borderColor: "primary.main",
+                    }
                     : {},
                 }}
               >

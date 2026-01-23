@@ -23,7 +23,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import { getAllRestaurants } from "../../restaurants/actions";
 import { createEmployeeAccount } from "./actions";
 import { uploadProfileImage } from "../upload-image";
-
+import SuccessScreen from "@/components/SuccessScreen";
 import AdminNavbar, { navWidth, headerHeight } from "@/components/AdminNavbar";
 
 
@@ -44,6 +44,7 @@ export default function EmployeeCreatePage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string>("");
   const [confirmPasswordError, setConfirmPasswordError] = useState<string>("");
+  const [showSuccessScreen, setShowSuccessScreen] = useState(false);
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -126,16 +127,7 @@ export default function EmployeeCreatePage() {
 
       if (result.success) {
         setSuccess("Zaposlenik uspješno kreiran");
-        setFormData({
-          name: "",
-          lastName: "",
-          username: "",
-          password: "",
-          confirmPassword: "",
-          role: undefined,
-        });
-        setImageFile(null);
-        setImagePreview(null);
+        setShowSuccessScreen(true);
       } else {
         setError(result.error || "Došlo je do greške");
       }
@@ -147,6 +139,29 @@ export default function EmployeeCreatePage() {
   };
 
 
+
+  if (showSuccessScreen) {
+    return (
+      <SuccessScreen
+        message="Račun uspješno kreiran!"
+        onContinue={() => {
+          setShowSuccessScreen(false);
+          setFormData({
+            name: "",
+            lastName: "",
+            username: "",
+            password: "",
+            confirmPassword: "",
+            role: undefined,
+          });
+          setImageFile(null);
+          setImagePreview(null);
+          setSuccess(null);
+        }}
+        continueText="Kreiraj novi račun"
+      />
+    );
+  }
 
   // Desktop Layout
   return (
