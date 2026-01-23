@@ -1,8 +1,6 @@
 "use server";
 
-import Restaurant, {
-  IWorkingDay,
-} from "../../../../models/Restaurant";
+import Restaurant, { IWorkingDay } from "../../../../models/Restaurant";
 import dbConnect from "../../../../utils/dbConnect";
 import { Types } from "mongoose";
 import { assignEmployee } from "../actions";

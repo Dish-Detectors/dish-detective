@@ -191,8 +191,8 @@ export default function EmployeeCreatePage() {
       } else {
         setError(
           ("errorKey" in result && result.errorKey && t(result.errorKey)) ||
-          ("error" in result && result.error) ||
-          t("accountCreateError"),
+            ("error" in result && result.error) ||
+            t("accountCreateError"),
         );
       }
     } catch (err) {
@@ -413,9 +413,9 @@ export default function EmployeeCreatePage() {
           <Box
             onClick={
               loading ||
-                loadingRestaurants ||
-                !!passwordError ||
-                !!confirmPasswordError
+              loadingRestaurants ||
+              !!passwordError ||
+              !!confirmPasswordError
                 ? undefined
                 : handleSubmit
             }
@@ -427,9 +427,9 @@ export default function EmployeeCreatePage() {
               height: "70px",
               bgcolor:
                 loading ||
-                  loadingRestaurants ||
-                  !!passwordError ||
-                  !!confirmPasswordError
+                loadingRestaurants ||
+                !!passwordError ||
+                !!confirmPasswordError
                   ? "grey.400"
                   : "#57aaf4",
               display: "flex",
@@ -437,9 +437,9 @@ export default function EmployeeCreatePage() {
               justifyContent: "center",
               cursor:
                 loading ||
-                  loadingRestaurants ||
-                  !!passwordError ||
-                  !!confirmPasswordError
+                loadingRestaurants ||
+                !!passwordError ||
+                !!confirmPasswordError
                   ? "not-allowed"
                   : "pointer",
               transition: "all 0.2s ease-in-out",
@@ -448,9 +448,9 @@ export default function EmployeeCreatePage() {
               "&:active": {
                 bgcolor:
                   loading ||
-                    loadingRestaurants ||
-                    !!passwordError ||
-                    !!confirmPasswordError
+                  loadingRestaurants ||
+                  !!passwordError ||
+                  !!confirmPasswordError
                     ? "grey.400"
                     : "#3d8fd9",
               },

@@ -332,8 +332,8 @@ export default async function RestaurantOfferPage({
             allergens: dish.allergens?.map((a: any) => a.name) || [],
             lastServed: lastServedMap.has(dish._id.toString())
               ? lastServedMap
-                .get(dish._id.toString())!
-                .toLocaleDateString(lang === "HR" ? "hr-HR" : "en-GB")
+                  .get(dish._id.toString())!
+                  .toLocaleDateString(lang === "HR" ? "hr-HR" : "en-GB")
               : neverServedText,
             rating: ratingInfo.avg,
             ratingCount: ratingInfo.count,

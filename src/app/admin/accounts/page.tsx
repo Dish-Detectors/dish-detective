@@ -107,9 +107,7 @@ export default function WorkerManagerAccountsPage() {
           filteredEmployees.filter((emp) => emp.id !== employeeToDelete),
         );
       } else {
-        const message =
-          result.error ||
-          t("deleteFailed");
+        const message = result.error || t("deleteFailed");
         alert(message);
       }
     } catch (error) {
