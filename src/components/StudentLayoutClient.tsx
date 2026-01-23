@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode, useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import StudentNavbar, {
   navWidth,
   headerHeight,
@@ -9,6 +10,7 @@ import NotificationSync from "@/components/NotificationSync";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
 
+
 export default function StudentLayoutClient({
   children,
 }: {
@@ -16,6 +18,8 @@ export default function StudentLayoutClient({
 }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const pathname = usePathname();
+  const isMapPage = pathname === "/student/map";
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -45,9 +49,9 @@ export default function StudentLayoutClient({
         component="main"
         sx={{
           height: `calc(100vh - ${headerHeight}px)`,
-          overflowY: "auto",
+          overflowY: isMapPage ? "hidden" : "auto",
           ml: isMobile ? 0 : `${navWidth}px`,
-          pb: isMobile ? "96px" : 4,
+          pb: isMapPage ? 0 : isMobile ? "96px" : 4,
           bgcolor: "background.default", // Use theme background
           transition: "background-color 0.3s ease",
         }}

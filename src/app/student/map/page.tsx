@@ -1,6 +1,6 @@
 import { getAllRestaurants } from "@/app/admin/restaurants/actions";
 import RestaurantMap from "@/components/RestaurantMap";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { IRestaurant } from "@/models/Restaurant";
 
 export default async function StudentMapPage() {
@@ -11,20 +11,19 @@ export default async function StudentMapPage() {
     <Box
       sx={{
         p: 3,
-        height: "calc(100vh - 64px)", // Adjust for header height
+        height: "100%", // Fill parent (which is already calc(100vh - header))
         display: "flex",
         flexDirection: "column",
         boxSizing: "border-box",
+        overflow: "hidden", // Prevent scroll
       }}
     >
-      <Typography variant="h4" fontWeight="bold" sx={{ mb: 3 }}>
-        Karta restorana
-      </Typography>
       <Box
         sx={{
           flexGrow: 1,
           borderRadius: 4,
           overflow: "hidden",
+          minHeight: 0, // Critical for flex scrolling/containment
         }}
       >
         <RestaurantMap restaurants={restaurants} />

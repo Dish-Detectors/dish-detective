@@ -12,7 +12,8 @@ export default function Footer() {
   const theme = useTheme();
   const { mode } = useColorMode();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const showFooterBar = pathname !== "/" && !isMobile;
+  const showFooterBar =
+    pathname !== "/" && !isMobile && !pathname.startsWith("/student/map");
 
   if (!showFooterBar) return null;
 
