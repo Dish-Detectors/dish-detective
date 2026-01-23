@@ -20,6 +20,7 @@ export default function StudentLayoutClient({
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const pathname = usePathname();
   const isMapPage = pathname === "/student/map";
+  const isRestaurantsOverviewPage = pathname === "/student/restaurants";
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -31,7 +32,8 @@ export default function StudentLayoutClient({
       <Box
         sx={{
           display: "flex",
-          minHeight: "100vh",
+          height: "100%",
+          minHeight: 0,
           bgcolor: "background.default",
         }}
       >
@@ -57,7 +59,8 @@ export default function StudentLayoutClient({
             flexGrow: 1,
             ml: { xs: 0, sm: `${navWidth}px` },
             mb: { xs: 8, sm: 0 },
-            height: "100vh",
+            height: "100%",
+            minHeight: 0,
             overflow: "hidden",
           }}
         >
@@ -68,15 +71,17 @@ export default function StudentLayoutClient({
   }
 
   return (
-    <Box>
+    <Box sx={{ height: "100%", minHeight: 0, overflow: "hidden" }}>
       <StudentNavbar isMobile={isMobile} />
       <Box
         component="main"
         sx={{
-          height: `calc(100vh - ${headerHeight}px)`,
-          overflowY: isMapPage ? "hidden" : "auto",
+          height: "100%",
+          minHeight: 0,
+          overflowY: isMapPage || isRestaurantsOverviewPage ? "hidden" : "auto",
+          overflowX: "hidden",
           ml: isMobile ? 0 : `${navWidth}px`,
-          pb: isMapPage ? 0 : isMobile ? "96px" : 4,
+          pb: isMapPage ? (isMobile ? "64px" : 0) : isMobile ? "64px" : 4,
           bgcolor: "background.default", // Use theme background
           transition: "background-color 0.3s ease",
         }}

@@ -141,9 +141,7 @@ function RestaurantMapContent({ restaurants }: { restaurants: IRestaurant[] }) {
               [restaurant._id as string]: { lat: loc.lat(), lng: loc.lng() },
             }));
           } else {
-            console.warn(
-              `Geocode failed for ${restaurant.name}: ${status}`,
-            );
+            console.warn(`Geocode failed for ${restaurant.name}: ${status}`);
           }
         },
       );
@@ -267,11 +265,7 @@ function RestaurantMapContent({ restaurants }: { restaurants: IRestaurant[] }) {
                   }}
                 />
               )}
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mb: 2 }}
-              >
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 {selectedRestaurant.address}
               </Typography>
               <Button
@@ -279,8 +273,9 @@ function RestaurantMapContent({ restaurants }: { restaurants: IRestaurant[] }) {
                 size="small"
                 fullWidth
                 startIcon={<NavigationIcon />}
-                href={`https://www.google.com/maps/dir/?api=1&destination=${markers[selectedRestaurant._id as string]?.lat
-                  },${markers[selectedRestaurant._id as string]?.lng}`}
+                href={`https://www.google.com/maps/dir/?api=1&destination=${
+                  markers[selectedRestaurant._id as string]?.lat
+                },${markers[selectedRestaurant._id as string]?.lng}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 sx={{ textTransform: "none" }}

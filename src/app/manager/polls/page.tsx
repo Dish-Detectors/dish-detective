@@ -87,7 +87,8 @@ export default function PollsListingPage() {
   return (
     <Box
       sx={{
-        height: "100vh",
+        height: "100%",
+        minHeight: 0,
         bgcolor: "#f5f5f5",
         display: "flex",
         flexDirection: "column",
@@ -95,6 +96,7 @@ export default function PollsListingPage() {
         py: { xs: 2, md: 4 },
         pt: 0,
         pb: 0,
+        boxSizing: "border-box",
         overflow: "hidden",
       }}
     >
@@ -106,7 +108,7 @@ export default function PollsListingPage() {
           maxWidth: 800,
           mx: "auto",
           pr: { xs: 0, sm: 1 },
-          pb: { xs: "100px", sm: 4 },
+          pb: { xs: 2, sm: 4 },
           scrollbarGutter: "stable",
         }}
       >
