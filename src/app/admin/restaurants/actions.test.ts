@@ -59,10 +59,6 @@ describe("Restaurant Server Actions", () => {
           { day: 6, shifts: [{ start: "12:00", end: "23:00" }] },
           { day: 0, shifts: [{ start: "12:00", end: "23:00" }] },
         ],
-        location: {
-          type: "Point" as const,
-          coordinates: [-73.935242, 40.73061] as [number, number],
-        },
       },
       {
         name: "Sushi House",
@@ -77,10 +73,6 @@ describe("Restaurant Server Actions", () => {
           { day: 6, shifts: [{ start: "12:00", end: "22:00" }] },
           { day: 0, shifts: [{ start: "12:00", end: "22:00" }] },
         ],
-        location: {
-          type: "Point" as const,
-          coordinates: [-118.243683, 34.052235] as [number, number],
-        },
       },
       {
         name: "Burger Joint",
@@ -95,10 +87,6 @@ describe("Restaurant Server Actions", () => {
           { day: 6, shifts: [{ start: "11:00", end: "23:00" }] },
           { day: 0, shifts: [{ start: "11:00", end: "23:00" }] },
         ],
-        location: {
-          type: "Point" as const,
-          coordinates: [-87.629799, 41.878113] as [number, number],
-        },
       },
       {
         name: "Taco Fiesta",
@@ -113,10 +101,6 @@ describe("Restaurant Server Actions", () => {
           { day: 6, shifts: [{ start: "10:00", end: "22:00" }] },
           { day: 0, shifts: [{ start: "10:00", end: "22:00" }] },
         ],
-        location: {
-          type: "Point" as const,
-          coordinates: [-97.743061, 30.267153] as [number, number],
-        },
       },
       {
         name: "Pasta Palace",
@@ -130,10 +114,6 @@ describe("Restaurant Server Actions", () => {
           { day: 6, shifts: [{ start: "17:00", end: "23:00" }] },
           { day: 0, shifts: [{ start: "17:00", end: "23:00" }] },
         ],
-        location: {
-          type: "Point" as const,
-          coordinates: [-80.191788, 25.761681] as [number, number],
-        },
       },
     ];
 
@@ -165,10 +145,6 @@ describe("Restaurant Server Actions", () => {
     const updateResult2 = await updateRestaurant(createdRestaurantIds[2], {
       name: "Burger Joint Premium",
       imageUrl: "https://example.com/burger-joint-premium.jpg",
-      location: {
-        type: "Point" as const,
-        coordinates: [-87.63, 41.8782], // Slightly different location
-      },
     });
     expect(updateResult2.success).toBe(true);
 
@@ -214,21 +190,12 @@ describe("Restaurant Server Actions", () => {
     expect(burgerJoint.imageUrl).toBe(
       "https://example.com/burger-joint-premium.jpg",
     );
-    expect(burgerJoint.location.coordinates[0]).toBeCloseTo(-87.63);
 
     const pastaPalace = getAllResult.data.find(
       (r: any) => r.name === "Pasta Palace",
     );
     expect(pastaPalace.workingHours).toHaveLength(1);
     expect(pastaPalace.workingHours[0].shifts[0].end).toBe("23:59");
-
-    // Verify GeoJSON structure
-    getAllResult.data.forEach((restaurant: any) => {
-      expect(restaurant.location.type).toBe("Point");
-      expect(restaurant.location.coordinates).toHaveLength(2);
-      expect(typeof restaurant.location.coordinates[0]).toBe("number");
-      expect(typeof restaurant.location.coordinates[1]).toBe("number");
-    });
 
     // Step 4: Delete all restaurants
     console.log("\nStep 4: Deleting restaurants...");
@@ -266,10 +233,6 @@ describe("Restaurant Server Actions", () => {
       address: "Test Address",
       imageUrl: "test.jpg",
       workingHours: [],
-      location: {
-        type: "Point",
-        coordinates: [-73.935242, 40.73061],
-      },
     });
     expect(invalidCreateResult.success).toBe(false);
     expect(invalidCreateResult.errors).toBeDefined();
@@ -282,10 +245,6 @@ describe("Restaurant Server Actions", () => {
       address: "100 Center St",
       imageUrl: "https://example.com/central.jpg",
       workingHours: STANDARD_HOURS,
-      location: {
-        type: "Point",
-        coordinates: [0, 0], // Origin point
-      },
     });
 
     const restaurant2 = await createRestaurant({
@@ -293,10 +252,6 @@ describe("Restaurant Server Actions", () => {
       address: "200 Near St",
       imageUrl: "https://example.com/nearby.jpg",
       workingHours: STANDARD_HOURS,
-      location: {
-        type: "Point",
-        coordinates: [0.01, 0.01], // Close to origin
-      },
     });
 
     expect(restaurant1.success).toBe(true);
@@ -305,12 +260,6 @@ describe("Restaurant Server Actions", () => {
     // Retrieve all and verify locations are preserved correctly
     const allRestaurants = await getAllRestaurants();
     expect(allRestaurants.data).toHaveLength(2);
-
-    const central = allRestaurants.data.find(
-      (r: any) => r.name === "Central Restaurant",
-    );
-    expect(central.location.coordinates[0]).toBe(0);
-    expect(central.location.coordinates[1]).toBe(0);
   });
 
   it("should handle partial updates without affecting other fields", async () => {
@@ -323,10 +272,6 @@ describe("Restaurant Server Actions", () => {
         { day: 1, shifts: [{ start: "09:00", end: "17:00" }] },
         { day: 6, shifts: [{ start: "10:00", end: "18:00" }] },
       ],
-      location: {
-        type: "Point",
-        coordinates: [-73.935242, 40.73061],
-      },
     });
 
     expect(createResult.success).toBe(true);
@@ -345,7 +290,6 @@ describe("Restaurant Server Actions", () => {
     expect(updated.address).toBe("Original Address");
     expect(updated.imageUrl).toBe("https://example.com/original.jpg");
     expect(updated.workingHours).toHaveLength(2);
-    expect(updated.location.coordinates[0]).toBe(-73.935242);
   });
 
   it("should validate working hours array is not empty", async () => {
@@ -354,10 +298,6 @@ describe("Restaurant Server Actions", () => {
       address: "123 Test St",
       imageUrl: "https://example.com/test.jpg",
       workingHours: [], // Empty array
-      location: {
-        type: "Point",
-        coordinates: [-73.935242, 40.73061],
-      },
     });
 
     expect(result.success).toBe(false);
@@ -371,10 +311,6 @@ describe("Restaurant Server Actions", () => {
       address: "Address A",
       imageUrl: "https://example.com/a.jpg",
       workingHours: [{ day: 1, shifts: [{ start: "09:00", end: "17:00" }] }],
-      location: {
-        type: "Point",
-        coordinates: [-73.935242, 40.73061],
-      },
     });
 
     const restaurant2 = await createRestaurant({
@@ -382,10 +318,6 @@ describe("Restaurant Server Actions", () => {
       address: "Address B",
       imageUrl: "https://example.com/b.jpg",
       workingHours: [{ day: 1, shifts: [{ start: "10:00", end: "22:00" }] }],
-      location: {
-        type: "Point",
-        coordinates: [-74.006, 40.714],
-      },
     });
 
     expect(restaurant1.success).toBe(true);
@@ -432,10 +364,6 @@ describe("Restaurant Server Actions", () => {
         address: "123 Test St",
         imageUrl: "https://example.com/test.jpg",
         workingHours: STANDARD_HOURS,
-        location: {
-          type: "Point",
-          coordinates: [-73.935242, 40.73061],
-        },
       });
 
       expect(result.success).toBe(true);
@@ -460,10 +388,6 @@ describe("Restaurant Server Actions", () => {
       address: "123 Test St",
       imageUrl: "https://example.com/test.jpg",
       workingHours: longWorkingHours,
-      location: {
-        type: "Point",
-        coordinates: [-73.935242, 40.73061],
-      },
     });
 
     expect(result.success).toBe(true);
@@ -482,10 +406,6 @@ describe("Restaurant Server Actions", () => {
       address: "Address 1",
       imageUrl: "https://example.com/1.jpg",
       workingHours: STANDARD_HOURS,
-      location: {
-        type: "Point",
-        coordinates: [-73.935242, 40.73061],
-      },
     });
 
     const r2 = await createRestaurant({
@@ -493,10 +413,6 @@ describe("Restaurant Server Actions", () => {
       address: "Address 2",
       imageUrl: "https://example.com/2.jpg",
       workingHours: STANDARD_HOURS,
-      location: {
-        type: "Point",
-        coordinates: [-74.006, 40.714],
-      },
     });
 
     const r3 = await createRestaurant({
@@ -504,10 +420,6 @@ describe("Restaurant Server Actions", () => {
       address: "Address 3",
       imageUrl: "https://example.com/3.jpg",
       workingHours: STANDARD_HOURS,
-      location: {
-        type: "Point",
-        coordinates: [-75.0, 41.0],
-      },
     });
 
     // Delete the middle restaurant
@@ -532,21 +444,18 @@ describe("Restaurant Server Actions", () => {
         address: "Address 1",
         imageUrl: "https://example.com/1.jpg",
         workingHours: STANDARD_HOURS,
-        location: { type: "Point", coordinates: [-73.9, 40.7] },
       }),
       createRestaurant({
         name: "Concurrent 2",
         address: "Address 2",
         imageUrl: "https://example.com/2.jpg",
         workingHours: STANDARD_HOURS,
-        location: { type: "Point", coordinates: [-73.8, 40.8] },
       }),
       createRestaurant({
         name: "Concurrent 3",
         address: "Address 3",
         imageUrl: "https://example.com/3.jpg",
         workingHours: STANDARD_HOURS,
-        location: { type: "Point", coordinates: [-73.7, 40.9] },
       }),
     ];
 
@@ -571,10 +480,6 @@ describe("Restaurant Server Actions", () => {
         { day: 1, shifts: [{ start: "09:00", end: "17:00" }] },
         { day: 0, shifts: [{ start: "10:00", end: "18:00" }] },
       ],
-      location: {
-        type: "Point",
-        coordinates: [-73.935242, 40.73061],
-      },
     });
 
     expect(createResult.success).toBe(true);
@@ -590,11 +495,6 @@ describe("Restaurant Server Actions", () => {
     expect(typeof restaurant.address).toBe("string");
     expect(typeof restaurant.imageUrl).toBe("string");
     expect(Array.isArray(restaurant.workingHours)).toBe(true);
-    expect(typeof restaurant.location).toBe("object");
-    expect(restaurant.location.type).toBe("Point");
-    expect(Array.isArray(restaurant.location.coordinates)).toBe(true);
-    expect(typeof restaurant.location.coordinates[0]).toBe("number");
-    expect(typeof restaurant.location.coordinates[1]).toBe("number");
     expect(typeof restaurant.createdAt).toBe("string"); // ISO string after serialization
     expect(typeof restaurant.updatedAt).toBe("string"); // ISO string after serialization
   });
