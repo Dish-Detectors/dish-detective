@@ -1,5 +1,11 @@
 import { test, expect } from "@playwright/test";
 
+
+test.beforeEach(async ({ context }) => {
+  // Clears all cookies for the current browser context
+  await context.clearCookies();
+});
+
 test("admin dish creation", async ({ page, isMobile }) => {
   test.skip(isMobile, "Admin isn't supposed work from mobile viewports");
   await page.goto("http://employee.localhost:3000/login/employee");
@@ -77,6 +83,4 @@ test('manual redirect test', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Lozinka' }).fill('worker');
   await page.getByRole('button', { name: 'Prijavi se' }).click();
   await page.goto('http://employee.localhost:3000/admin');
-  await page.getByRole('button', { name: 'Open user menu' }).click();
-  await page.getByRole('menuitem', { name: 'Sign out' }).click();
 });
