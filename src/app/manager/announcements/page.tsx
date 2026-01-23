@@ -94,7 +94,9 @@ export default function AnnouncementChatPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const formatTime = (date: Date) => {
+  const formatTime = (dateOrString: Date | string) => {
+    const date =
+      typeof dateOrString === "string" ? new Date(dateOrString) : dateOrString;
     return date.toLocaleTimeString(lang === "HR" ? "hr-HR" : "en-GB", {
       hour: "2-digit",
       minute: "2-digit",
@@ -166,7 +168,7 @@ export default function AnnouncementChatPage() {
     const newMessage: IMessage = {
       id: optimisticId,
       text: messageInput,
-      time: formatTime(new Date()),
+      time: new Date().toISOString(),
       isAdmin: true,
       file: attachmentData
         ? { ...attachmentData, date: new Date().toLocaleDateString() }
@@ -380,7 +382,7 @@ export default function AnnouncementChatPage() {
                     fontSize: "0.7rem",
                   }}
                 >
-                  {msg.time}
+                  {formatTime(msg.time)}
                 </Typography>
               </Box>
             ))}

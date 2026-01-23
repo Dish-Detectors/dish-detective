@@ -116,10 +116,7 @@ export async function getAnnouncements(type: "worker" | "student") {
         return {
           id: (notif as any)._id.toString(),
           text: notif.description,
-          time: new Date(notif.createdAt).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
+          time: new Date(notif.createdAt).toISOString(),
           // We mark all these as "isAdmin: true" because they are sent by managers
           isAdmin: true,
           file:
