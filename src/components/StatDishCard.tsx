@@ -56,7 +56,7 @@ const StatDishCard = ({ name, imageUrl, count }: StatDishCardProps) => {
           title={name}
           sx={{
             fontWeight: 600,
-            fontSize: { xs: '1rem', md: '0.95rem' },
+            fontSize: { xs: "1rem", md: "0.95rem" },
             color: "#212222",
             overflow: "hidden",
             textOverflow: "ellipsis",
