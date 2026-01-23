@@ -1,4 +1,5 @@
 import { IWorkingDay } from "@/models/Restaurant";
+import { pick, type SupportedLang } from "@/utils/i18n.shared";
 
 export type RestaurantStatus =
   | "open"
@@ -13,7 +14,10 @@ interface StatusResult {
   isToday: boolean;
 }
 
-export function getRestaurantStatus(workingHours: IWorkingDay[]): StatusResult {
+export function getRestaurantStatus(
+  workingHours: IWorkingDay[],
+  lang: SupportedLang = "HR",
+): StatusResult {
   const now = new Date();
   const currentDay = now.getDay(); // 0 (Sunday) - 6 (Saturday)
   const currentTime = now.getHours() * 60 + now.getMinutes();
@@ -26,7 +30,7 @@ export function getRestaurantStatus(workingHours: IWorkingDay[]): StatusResult {
     !todaySchedule.shifts ||
     todaySchedule.shifts.length === 0
   ) {
-    return getNextOpenStatus(workingHours, currentDay, currentTime);
+    return getNextOpenStatus(workingHours, currentDay, currentTime, lang);
   }
 
   // Check if currently open
@@ -42,13 +46,13 @@ export function getRestaurantStatus(workingHours: IWorkingDay[]): StatusResult {
       if (remainingMinutes <= 60) {
         return {
           status: "closing_soon",
-          message: `Zatvara se uskoro (${shift.end})`,
+          message: pick(lang, `Zatvara se uskoro (${shift.end})`, `Closing soon (${shift.end})`),
           isToday: true,
         };
       }
       return {
         status: "open",
-        message: `Otvoreno do ${shift.end}`,
+        message: pick(lang, `Otvoreno do ${shift.end}`, `Open until ${shift.end}`),
         isToday: true,
       };
     }
@@ -59,7 +63,7 @@ export function getRestaurantStatus(workingHours: IWorkingDay[]): StatusResult {
       if (minutesUntilOpen <= 60) {
         return {
           status: "opening_soon",
-          message: `Otvara se uskoro (${shift.start})`,
+          message: pick(lang, `Otvara se uskoro (${shift.start})`, `Opening soon (${shift.start})`),
           nextOpenTime: shift.start,
           isToday: true,
         };
@@ -67,7 +71,7 @@ export function getRestaurantStatus(workingHours: IWorkingDay[]): StatusResult {
       // Future shift today
       return {
         status: "closed",
-        message: `Otvara se u ${shift.start}`,
+        message: pick(lang, `Otvara se u ${shift.start}`, `Opens at ${shift.start}`),
         nextOpenTime: shift.start,
         isToday: true,
       };
@@ -82,6 +86,7 @@ function getNextOpenStatus(
   workingHours: IWorkingDay[],
   currentDay: number,
   currentTime: number,
+  lang: SupportedLang,
 ): StatusResult {
   // Logic to find next working day
   // Check remaining shifts today first? (Already done in main loop, if we are here we missed them)
@@ -100,19 +105,23 @@ function getNextOpenStatus(
       )[0];
 
       const daysMap = [
-        "Nedjelja",
-        "Ponedjeljak",
-        "Utorak",
-        "Srijeda",
-        "Četvrtak",
-        "Petak",
-        "Subota",
+        pick(lang, "Nedjelja", "Sunday"),
+        pick(lang, "Ponedjeljak", "Monday"),
+        pick(lang, "Utorak", "Tuesday"),
+        pick(lang, "Srijeda", "Wednesday"),
+        pick(lang, "Četvrtak", "Thursday"),
+        pick(lang, "Petak", "Friday"),
+        pick(lang, "Subota", "Saturday"),
       ];
-      const dayName = i === 1 ? "Sutra" : daysMap[nextDayIndex];
+      const dayName = i === 1 ? pick(lang, "Sutra", "Tomorrow") : daysMap[nextDayIndex];
 
       return {
         status: "closed",
-        message: `Zatvoreno. Otvara se ${dayName.toLowerCase()} u ${firstShift.start}`,
+        message: pick(
+          lang,
+          `Zatvoreno. Otvara se ${dayName.toLowerCase()} u ${firstShift.start}`,
+          `Closed. Opens ${dayName.toLowerCase()} at ${firstShift.start}`,
+        ),
         nextOpenTime: firstShift.start,
         isToday: false,
       };
@@ -121,12 +130,15 @@ function getNextOpenStatus(
 
   return {
     status: "closed",
-    message: "Trajno zatvoreno",
+    message: pick(lang, "Trajno zatvoreno", "Permanently closed"),
     isToday: false,
   };
 }
 
-export function getWorkingHoursString(workingHours: IWorkingDay[]): string {
+export function getWorkingHoursString(
+  workingHours: IWorkingDay[],
+  lang: SupportedLang = "HR",
+): string {
   const now = new Date();
   const currentDay = now.getDay();
   const todaySchedule = workingHours.find((day) => day.day === currentDay);
@@ -136,7 +148,7 @@ export function getWorkingHoursString(workingHours: IWorkingDay[]): string {
     !todaySchedule.shifts ||
     todaySchedule.shifts.length === 0
   ) {
-    return "Zatvoreno danas";
+    return pick(lang, "Zatvoreno danas", "Closed today");
   }
 
   return todaySchedule.shifts.map((s) => `${s.start} - ${s.end}`).join(", ");
