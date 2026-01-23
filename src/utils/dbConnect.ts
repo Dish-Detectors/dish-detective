@@ -24,7 +24,6 @@ if (!cached) {
  */
 async function dbConnect(): Promise<typeof mongoose> {
   if (cached.conn) {
-    console.log("Using existing MongoDB connection.");
     return cached.conn;
   }
 
