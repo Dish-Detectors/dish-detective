@@ -34,7 +34,13 @@ export default function Header() {
   // Get the role from the public metadata we just set
   const userRole = user?.publicMetadata?.role as string | undefined;
   // Create the dynamic link. Default to "/" if role isn't found.
-  const homeHref = userRole ? `/${userRole}` : "/";
+  // Students go to /student/restaurants
+  const homeHref =
+    userRole === "student"
+      ? "/student/restaurants"
+      : userRole
+        ? `/${userRole}`
+        : "/";
 
   // State for restaurant name
   const [restaurantName, setRestaurantName] = React.useState<string | null>(
@@ -162,7 +168,13 @@ export default function Header() {
             </Typography>
           </Box>
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1, md: 2 } }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: { xs: 1, md: 2 },
+            }}
+          >
             <Button
               sx={{
                 display: { xs: "flex", sm: "none" },
@@ -246,7 +258,9 @@ export default function Header() {
           </Typography>
         </Box>
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 2, md: 3 } }}>
+        <Box
+          sx={{ display: "flex", alignItems: "center", gap: { xs: 2, md: 3 } }}
+        >
           <Typography
             variant="body1"
             sx={{
