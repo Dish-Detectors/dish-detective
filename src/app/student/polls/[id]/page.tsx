@@ -20,6 +20,7 @@ import PancakeStackLoader from "@/components/PancakeStackLoader";
 import { getPoll, submitPollAnswers } from "../actions";
 import SendIcon from "@mui/icons-material/Send";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { useI18n } from "@/components/I18nProvider";
 
 interface PollData {
   _id: string;
@@ -27,6 +28,7 @@ interface PollData {
 }
 
 export default function PollPage() {
+  const { t } = useI18n();
   const params = useParams();
   const router = useRouter();
   const pollId = params.id as string;
@@ -43,15 +45,16 @@ export default function PollPage() {
     async function loadData() {
       if (!pollId) return;
       const res = await getPoll(pollId);
-      if (res.error) {
-        if (res.alreadyAnswered) {
-          // Handle already answered gracefully
-          // Maybe show a specific message
-        }
+      if ("errorKey" in res && res.errorKey) {
+        setError(t(res.errorKey));
+      } else if ("error" in res && res.error) {
         setError(res.error);
       } else if (res.poll) {
         setPoll(res.poll);
-        setRestaurantName(res.restaurantName || "");
+        const name = res.restaurantName || "";
+        setRestaurantName(
+          name === "__unknownRestaurant__" ? t("unknownRestaurant") : name,
+        );
       }
       setLoading(false);
     }
@@ -73,7 +76,7 @@ export default function PollPage() {
     );
 
     if (!allAnswered) {
-      setError("Molimo odgovorite na sva pitanja.");
+      setError(t("pleaseAnswerAllQuestions"));
       return;
     }
 
@@ -87,7 +90,10 @@ export default function PollPage() {
 
     const res = await submitPollAnswers(pollId, formattedAnswers);
 
-    if (res.error) {
+    if ("errorKey" in res && res.errorKey) {
+      setError(t(res.errorKey));
+      setSubmitting(false);
+    } else if ("error" in res && res.error) {
       setError(res.error);
       setSubmitting(false);
     } else {
@@ -130,12 +136,12 @@ export default function PollPage() {
         >
           <CheckCircleIcon color="success" sx={{ fontSize: 80, mb: 2 }} />
           <Typography variant="h4" fontWeight={700}>
-            Hvala vam!
+            {t("thankYou")}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Vaši odgovori su uspješno zabilježeni.
+            {t("answersRecorded")}
             <br />
-            Preusmjeravamo vas na početnu stranicu...
+            {t("redirectingToHome")}
           </Typography>
           <CircularProgress size={24} sx={{ mt: 2 }} />
         </Paper>
@@ -153,7 +159,7 @@ export default function PollPage() {
           onClick={() => router.push("/student/restaurants")}
           sx={{ mt: 2 }}
         >
-          Povratak na naslovnicu
+          {t("backToHome")}
         </Button>
       </Container>
     );
@@ -176,7 +182,7 @@ export default function PollPage() {
           gutterBottom
           sx={{ mb: 4, textAlign: "center" }}
         >
-          Molimo vas da ocijenite svoje iskustvo
+          {t("pleaseRateExperience")}
         </Typography>
 
         {error && (
@@ -202,10 +208,10 @@ export default function PollPage() {
                     }}
                   >
                     <Typography variant="caption" color="text.secondary">
-                      U potpunosti se ne slažem
+                      {t("stronglyDisagree")}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      U potpunosti se slažem
+                      {t("stronglyAgree")}
                     </Typography>
                   </Box>
                   <RadioGroup
@@ -258,7 +264,7 @@ export default function PollPage() {
                   textTransform: "none",
                 }}
               >
-                Pošalji odgovore
+                {t("submitAnswers")}
               </Button>
             </Box>
           </Stack>

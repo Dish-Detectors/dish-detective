@@ -13,6 +13,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import PersonIcon from "@mui/icons-material/Person";
 import PlaceIcon from "@mui/icons-material/Place";
+import { useI18n } from "@/components/I18nProvider";
 
 interface RestaurantCardProps {
   name: string;
@@ -31,6 +32,8 @@ export default function RestaurantCard({
   onEdit,
   onDelete,
 }: RestaurantCardProps) {
+  const { t } = useI18n();
+
   const buttonStyle = {
     flex: 1,
     borderRadius: 2.5,
@@ -83,7 +86,7 @@ export default function RestaurantCard({
         <Box sx={{ display: "flex", alignItems: "center", mb: 2, gap: 1 }}>
           <PersonIcon sx={{ fontSize: 18, color: "text.secondary" }} />
           <Typography variant="body2" color="text.secondary" noWrap>
-            Voditelj: {managerName || "Nije dodijeljen"}
+            {t("managerLabel")}: {managerName || t("managerUnassigned")}
           </Typography>
         </Box>
 

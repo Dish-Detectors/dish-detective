@@ -25,16 +25,7 @@ import dbConnect from "@/utils/dbConnect";
 import NavigationIcon from "@mui/icons-material/Navigation";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-
-const DAYS = [
-  "Nedjelja",
-  "Ponedjeljak",
-  "Utorak",
-  "Srijeda",
-  "Četvrtak",
-  "Petak",
-  "Subota",
-];
+import { getServerLang, tServer } from "@/utils/i18nServer";
 
 export default async function RestaurantOfferPage({
   params,
@@ -42,6 +33,18 @@ export default async function RestaurantOfferPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const lang = await getServerLang();
+  const days = await Promise.all([
+    tServer("daySunday"),
+    tServer("dayMonday"),
+    tServer("dayTuesday"),
+    tServer("dayWednesday"),
+    tServer("dayThursday"),
+    tServer("dayFriday"),
+    tServer("daySaturday"),
+  ]);
+  const neverServedText = await tServer("neverServed");
+
   await dbConnect();
   // Cast to unknown first to avoid "neither type sufficiently overlaps" error
   const restaurant = (await Restaurant.findById(
@@ -121,7 +124,7 @@ export default async function RestaurantOfferPage({
   if (!restaurant) {
     return (
       <Box sx={{ p: 4, textAlign: "center" }}>
-        <Typography variant="h5">Restoran nije pronađen.</Typography>
+        <Typography variant="h5">{await tServer("restaurantNotFound")}</Typography>
       </Box>
     );
   }
@@ -206,7 +209,11 @@ export default async function RestaurantOfferPage({
                     {restaurant.name}
                   </Typography>
                   <Chip
-                    label={isOpen ? "OTVORENO" : "ZATVORENO - Van radnog vremena"}
+                    label={
+                      isOpen
+                        ? await tServer("openNow")
+                        : await tServer("closedOutOfHours")
+                    }
                     color={isOpen ? "success" : "error"}
                     sx={{ fontWeight: 700, borderRadius: 2 }}
                   />
@@ -258,7 +265,7 @@ export default async function RestaurantOfferPage({
                 >
                   <AccessTimeIcon color="primary" />
                   <Typography variant="h6" fontWeight="700">
-                    Radno Vrijeme
+                    {await tServer("workingHoursTitle")}
                   </Typography>
                 </Stack>
                 <Stack spacing={1.5}>
@@ -277,7 +284,7 @@ export default async function RestaurantOfferPage({
                           new Date().getDay() === wh.day ? "bold" : "normal"
                         }
                       >
-                        {DAYS[wh.day]}
+                        {days[wh.day]}
                       </Typography>
                       <Typography
                         fontWeight={
@@ -319,8 +326,8 @@ export default async function RestaurantOfferPage({
             lastServed: lastServedMap.has(dish._id.toString())
               ? lastServedMap
                 .get(dish._id.toString())!
-                .toLocaleDateString("hr-HR")
-              : "Nikada do sada",
+                .toLocaleDateString(lang === "HR" ? "hr-HR" : "en-GB")
+              : neverServedText,
             rating: ratingInfo.avg,
             ratingCount: ratingInfo.count,
             userRating: userRatingsMap.get(dish._id.toString()) || 0,

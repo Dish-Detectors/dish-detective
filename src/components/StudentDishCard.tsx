@@ -17,6 +17,7 @@ import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import { useI18n } from "@/components/I18nProvider";
 import {
   subscribeToDishTopic,
   unsubscribeFromDishTopic,
@@ -55,6 +56,7 @@ export default function StudentDishCard({
   isOffer = true,
   restaurantId,
 }: StudentDishCardProps) {
+  const { t } = useI18n();
   const [personalRating, setPersonalRating] = useState(userRating);
   const [isSubscribed, setIsSubscribed] = useState(isInitiallySubscribed);
   const [loading, setLoading] = useState(false);
@@ -196,7 +198,7 @@ export default function StudentDishCard({
             ))
           ) : (
             <Typography variant="caption" color="text.disabled">
-              Nema alergena
+              {t("noAllergens")}
             </Typography>
           )}
         </Box>
@@ -218,8 +220,8 @@ export default function StudentDishCard({
           <ScheduleIcon sx={{ fontSize: 18, color: "primary.main" }} />
           <Typography variant="caption" fontWeight="700">
             {isOffer
-              ? `Dostupno od: ${lastServed}`
-              : `Zadnje dostupno: ${lastServed}`}
+              ? t("availableFromWithDate", { date: lastServed })
+              : t("lastAvailableWithDate", { date: lastServed })}
           </Typography>
         </Box>
 
@@ -296,7 +298,7 @@ export default function StudentDishCard({
                   : "none",
               }}
             >
-              {isSubscribed ? "Ukloni pretplatu" : "Pretplati se"}
+              {isSubscribed ? t("unsubscribe") : t("subscribe")}
             </Button>
           </Box>
         </Box>
