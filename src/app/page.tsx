@@ -50,6 +50,28 @@ export default function Home() {
   const isShortScreen = useMediaQuery("(max-height: 740px)");
   const showDesktopCards = useMediaQuery("(min-width: 1400px)");
 
+  // Prevent scrollbars from appearing during reveal/card animations
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevBodyOverflowX = document.body.style.overflowX;
+    const prevBodyOverflowY = document.body.style.overflowY;
+
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    document.body.style.overflowX = "hidden";
+    document.body.style.overflowY = "hidden";
+
+    return () => {
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+      document.body.style.overflowX = prevBodyOverflowX;
+      document.body.style.overflowY = prevBodyOverflowY;
+    };
+  }, []);
+
   const [cardSwapLayout, setCardSwapLayout] = useState(() => ({
     cardWidth: 500,
     cardHeight: 327,
