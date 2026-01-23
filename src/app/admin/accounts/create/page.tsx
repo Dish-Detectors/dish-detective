@@ -363,8 +363,11 @@ export default function EmployeeCreatePage() {
                 loading ||
                 !formData.name ||
                 !formData.lastName ||
-                !!passwordError ||
-                !!confirmPasswordError
+                !formData.username ||
+                !formData.password ||
+                !formData.confirmPassword ||
+                formData.password.length < 8 ||
+                formData.password !== formData.confirmPassword
               }
               sx={{
                 py: 1.5,
