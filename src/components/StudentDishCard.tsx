@@ -39,6 +39,7 @@ interface StudentDishCardProps {
   isInitiallySubscribed?: boolean;
   isOffer?: boolean;
   restaurantId: string;
+  density?: "default" | "compact";
 }
 
 export default function StudentDishCard({
@@ -55,8 +56,10 @@ export default function StudentDishCard({
   isInitiallySubscribed = false,
   isOffer = true,
   restaurantId,
+  density = "default",
 }: StudentDishCardProps) {
   const { t } = useI18n();
+  const isCompact = density === "compact";
   const [personalRating, setPersonalRating] = useState(userRating);
   const [isSubscribed, setIsSubscribed] = useState(isInitiallySubscribed);
   const [loading, setLoading] = useState(false);
@@ -122,7 +125,7 @@ export default function StudentDishCard({
     <Card
       sx={{
         width: "100%",
-        maxWidth: { xs: "none", sm: 400 },
+        maxWidth: { xs: "none", sm: isCompact ? 340 : 400 },
         borderRadius: 4,
         boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
         overflow: "hidden",
@@ -136,11 +139,11 @@ export default function StudentDishCard({
     >
       <CardMedia
         component="img"
-        height="200"
+        height={isCompact ? 150 : 200}
         image={imageUrl || "/placeholder-dish.jpg"}
         alt={name}
       />
-      <CardContent sx={{ p: 2 }}>
+      <CardContent sx={{ p: isCompact ? 1.5 : 2 }}>
         <Box
           sx={{
             display: "flex",
@@ -149,7 +152,10 @@ export default function StudentDishCard({
             mb: 0.5,
           }}
         >
-          <Typography variant="h6" fontWeight="bold">
+          <Typography
+            variant={isCompact ? "subtitle1" : "h6"}
+            fontWeight="bold"
+          >
             {name}
           </Typography>
           <Box
@@ -171,13 +177,20 @@ export default function StudentDishCard({
         <Typography
           variant="body2"
           color="text.secondary"
-          sx={{ mb: 0.5, minHeight: "3em" }} // Allow some space for description
+          sx={{ mb: 0.5, minHeight: isCompact ? "2.4em" : "3em" }} // Allow some space for description
         >
           {description}
         </Typography>
 
         {/* Allergens: Styled as Chips */}
-        <Box sx={{ mb: 2, display: "flex", flexWrap: "wrap", gap: 0.8 }}>
+        <Box
+          sx={{
+            mb: isCompact ? 1.5 : 2,
+            display: "flex",
+            flexWrap: "wrap",
+            gap: isCompact ? 0.6 : 0.8,
+          }}
+        >
           {allergens.length > 0 ? (
             allergens.map((allergen) => (
               <Chip
@@ -211,13 +224,15 @@ export default function StudentDishCard({
             gap: 1,
             color: "text.secondary",
             bgcolor: "action.hover", // Changed from grey.100
-            py: 0.8,
-            px: 1.5,
+            py: isCompact ? 0.6 : 0.8,
+            px: isCompact ? 1.25 : 1.5,
             borderRadius: 1.5,
             width: "fit-content",
           }}
         >
-          <ScheduleIcon sx={{ fontSize: 18, color: "primary.main" }} />
+          <ScheduleIcon
+            sx={{ fontSize: isCompact ? 16 : 18, color: "primary.main" }}
+          />
           <Typography variant="caption" fontWeight="700">
             {isOffer
               ? t("availableFromWithDate", { date: lastServed })
@@ -228,15 +243,15 @@ export default function StudentDishCard({
         {/* Action Box: Streamlined interactive elements */}
         <Box
           sx={{
-            mt: 2.5,
-            p: 2,
+            mt: isCompact ? 1.75 : 2.5,
+            p: isCompact ? 1.5 : 2,
             borderRadius: 3,
             bgcolor: "background.default", // Changed from grey.50 for better theme support
             border: "1px solid",
             borderColor: "divider", // Changed from grey.200
             display: "flex",
             flexDirection: "column",
-            gap: 2,
+            gap: isCompact ? 1.5 : 2,
             transition: "background-color 0.3s ease, border-color 0.3s ease",
           }}
         >
@@ -252,7 +267,7 @@ export default function StudentDishCard({
                 <Rating
                   value={personalRating}
                   onChange={handleRate}
-                  size="large"
+                  size={isCompact ? "medium" : "large"}
                   sx={{
                     "& .MuiRating-iconFilled": {
                       color: "primary.main",
@@ -292,7 +307,7 @@ export default function StudentDishCard({
                 borderRadius: 2.5,
                 textTransform: "none",
                 fontWeight: 700,
-                py: 1,
+                py: isCompact ? 0.75 : 1,
                 boxShadow: isSubscribed
                   ? "0 4px 12px rgba(211, 47, 47, 0.15)"
                   : "none",

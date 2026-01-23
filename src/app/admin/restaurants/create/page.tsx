@@ -367,6 +367,7 @@ export default function CreateRestaurantPage() {
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "center",
+        px: { xs: 2, sm: 3 },
         pt: 4, // Reduced from 12
         pb: 4, // Reduced from 15
       }}

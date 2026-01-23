@@ -149,11 +149,10 @@ export default function Header() {
               gap: 1,
               textDecoration: "none",
               color: "white",
-              ...(isMobile && { color: "black" }),
             }}
           >
             <Image
-              src={isMobile ? "/logoDark.png" : "/logoWhite.png"}
+              src="/logoWhite.png"
               alt="Dish Detective Logo"
               width={32}
               height={32}
@@ -164,7 +163,6 @@ export default function Header() {
                 fontWeight: "bold",
                 "&:hover": {
                   color: "grey.200",
-                  ...(isMobile && { color: "grey.700" }),
                 },
               }}
             >
@@ -198,6 +196,7 @@ export default function Header() {
                 alt="Translate"
                 width={32}
                 height={32}
+                style={{ filter: "invert(1)" }}
               />
             </Button>
           </Box>

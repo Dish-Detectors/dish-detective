@@ -471,7 +471,7 @@ export default function EmployeeCreatePage() {
           height: `calc(100vh - ${headerHeight}px)`,
           bgcolor: "#f5f5f5",
           pt: `${headerHeight}px`,
-          pb: 3,
+          pb: 8,
           pl: `${navWidth}px`,
           overflowY: "auto",
         }}

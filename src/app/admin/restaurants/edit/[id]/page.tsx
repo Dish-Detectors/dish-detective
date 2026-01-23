@@ -487,6 +487,7 @@ export default function EditRestaurantPage({
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "center",
+        px: { xs: 2, sm: 3 },
         pt: 4,
         pb: 10,
       }}

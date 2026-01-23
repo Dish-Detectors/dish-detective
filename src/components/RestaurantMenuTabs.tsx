@@ -25,6 +25,7 @@ interface RestaurantMenuTabsProps {
   otherDishes: DishData[];
   isOpen: boolean;
   restaurantId: string;
+  density?: "default" | "compact";
 }
 
 interface TabPanelProps {
@@ -55,9 +56,11 @@ export default function RestaurantMenuTabs({
   otherDishes,
   isOpen,
   restaurantId,
+  density = "default",
 }: RestaurantMenuTabsProps) {
   const { t } = useI18n();
   const [value, setValue] = useState(isOpen ? 0 : 1);
+  const isCompact = density === "compact";
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -109,7 +112,7 @@ export default function RestaurantMenuTabs({
       );
     }
     return (
-      <Grid container spacing={3}>
+      <Grid container spacing={isCompact ? 2 : 3}>
         {dishes.map((item) => (
           <Grid
             size={{ xs: 12, sm: 6, md: 4 }}
@@ -130,6 +133,7 @@ export default function RestaurantMenuTabs({
               isInitiallySubscribed={item.isSubscribed}
               isOffer={isOffer}
               restaurantId={restaurantId}
+              density={density}
             />
           </Grid>
         ))}
