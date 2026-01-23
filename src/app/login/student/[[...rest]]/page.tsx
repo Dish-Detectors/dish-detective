@@ -72,7 +72,7 @@ export default function Page() {
     return (
       <Box
         sx={{
-          height: "100vh",
+          height: "100%",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -87,7 +87,7 @@ export default function Page() {
   return (
     <Box
       sx={{
-        minHeight: "100vh",
+        height: "100%",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -95,8 +95,10 @@ export default function Page() {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        p: 3,
+        p: { xs: 2, sm: 3 },
         bgcolor: "background.default",
+        boxSizing: "border-box",
+        overflow: "hidden",
       }}
     >
       <Box
