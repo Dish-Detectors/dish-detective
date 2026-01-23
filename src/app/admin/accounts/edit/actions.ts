@@ -41,7 +41,7 @@ export async function updateEmployeeAccount({
     const clerkUpdateData: any = {};
     if (name !== undefined) clerkUpdateData.firstName = name;
     if (lastName !== undefined) clerkUpdateData.lastName = lastName;
-    if (username !== undefined) clerkUpdateData.username = username;
+    if (username !== undefined) clerkUpdateData.username = username.trim();
     if (password !== undefined) clerkUpdateData.password = password;
 
     // Prepare metadata if needed
