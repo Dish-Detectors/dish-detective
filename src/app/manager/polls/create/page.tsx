@@ -138,7 +138,8 @@ export default function ManagerPollsPage() {
   return (
     <Box
       sx={{
-        height: "100vh",
+        height: "100%",
+        minHeight: 0,
         bgcolor: "#f5f5f5",
         display: "flex",
         flexDirection: "column",
@@ -146,6 +147,7 @@ export default function ManagerPollsPage() {
         py: { xs: 2, md: 4 },
         pt: 0,
         pb: 0,
+        boxSizing: "border-box",
         overflow: "hidden",
       }}
     >

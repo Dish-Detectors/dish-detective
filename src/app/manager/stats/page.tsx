@@ -108,14 +108,16 @@ export default function ManagerStatsPage() {
   return (
     <Box
       sx={{
-        height: "100vh",
+        height: "100%",
+        minHeight: 0,
         bgcolor: "#f5f5f5",
         display: "flex",
         flexDirection: "column",
         px: { xs: 3, sm: 5 },
         py: { xs: 3, sm: 5 },
         pt: 0,
-        pb: { xs: "140px", sm: 8 },
+        pb: 0,
+        boxSizing: "border-box",
         overflow: "hidden",
       }}
     >

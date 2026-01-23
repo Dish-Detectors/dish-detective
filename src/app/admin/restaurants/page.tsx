@@ -106,7 +106,8 @@ export default function RestaurantsPage() {
     return (
       <Box
         sx={{
-          minHeight: "100vh",
+          height: "100%",
+          minHeight: 0,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -121,7 +122,8 @@ export default function RestaurantsPage() {
   return (
     <Box
       sx={{
-        height: "100vh",
+        height: "100%",
+        minHeight: 0,
         bgcolor: "#f5f5f5",
         display: "flex",
         flexDirection: "column",
@@ -129,6 +131,7 @@ export default function RestaurantsPage() {
         py: { xs: 3, sm: 5 },
         pt: 0,
         pb: 0,
+        boxSizing: "border-box",
         overflow: "hidden",
       }}
     >

@@ -83,10 +83,12 @@ export default function PollResultsPage({
   return (
     <Box
       sx={{
-        height: "100vh",
+        height: "100%",
+        minHeight: 0,
         bgcolor: "#f5f5f5",
         display: "flex",
         flexDirection: "column",
+        boxSizing: "border-box",
         overflow: "hidden",
       }}
     >

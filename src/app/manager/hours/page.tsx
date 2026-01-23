@@ -176,7 +176,8 @@ export default function WorkingHoursPage() {
     return (
       <Box
         sx={{
-          minHeight: "100vh",
+          height: "100%",
+          minHeight: 0,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -193,14 +194,16 @@ export default function WorkingHoursPage() {
   return (
     <Box
       sx={{
-        height: "100vh",
+        height: "100%",
+        minHeight: 0,
         bgcolor: "#f5f5f5",
         display: "flex",
         flexDirection: "column",
         px: { xs: 3, sm: 5 },
         py: { xs: 3, sm: 5 },
         pt: 0,
-        pb: { xs: "100px", sm: 6 },
+        pb: 0,
+        boxSizing: "border-box",
         overflow: "hidden",
       }}
     >
