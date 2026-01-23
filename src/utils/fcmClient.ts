@@ -53,13 +53,18 @@ import {
 } from "@/actions/notification";
 
 // This calls a server action to subscribe the token to a topic
-// This calls a server action to subscribe the token to a topic
-export const subscribeToDishTopic = async (dishId: string) => {
+export const subscribeToDishTopic = async (
+  dishId: string,
+  restaurantId: string,
+) => {
   const token = await requestNotificationPermission();
   if (!token) return false;
 
   try {
-    const res = await subscribeTokenToTopic(token, `dish_notify_${dishId}`);
+    const res = await subscribeTokenToTopic(
+      token,
+      `dish_notify_${dishId}_${restaurantId}`,
+    );
     return res.success;
   } catch (error) {
     console.error("Subscription failed", error);
@@ -67,12 +72,18 @@ export const subscribeToDishTopic = async (dishId: string) => {
   }
 };
 
-export const unsubscribeFromDishTopic = async (dishId: string) => {
+export const unsubscribeFromDishTopic = async (
+  dishId: string,
+  restaurantId: string,
+) => {
   const token = await requestNotificationPermission();
   if (!token) return false;
 
   try {
-    const res = await unsubscribeTokenFromTopic(token, `dish_notify_${dishId}`);
+    const res = await unsubscribeTokenFromTopic(
+      token,
+      `dish_notify_${dishId}_${restaurantId}`,
+    );
     return res.success;
   } catch (error) {
     console.error("Unsubscription failed", error);

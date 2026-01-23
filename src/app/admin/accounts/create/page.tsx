@@ -27,10 +27,6 @@ import SuccessScreen from "@/components/SuccessScreen";
 import AdminNavbar, { navWidth, headerHeight } from "@/components/AdminNavbar";
 import { useI18n } from "@/components/I18nProvider";
 
-// ... inside component
-
-// ... rest of component until handleSubmit
-
 type Restaurant = {
   _id: string;
   name: string;
@@ -42,7 +38,7 @@ export default function EmployeeCreatePage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  // ...existing code...
+
   const [loading, setLoading] = useState(false);
   const [loadingRestaurants, setLoadingRestaurants] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,6 +46,7 @@ export default function EmployeeCreatePage() {
   const [passwordError, setPasswordError] = useState<string>("");
   const [confirmPasswordError, setConfirmPasswordError] = useState<string>("");
   const [showSuccessScreen, setShowSuccessScreen] = useState(false);
+
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -71,7 +68,7 @@ export default function EmployeeCreatePage() {
     username: "",
     password: "",
     confirmPassword: "",
-    role: "worker" as "worker" | "manager",
+    role: undefined as "worker" | "manager" | undefined,
   });
 
   const validatePassword = (password: string): string => {
@@ -101,14 +98,18 @@ export default function EmployeeCreatePage() {
     } else {
       setPasswordError("");
     }
+
+    if (formData.confirmPassword && password !== formData.confirmPassword) {
+      setConfirmPasswordError("Lozinke se moraju podudarati");
+    } else if (formData.confirmPassword) {
+      setConfirmPasswordError("");
+    }
   };
 
-  const handleConfirmPasswordChange = (confirmPassword: string) => {
-    setFormData({ ...formData, confirmPassword });
-    if (confirmPassword) {
-      setConfirmPasswordError(
-        validateConfirmPassword(confirmPassword, formData.password),
-      );
+  const handleConfirmPasswordChange = (value: string) => {
+    setFormData({ ...formData, confirmPassword: value });
+    if (value !== formData.password) {
+      setConfirmPasswordError("Lozinke se moraju podudarati");
     } else {
       setConfirmPasswordError("");
     }
@@ -148,6 +149,23 @@ export default function EmployeeCreatePage() {
     setError(null);
     setSuccess(null);
 
+    if (
+      !formData.name ||
+      !formData.lastName ||
+      !formData.username ||
+      !formData.password
+    ) {
+      setError("Molimo ispunite sva polja");
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setConfirmPasswordError("Lozinke se moraju podudarati");
+      setLoading(false);
+      return;
+    }
+
     try {
       const result = await createEmployeeAccount({
         name: formData.name,
@@ -170,14 +188,10 @@ export default function EmployeeCreatePage() {
 
         setSuccess(t("accountCreatedSuccess"));
         setShowSuccessScreen(true);
-        // Redirect after showing success screen
-        setTimeout(() => {
-          router.push("/admin/accounts");
-        }, 2000);
       } else {
         setError(
           ("errorKey" in result && result.errorKey && t(result.errorKey)) ||
-            result.error ||
+            ("error" in result && result.error) ||
             t("accountCreateError"),
         );
       }
@@ -188,8 +202,11 @@ export default function EmployeeCreatePage() {
     }
   };
 
-  // Show success screen after successful creation
   if (showSuccessScreen) {
+    setTimeout(() => {
+      router.push("/admin/accounts");
+    }, 2000);
+
     return <SuccessScreen message={t("accountCreatedSuccess")} />;
   }
 
@@ -669,7 +686,17 @@ export default function EmployeeCreatePage() {
               fullWidth
               variant="contained"
               size="large"
-              disabled={loading || !!passwordError || !!confirmPasswordError}
+              disabled={
+                loading ||
+                !formData.name ||
+                !formData.lastName ||
+                !formData.username ||
+                formData.username.length < 4 ||
+                !formData.password ||
+                !formData.confirmPassword ||
+                formData.password.length < 8 ||
+                formData.password !== formData.confirmPassword
+              }
               sx={{
                 py: 1.5,
                 textTransform: "none",

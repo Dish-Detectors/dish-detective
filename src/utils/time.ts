@@ -95,7 +95,7 @@ export function getRestaurantStatus(
   }
 
   // If we are here, it means we are past all shifts for today
-  return getNextOpenStatus(workingHours, currentDay, currentTime);
+  return getNextOpenStatus(workingHours, currentDay, currentTime, lang);
 }
 
 function getNextOpenStatus(

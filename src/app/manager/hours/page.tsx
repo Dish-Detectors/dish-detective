@@ -19,6 +19,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
+import TimePicker24 from "@/components/TimePicker24";
 import { getManagerRestaurant, saveWorkingHours } from "./actions";
 import { IWorkingDay, IShift } from "@/models/Restaurant";
 import { useI18n } from "@/components/I18nProvider";
@@ -317,25 +318,12 @@ export default function WorkingHoursPage() {
                         minWidth: 0,
                       }}
                     >
-                      <TextField
+                      <TimePicker24
                         label={t("shiftStart")}
-                        type="time"
-                        size="small"
                         value={shift.start}
-                        onChange={(e) =>
-                          handleShiftChange(index, "start", e.target.value)
+                        onChange={(val) =>
+                          handleShiftChange(index, "start", val)
                         }
-                        slotProps={{
-                          inputLabel: { shrink: true },
-                          htmlInput: {
-                            max: shift.end,
-                          },
-                        }}
-                        sx={{
-                          bgcolor: "white",
-                          "& .MuiOutlinedInput-root": { borderRadius: 2 },
-                          width: { xs: "100%", sm: 140 },
-                        }}
                       />
                       <Typography
                         color="text.secondary"
@@ -343,25 +331,10 @@ export default function WorkingHoursPage() {
                       >
                         {t("timeTo")}
                       </Typography>
-                      <TextField
+                      <TimePicker24
                         label={t("shiftEnd")}
-                        type="time"
-                        size="small"
                         value={shift.end}
-                        onChange={(e) =>
-                          handleShiftChange(index, "end", e.target.value)
-                        }
-                        slotProps={{
-                          inputLabel: { shrink: true },
-                          htmlInput: {
-                            min: shift.start,
-                          },
-                        }}
-                        sx={{
-                          bgcolor: "white",
-                          "& .MuiOutlinedInput-root": { borderRadius: 2 },
-                          width: { xs: "100%", sm: 140 },
-                        }}
+                        onChange={(val) => handleShiftChange(index, "end", val)}
                       />
                     </Box>
                     <IconButton

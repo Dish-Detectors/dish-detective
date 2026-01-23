@@ -26,7 +26,7 @@ const menuItemSchema = new Schema<IMenuItem>({
   available: {
     type: Boolean,
     required: [true, "Available status is required"],
-    default: true,
+    default: false,
   },
   lastServed: {
     type: Date,

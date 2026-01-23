@@ -77,7 +77,7 @@ export default function RestaurantMenuTabs({
           sx={{
             textAlign: "center",
             py: 8,
-            bgcolor: "grey.50",
+            bgcolor: "background.paper",
             borderRadius: 4,
             border: "1px dashed",
             borderColor: "divider",
@@ -99,7 +99,7 @@ export default function RestaurantMenuTabs({
           sx={{
             textAlign: "center",
             py: 8,
-            bgcolor: "grey.50",
+            bgcolor: "background.paper",
             borderRadius: 4,
             border: "1px dashed",
             borderColor: "divider",
