@@ -25,13 +25,15 @@ export default function SuccessScreen({
   return (
     <Box
       sx={{
-        minHeight: "100vh",
+        height: "100%",
+        minHeight: 0,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         bgcolor: "#f5f5f5",
         p: 3,
+        pb: { xs: 6, md: 8 },
       }}
     >
       <Box
@@ -41,18 +43,19 @@ export default function SuccessScreen({
           alignItems: "center",
           gap: 3,
           bgcolor: "white",
-          p: 6,
+          p: { xs: 6, md: 5, lg: 4 },
+          pb: { xs: 8, md: 8, lg: 6 },
           borderRadius: 3,
           boxShadow: 2,
-          maxWidth: 500,
+          maxWidth: { xs: 500, md: 420, lg: 360 },
         }}
       >
         {/* Pancake Loader */}
         {showLoader && (
           <Box
             sx={{
-              width: 200,
-              height: 200,
+              width: { xs: 200, md: 160, lg: 140 },
+              height: { xs: 200, md: 160, lg: 140 },
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -65,7 +68,7 @@ export default function SuccessScreen({
         {/* Checkmark Icon */}
         <CheckCircleIcon
           sx={{
-            fontSize: 100,
+            fontSize: { xs: 100, md: 80, lg: 64 },
             color: "#4caf50",
             animation: "scaleIn 0.5s ease-out",
             "@keyframes scaleIn": {
