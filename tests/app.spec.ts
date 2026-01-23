@@ -1,5 +1,11 @@
 import { test, expect } from "@playwright/test";
 
+
+test.beforeEach(async ({ context }) => {
+  // Clears all cookies for the current browser context
+  await context.clearCookies();
+});
+
 test("admin dish creation", async ({ page, isMobile }) => {
   test.skip(isMobile, "Admin isn't supposed work from mobile viewports");
   await page.goto("http://employee.localhost:3000/login/employee");
@@ -59,26 +65,22 @@ test("admin dish creation of already existing dish", async ({
   await page.getByRole("menuitem", { name: "Sign out" }).click();
 });
 
-test("wrong login for worker", async ({ page }) => {
-  await page.goto("http://employee.localhost:3000/login/employee");
-  await page.getByRole("textbox", { name: "Korisničko ime" }).click();
-  await page.getByRole("textbox", { name: "Korisničko ime" }).fill("worker");
-  await page.getByRole("textbox", { name: "Korisničko ime" }).press("Tab");
-  await page.getByRole("textbox", { name: "Lozinka" }).fill("test");
-  await page.getByRole("button", { name: "Prijavi se" }).click();
-  await expect(page.getByText("Neispravno korisničko ime ili")).toBeVisible();
-  await page.getByRole("button", { name: "Open user menu" }).click();
-  await page.getByRole("menuitem", { name: "Sign out" }).click();
-});
+test('wrong login for worker', async ({ page }) => {
+  await page.goto('http://employee.localhost:3000/login/employee');
+  await page.getByRole('textbox', { name: 'Korisničko ime' }).click();
+  await page.getByRole('textbox', { name: 'Korisničko ime' }).fill('worker');
+  await page.getByRole('textbox', { name: 'Korisničko ime' }).press('Tab');
+  await page.getByRole('textbox', { name: 'Lozinka' }).fill('test');
+  await page.getByRole('button', { name: 'Prijavi se' }).click();
+  await expect(page.getByText('Neispravno korisničko ime ili')).toBeVisible();
+}); 
 
-test("manual redirect test", async ({ page }) => {
-  await page.goto("http://employee.localhost:3000/login/employee");
-  await page.getByRole("textbox", { name: "Korisničko ime" }).click();
-  await page.getByRole("textbox", { name: "Korisničko ime" }).fill("worker");
-  await page.getByRole("textbox", { name: "Lozinka" }).click();
-  await page.getByRole("textbox", { name: "Lozinka" }).fill("worker");
-  await page.getByRole("button", { name: "Prijavi se" }).click();
-  await page.goto("http://employee.localhost:3000/admin");
-  await page.getByRole("button", { name: "Open user menu" }).click();
-  await page.getByRole("menuitem", { name: "Sign out" }).click();
+test('manual redirect test', async ({ page }) => {
+  await page.goto('http://employee.localhost:3000/login/employee');
+  await page.getByRole('textbox', { name: 'Korisničko ime' }).click();
+  await page.getByRole('textbox', { name: 'Korisničko ime' }).fill('worker');
+  await page.getByRole('textbox', { name: 'Lozinka' }).click();
+  await page.getByRole('textbox', { name: 'Lozinka' }).fill('worker');
+  await page.getByRole('button', { name: 'Prijavi se' }).click();
+  await page.goto('http://employee.localhost:3000/admin');
 });
