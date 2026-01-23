@@ -373,7 +373,7 @@ export default function ManagerStatsPage() {
                 xl: "repeat(3, 1fr)",
               },
               gap: 2,
-              pb: 2,
+              pb: 1,
             }}
           >
             {sortedDishes.map((dish, index) => (

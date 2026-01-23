@@ -285,6 +285,7 @@ export default function Home() {
         paddingLeft: { xs: 0, lg: 10 },
         bgcolor: "black",
         overflowX: "hidden", // Prevent horizontal scroll
+        overflowY: "hidden", // Prevent vertical scroll
       }}
     >
       <Box
@@ -341,7 +342,7 @@ export default function Home() {
             alignItems: "center",
             // On mobile, use space-evenly to distribute available vertical space
             justifyContent: { xs: "space-evenly", lg: "space-between" },
-            gap: { xs: 2, lg: 8 }, // Smaller gap on mobile
+            gap: { xs: 1, lg: 12 }, // Smaller vertical gap on mobile, larger on desktop
             pr: { xs: 0, lg: "clamp(70px, 2vw, 180px)" },
             pt: { xs: 2, lg: 0 }, // Minimal top padding to push text up
             pb: { xs: 2, lg: 0 }, // Reduced bottom padding (was 4)
@@ -376,7 +377,7 @@ export default function Home() {
             <Typography
               variant="h5"
               sx={{
-                mb: 2, // Reduced margin (was 3)
+                mb: { xs: 1, sm: 2 }, // Smaller bottom margin on mobile
                 color: "lightgrey",
                 letterSpacing: 1.2,
                 fontSize: { xs: "1rem", sm: "1.5rem" }, // Smaller subtitle
@@ -453,224 +454,238 @@ export default function Home() {
               staggerFadeInEachMs={120}
               staggerFadeInDurationSec={0.55}
             >
-              <Card
-                style={{
-                  background:
-                    "linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.78) 100%)",
-                  border: "1px solid rgba(255,255,255,0.45)",
-                  borderRadius: 18,
-                  boxShadow: "0 18px 50px rgba(0,0,0,0.22)",
-                  overflow: "hidden",
-                  backdropFilter: "blur(10px)",
-                  WebkitBackdropFilter: "blur(10px)",
-                }}
+              <CardSwap
+                appearDelayMs={250}
+                width={cardSwapLayout.cardWidth}
+                height={cardSwapLayout.cardHeight}
+                cardDistance={cardSwapLayout.cardDistance}
+                verticalDistance={cardSwapLayout.verticalDistance}
+                delay={5200}
+                pauseOnHover
+                staggerFadeIn
+                staggerFadeInDelayMs={60}
+                staggerFadeInEachMs={120}
+                staggerFadeInDurationSec={0.55}
               >
-                <Box
-                  sx={{
-                    p: 1.5,
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
+                <Card
+                  style={{
+                    background:
+                      "linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.78) 100%)",
+                    border: "1px solid rgba(255,255,255,0.45)",
+                    borderRadius: 18,
+                    boxShadow: "0 18px 50px rgba(0,0,0,0.22)",
+                    overflow: "hidden",
+                    backdropFilter: "blur(10px)",
+                    WebkitBackdropFilter: "blur(10px)",
                   }}
                 >
                   <Box
                     sx={{
-                      width: 56,
-                      height: 4,
-                      borderRadius: 999,
-                      background: "#56AAF5",
-                      mb: 1,
-                    }}
-                  />
-                  <Typography
-                    variant="subtitle1"
-                    fontWeight={800}
-                    sx={{ color: "#111827", lineHeight: 1.1 }}
-                  >
-                    {tr("cardRealTimeMeni")}
-                  </Typography>
-                  <Box
-                    sx={{
-                      mt: 0.75,
-                      width: "100%",
-                      aspectRatio: "1380 / 780",
-                      borderRadius: 2,
-                      background: "#f6f7f9",
-                      border: "1px solid rgba(0,0,0,0.10)",
-                      overflow: "hidden",
-                      p: 0,
+                      p: 1.5,
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
                     }}
                   >
                     <Box
                       sx={{
-                        position: "relative",
+                        width: 56,
+                        height: 4,
+                        borderRadius: 999,
+                        background: "#56AAF5",
+                        mb: 1,
+                      }}
+                    />
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight={800}
+                      sx={{ color: "#111827", lineHeight: 1.1 }}
+                    >
+                      {tr("cardRealTimeMeni")}
+                    </Typography>
+                    <Box
+                      sx={{
+                        mt: 0.75,
                         width: "100%",
-                        height: "100%",
+                        aspectRatio: "1380 / 780",
+                        borderRadius: 2,
+                        background: "#f6f7f9",
+                        border: "1px solid rgba(0,0,0,0.10)",
+                        overflow: "hidden",
+                        p: 0,
                       }}
                     >
-                      <Image
-                        src={LANDING_IMAGES.REAL_TIME_MENU}
-                        alt="Student view"
-                        fill
-                        sizes={cardSwapImageSizes}
-                        style={{
-                          objectFit: "contain",
-                          objectPosition: "center",
+                      <Box
+                        sx={{
+                          position: "relative",
+                          width: "100%",
+                          height: "100%",
                         }}
-                        priority
-                      />
+                      >
+                        <Image
+                          src={LANDING_IMAGES.REAL_TIME_MENU}
+                          alt="Student view"
+                          fill
+                          sizes={cardSwapImageSizes}
+                          style={{
+                            objectFit: "contain",
+                            objectPosition: "center",
+                          }}
+                          priority
+                        />
+                      </Box>
                     </Box>
                   </Box>
-                </Box>
-              </Card>
+                </Card>
 
-              <Card
-                style={{
-                  background:
-                    "linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.78) 100%)",
-                  border: "1px solid rgba(255,255,255,0.45)",
-                  borderRadius: 18,
-                  boxShadow: "0 18px 50px rgba(0,0,0,0.22)",
-                  overflow: "hidden",
-                  backdropFilter: "blur(10px)",
-                  WebkitBackdropFilter: "blur(10px)",
-                }}
-              >
-                <Box
-                  sx={{
-                    p: 1.5,
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
+                <Card
+                  style={{
+                    background:
+                      "linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.78) 100%)",
+                    border: "1px solid rgba(255,255,255,0.45)",
+                    borderRadius: 18,
+                    boxShadow: "0 18px 50px rgba(0,0,0,0.22)",
+                    overflow: "hidden",
+                    backdropFilter: "blur(10px)",
+                    WebkitBackdropFilter: "blur(10px)",
                   }}
                 >
                   <Box
                     sx={{
-                      width: 56,
-                      height: 4,
-                      borderRadius: 999,
-                      background: "#56AAF5",
-                      mb: 1,
-                      opacity: 0.9,
-                    }}
-                  />
-                  <Typography
-                    variant="subtitle1"
-                    fontWeight={800}
-                    sx={{ color: "#111827", lineHeight: 1.1 }}
-                  >
-                    {tr("cardOverview")}
-                  </Typography>
-                  <Box
-                    sx={{
-                      mt: 0.75,
-                      width: "100%",
-                      aspectRatio: "1380 / 780",
-                      borderRadius: 2,
-                      background: "#f6f7f9",
-                      border: "1px solid rgba(0,0,0,0.10)",
-                      overflow: "hidden",
-                      p: 0,
+                      p: 1.5,
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
                     }}
                   >
                     <Box
                       sx={{
-                        position: "relative",
+                        width: 56,
+                        height: 4,
+                        borderRadius: 999,
+                        background: "#56AAF5",
+                        mb: 1,
+                        opacity: 0.9,
+                      }}
+                    />
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight={800}
+                      sx={{ color: "#111827", lineHeight: 1.1 }}
+                    >
+                      {tr("cardOverview")}
+                    </Typography>
+                    <Box
+                      sx={{
+                        mt: 0.75,
                         width: "100%",
-                        height: "100%",
+                        aspectRatio: "1380 / 780",
+                        borderRadius: 2,
+                        background: "#f6f7f9",
+                        border: "1px solid rgba(0,0,0,0.10)",
+                        overflow: "hidden",
+                        p: 0,
                       }}
                     >
-                      <Image
-                        src={LANDING_IMAGES.OVERVIEW}
-                        alt="Menza map"
-                        fill
-                        sizes={cardSwapImageSizes}
-                        style={{
-                          objectFit: "contain",
-                          objectPosition: "center",
+                      <Box
+                        sx={{
+                          position: "relative",
+                          width: "100%",
+                          height: "100%",
                         }}
-                      />
+                      >
+                        <Image
+                          src={LANDING_IMAGES.OVERVIEW}
+                          alt="Menza map"
+                          fill
+                          sizes={cardSwapImageSizes}
+                          style={{
+                            objectFit: "contain",
+                            objectPosition: "center",
+                          }}
+                        />
+                      </Box>
                     </Box>
                   </Box>
-                </Box>
-              </Card>
+                </Card>
 
-              <Card
-                style={{
-                  background:
-                    "linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.78) 100%)",
-                  border: "1px solid rgba(255,255,255,0.45)",
-                  borderRadius: 18,
-                  boxShadow: "0 18px 50px rgba(0,0,0,0.22)",
-                  overflow: "hidden",
-                  backdropFilter: "blur(10px)",
-                  WebkitBackdropFilter: "blur(10px)",
-                }}
-              >
-                <Box
-                  sx={{
-                    p: 1.75,
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
+                <Card
+                  style={{
+                    background:
+                      "linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.78) 100%)",
+                    border: "1px solid rgba(255,255,255,0.45)",
+                    borderRadius: 18,
+                    boxShadow: "0 18px 50px rgba(0,0,0,0.22)",
+                    overflow: "hidden",
+                    backdropFilter: "blur(10px)",
+                    WebkitBackdropFilter: "blur(10px)",
                   }}
                 >
                   <Box
                     sx={{
-                      width: 56,
-                      height: 4,
-                      borderRadius: 999,
-                      background: "#56AAF5",
-                      mb: 1,
-                      opacity: 0.85,
-                    }}
-                  />
-                  <Typography
-                    variant="subtitle1"
-                    fontWeight={800}
-                    sx={{ color: "#111827", lineHeight: 1.1 }}
-                  >
-                    {tr("cardNotifications")}
-                  </Typography>
-                  <Box
-                    sx={{
-                      width: "100%",
-                      mt: 0.75,
-                      aspectRatio: "1380 / 780",
-                      borderRadius: 2,
-                      background: "#f6f7f9",
-                      border: "1px solid rgba(0,0,0,0.10)",
-                      overflow: "hidden",
-                      p: 0,
+                      p: 1.75,
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
                     }}
                   >
                     <Box
                       sx={{
-                        position: "relative",
+                        width: 56,
+                        height: 4,
+                        borderRadius: 999,
+                        background: "#56AAF5",
+                        mb: 1,
+                        opacity: 0.85,
+                      }}
+                    />
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight={800}
+                      sx={{ color: "#111827", lineHeight: 1.1 }}
+                    >
+                      {tr("cardNotifications")}
+                    </Typography>
+                    <Box
+                      sx={{
                         width: "100%",
-                        height: "100%",
+                        mt: 0.75,
+                        aspectRatio: "1380 / 780",
+                        borderRadius: 2,
+                        background: "#f6f7f9",
+                        border: "1px solid rgba(0,0,0,0.10)",
+                        overflow: "hidden",
+                        p: 0,
                       }}
                     >
-                      <Image
-                        src={LANDING_IMAGES.NOTIFICATIONS}
-                        alt="Notifications"
-                        fill
-                        sizes={cardSwapImageSizes}
-                        style={{
-                          objectFit: "contain",
-                          objectPosition: "center",
+                      <Box
+                        sx={{
+                          position: "relative",
+                          width: "100%",
+                          height: "100%",
                         }}
-                      />
+                      >
+                        <Image
+                          src={LANDING_IMAGES.NOTIFICATIONS}
+                          alt="Notifications"
+                          fill
+                          sizes={cardSwapImageSizes}
+                          style={{
+                            objectFit: "contain",
+                            objectPosition: "center",
+                          }}
+                        />
+                      </Box>
                     </Box>
                   </Box>
-                </Box>
-              </Card>
-            </CardSwap>
-          </Box>
+                </Card>
+              </CardSwap>
+            </Box>
+          )}
 
           {/* Mobile Button - Shown ONLY on mobile, after cards */}
           <Stack
-            spacing={2}
+            spacing={1}
             sx={{
               width: "100%",
               alignItems: "center",
