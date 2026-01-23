@@ -57,6 +57,7 @@ export default function EditRestaurantPage({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
+  const [hoursError, setHoursError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [showSuccessScreen, setShowSuccessScreen] = useState(false);
 
@@ -141,6 +142,8 @@ export default function EditRestaurantPage({
 
     setSaving(true);
     setError(null);
+    setImageError(null);
+    setHoursError(null);
     setSuccess(null);
 
     try {
@@ -161,12 +164,23 @@ export default function EditRestaurantPage({
       Object.entries(workingHoursRaw).forEach(([dayStr, shifts]) => {
         const dayNum = parseInt(dayStr);
         if (shifts.length > 0) {
-          formattedHours.push({
-            day: dayNum,
-            shifts: shifts.filter((s: IShift) => s.start && s.end),
-          });
+          const validShifts = shifts.filter((s: IShift) => s.start && s.end);
+          if (validShifts.length > 0) {
+            formattedHours.push({
+              day: dayNum,
+              shifts: validShifts,
+            });
+          }
         }
       });
+
+      if (formattedHours.length === 0) {
+        setHoursError("Radno vrijeme je obavezno");
+        setError("Molimo definirajte radno vrijeme");
+        setSaving(false);
+        return;
+      }
+      setHoursError(null);
 
       const res = await updateRestaurant(id, {
         name: formData.name,
@@ -361,6 +375,7 @@ export default function EditRestaurantPage({
         <WorkingHoursEditor
           initialData={initialHours}
           onChange={setWorkingHoursRaw}
+          error={hoursError}
         />
       </Box>
     </Box>
@@ -567,6 +582,7 @@ export default function EditRestaurantPage({
                 <WorkingHoursEditor
                   initialData={initialHours}
                   onChange={setWorkingHoursRaw}
+                  error={hoursError}
                 />
               </Box>
             </Box>
