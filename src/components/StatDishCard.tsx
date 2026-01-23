@@ -19,7 +19,7 @@ const StatDishCard = ({ name, imageUrl, count }: StatDishCardProps) => {
         overflow: "hidden",
         display: "flex",
         alignItems: "center",
-        p: 1.5,
+        p: { xs: 1.5, md: 1 },
         bgcolor: "white",
         border: "1px solid #e0e0e0",
         transition: "all 0.2s ease-in-out",
@@ -35,8 +35,8 @@ const StatDishCard = ({ name, imageUrl, count }: StatDishCardProps) => {
         src={imageUrl}
         variant="rounded"
         sx={{
-          width: 56,
-          height: 56,
+          width: { xs: 56, md: 44 },
+          height: { xs: 56, md: 44 },
           bgcolor: "grey.100",
           mr: 2,
           border: "1px solid #f0f0f0",
@@ -56,6 +56,7 @@ const StatDishCard = ({ name, imageUrl, count }: StatDishCardProps) => {
           title={name}
           sx={{
             fontWeight: 600,
+            fontSize: { xs: "1rem", md: "0.95rem" },
             color: "#212222",
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -73,8 +74,8 @@ const StatDishCard = ({ name, imageUrl, count }: StatDishCardProps) => {
           alignItems: "center",
           gap: 0.5,
           bgcolor: "aliceblue",
-          px: 1.5,
-          py: 0.75,
+          px: { xs: 1.5, md: 1 },
+          py: { xs: 0.75, md: 0.5 },
           borderRadius: 2,
           border: "1px solid",
           borderColor: "primary.light",
