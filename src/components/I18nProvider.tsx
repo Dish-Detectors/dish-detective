@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 import { setCurrentLang } from "@/utils/i18n";
 import { t as translate, type SupportedLang } from "@/utils/i18n.shared";
@@ -27,7 +33,9 @@ export function I18nProvider({
     (nextLang: SupportedLang) => {
       setCurrentLang(nextLang);
       setLangState(nextLang);
-      window.dispatchEvent(new CustomEvent("dd:langChanged", { detail: nextLang }));
+      window.dispatchEvent(
+        new CustomEvent("dd:langChanged", { detail: nextLang }),
+      );
       router.refresh();
     },
     [router],

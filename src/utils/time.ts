@@ -46,13 +46,21 @@ export function getRestaurantStatus(
       if (remainingMinutes <= 60) {
         return {
           status: "closing_soon",
-          message: pick(lang, `Zatvara se uskoro (${shift.end})`, `Closing soon (${shift.end})`),
+          message: pick(
+            lang,
+            `Zatvara se uskoro (${shift.end})`,
+            `Closing soon (${shift.end})`,
+          ),
           isToday: true,
         };
       }
       return {
         status: "open",
-        message: pick(lang, `Otvoreno do ${shift.end}`, `Open until ${shift.end}`),
+        message: pick(
+          lang,
+          `Otvoreno do ${shift.end}`,
+          `Open until ${shift.end}`,
+        ),
         isToday: true,
       };
     }
@@ -63,7 +71,11 @@ export function getRestaurantStatus(
       if (minutesUntilOpen <= 60) {
         return {
           status: "opening_soon",
-          message: pick(lang, `Otvara se uskoro (${shift.start})`, `Opening soon (${shift.start})`),
+          message: pick(
+            lang,
+            `Otvara se uskoro (${shift.start})`,
+            `Opening soon (${shift.start})`,
+          ),
           nextOpenTime: shift.start,
           isToday: true,
         };
@@ -71,7 +83,11 @@ export function getRestaurantStatus(
       // Future shift today
       return {
         status: "closed",
-        message: pick(lang, `Otvara se u ${shift.start}`, `Opens at ${shift.start}`),
+        message: pick(
+          lang,
+          `Otvara se u ${shift.start}`,
+          `Opens at ${shift.start}`,
+        ),
         nextOpenTime: shift.start,
         isToday: true,
       };
@@ -113,7 +129,8 @@ function getNextOpenStatus(
         pick(lang, "Petak", "Friday"),
         pick(lang, "Subota", "Saturday"),
       ];
-      const dayName = i === 1 ? pick(lang, "Sutra", "Tomorrow") : daysMap[nextDayIndex];
+      const dayName =
+        i === 1 ? pick(lang, "Sutra", "Tomorrow") : daysMap[nextDayIndex];
 
       return {
         status: "closed",

@@ -356,9 +356,7 @@ export default function StaffAssignment({
                   }}
                 />
               )}
-              noOptionsText={
-                searching ? t("loading") : t("noAvailableUsers")
-              }
+              noOptionsText={searching ? t("loading") : t("noAvailableUsers")}
             />
 
             <Box>
@@ -400,9 +398,7 @@ export default function StaffAssignment({
       <Dialog open={!!userToDelete} onClose={() => setUserToDelete(null)}>
         <DialogTitle>{t("confirmRemovalTitle")}</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            {t("confirmRemoveEmployee")}
-          </DialogContentText>
+          <DialogContentText>{t("confirmRemoveEmployee")}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setUserToDelete(null)}>{t("cancel")}</Button>

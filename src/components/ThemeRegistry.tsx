@@ -11,7 +11,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
 export const ColorModeContext = createContext({
-  toggleColorMode: () => { },
+  toggleColorMode: () => {},
   mode: "light" as "light" | "dark",
 });
 

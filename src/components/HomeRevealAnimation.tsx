@@ -103,7 +103,6 @@ export default function HomeRevealAnimation({
     };
   }, [enabled, oncePerSession, prefersReducedMotion]);
 
-
   if (!visible) return null;
 
   return (

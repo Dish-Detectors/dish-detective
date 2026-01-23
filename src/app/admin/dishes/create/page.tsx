@@ -242,7 +242,7 @@ export default function Page() {
                           startIcon={<CloudUploadIcon />}
                           sx={{ textTransform: "none" }}
                         >
-                            {t("chooseImageButton")}
+                          {t("chooseImageButton")}
                         </Button>
                       </label>
                       <Typography

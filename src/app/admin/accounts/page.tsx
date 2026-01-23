@@ -107,9 +107,9 @@ export default function WorkerManagerAccountsPage() {
         );
       } else {
         const message =
-          ("errorKey" in result && result.errorKey && t(result.errorKey))
-          || result.error
-          || t("deleteFailed");
+          ("errorKey" in result && result.errorKey && t(result.errorKey)) ||
+          result.error ||
+          t("deleteFailed");
         alert(message);
       }
     } catch (error) {
@@ -300,9 +300,7 @@ export default function WorkerManagerAccountsPage() {
           {t("confirmRemovalTitle")}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            {t("confirmDeleteAccountBody")}
-          </DialogContentText>
+          <DialogContentText>{t("confirmDeleteAccountBody")}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={cancelDelete} disabled={deleting}>

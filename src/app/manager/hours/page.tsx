@@ -155,9 +155,9 @@ export default function WorkingHoursPage() {
         });
       } else {
         const message =
-          ("errorKey" in res && res.errorKey && t(res.errorKey))
-          || ("error" in res && res.error)
-          || t("workingHoursSaveError");
+          ("errorKey" in res && res.errorKey && t(res.errorKey)) ||
+          ("error" in res && res.error) ||
+          t("workingHoursSaveError");
         throw new Error(message);
       }
     } catch (error: any) {

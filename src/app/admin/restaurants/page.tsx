@@ -198,9 +198,7 @@ export default function RestaurantsPage() {
             }}
           >
             <Typography variant="body1" color="text.secondary">
-              {searchQuery
-                ? t("noSearchResults")
-                : t("noRestaurants")}
+              {searchQuery ? t("noSearchResults") : t("noRestaurants")}
             </Typography>
           </Box>
         ) : (

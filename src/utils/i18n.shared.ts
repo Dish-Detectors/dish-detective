@@ -43,7 +43,8 @@ export const translations = {
     deleteAllNotificationsConfirmTitle: "Obriši sve obavijesti?",
     deleteAllNotificationsConfirmBody:
       "Jeste li sigurni da želite obrisati sve obavijesti? Ova radnja se ne može poništiti.",
-    enableNotificationsPrompt: "Želite li primati obavijesti o novostima i jelima?",
+    enableNotificationsPrompt:
+      "Želite li primati obavijesti o novostima i jelima?",
     enable: "OMOGUĆI",
 
     // Staff assignment
@@ -60,7 +61,8 @@ export const translations = {
     roleManager: "Voditelj",
     adding: "Dodavanje...",
     confirmRemovalTitle: "Potvrda brisanja",
-    confirmRemoveEmployee: "Jeste li sigurni da želite ukloniti ovog zaposlenika?",
+    confirmRemoveEmployee:
+      "Jeste li sigurni da želite ukloniti ovog zaposlenika?",
     userAlreadyAdded: "Korisnik je već dodan.",
 
     // Working hours editor
@@ -81,7 +83,8 @@ export const translations = {
     shiftStart: "Početak",
     shiftEnd: "Kraj",
     timeTo: "do",
-    noShiftsDefined: "Nema definiranih smjena za ovaj dan. Restoran je zatvoren.",
+    noShiftsDefined:
+      "Nema definiranih smjena za ovaj dan. Restoran je zatvoren.",
     addShift: "Dodaj smjenu",
 
     // Allergens
@@ -153,7 +156,8 @@ export const translations = {
     // Admin - create/edit feedback
     failedToLoadData: "Neuspješno učitavanje podataka.",
     genericTryAgainError: "Došlo je do greške. Pokušajte ponovo.",
-    selectRestaurantLocationOnMap: "Molimo označite lokaciju restorana na karti",
+    selectRestaurantLocationOnMap:
+      "Molimo označite lokaciju restorana na karti",
     restaurantImageRequired: "Slika je obavezna",
     pleaseSelectRestaurantImage: "Molimo odaberite sliku restorana",
     nameAndAddressRequired: "Naziv i adresa su obavezni",
@@ -168,7 +172,7 @@ export const translations = {
     dataUpdatedSuccess: "Podaci uspješno ažurirani!",
     editDataTitle: "Uredi podatke",
     selectRestaurantDishesHelp:
-      "Odaberite sva jela koja ovaj restoran može ponuditi. Ova lista će se koristiti za filtriranje \"Sva jela\" na studentskoj stranici.",
+      'Odaberite sva jela koja ovaj restoran može ponuditi. Ova lista će se koristiti za filtriranje "Sva jela" na studentskoj stranici.',
     availableDishes: "Dostupna jela",
     dishCreatedSuccess: "Jelo uspješno kreirano!",
     dishUpdatedSuccess: "Jelo uspješno ažurirano!",
@@ -254,8 +258,10 @@ export const translations = {
     // Student restaurant tabs
     tabCurrentOffer: "Trenutna ponuda",
     tabAllDishes: "Sva jela",
-    restaurantClosedBanner: "RESTORAN JE TRENUTNO ZATVOREN - Van radnog vremena",
-    noAvailableDishesInRestaurant: "Trenutno nema dostupnih jela u ovom restoranu.",
+    restaurantClosedBanner:
+      "RESTORAN JE TRENUTNO ZATVOREN - Van radnog vremena",
+    noAvailableDishesInRestaurant:
+      "Trenutno nema dostupnih jela u ovom restoranu.",
     noOtherDishes: "Nema ostalih jela.",
 
     // Subscriptions
@@ -272,7 +278,8 @@ export const translations = {
 
     // Worker
     todayOfferTitle: "Ponuda dana",
-    noActiveMenuOrClosed: "Trenutno nema aktivnog menija ili je restoran zatvoren.",
+    noActiveMenuOrClosed:
+      "Trenutno nema aktivnog menija ili je restoran zatvoren.",
     available: "Dostupno",
     unavailable: "Nedostupno",
 
@@ -298,13 +305,14 @@ export const translations = {
     // Manager - polls create
     backToPollHistory: "Povratak na povijest",
     createNewPollTitle: "Kreiraj novu anketu",
-    sendPollSubtitle: "Pošaljite anketu studentima koji su pretplaćeni na vaša jela.",
+    sendPollSubtitle:
+      "Pošaljite anketu studentima koji su pretplaćeni na vaša jela.",
     basicInfoTitle: "Osnovne informacije",
     pollTitleLabel: "Naslov ankete",
     pollTitlePlaceholder: "npr. Anketa o zadovoljstvu hranom - Siječanj",
     questionsTitle: "Pitanja",
     questionsScaleHint:
-      "Studenti će za svako pitanje moći odabrati ocjenu od \"U potpunosti se ne slažem\" do \"U potpunosti se slažem\".",
+      'Studenti će za svako pitanje moći odabrati ocjenu od "U potpunosti se ne slažem" do "U potpunosti se slažem".',
     questionLabel: "Pitanje {number}",
     questionPlaceholder: "npr. Jeste li zadovoljni veličinom porcije?",
     addQuestion: "Dodaj pitanje",
@@ -339,7 +347,8 @@ export const translations = {
     saveChanges: "Spremi promjene",
     changePassword: "Promijeni lozinku",
     restaurantLabel: "Restoran",
-    invalidTimeForDay: "Neispravno vrijeme za {day}: Kraj mora biti nakon početka.",
+    invalidTimeForDay:
+      "Neispravno vrijeme za {day}: Kraj mora biti nakon početka.",
     workingHoursSaved: "Radno vrijeme uspješno spremljeno!",
     workingHoursSaveError: "Greška pri spremanju radnog vremena.",
 
@@ -368,7 +377,8 @@ export const translations = {
     signIn: "Prijavi se",
     username: "Korisničko ime",
     password: "Lozinka",
-    loginFailedCheckCredentials: "Neuspješna prijava. Provjerite korisničko ime i lozinku.",
+    loginFailedCheckCredentials:
+      "Neuspješna prijava. Provjerite korisničko ime i lozinku.",
     invalidUsernameOrPassword: "Neispravno korisničko ime ili lozinka",
 
     // Common phrases
@@ -412,7 +422,8 @@ export const translations = {
     deleteAllNotificationsConfirmTitle: "Delete all notifications?",
     deleteAllNotificationsConfirmBody:
       "Are you sure you want to delete all notifications? This action cannot be undone.",
-    enableNotificationsPrompt: "Do you want to receive notifications about news and dishes?",
+    enableNotificationsPrompt:
+      "Do you want to receive notifications about news and dishes?",
     enable: "ENABLE",
 
     // Staff assignment
@@ -450,7 +461,8 @@ export const translations = {
     shiftStart: "Start",
     shiftEnd: "End",
     timeTo: "to",
-    noShiftsDefined: "No shifts defined for this day. The restaurant is closed.",
+    noShiftsDefined:
+      "No shifts defined for this day. The restaurant is closed.",
     addShift: "Add shift",
 
     // Allergens
@@ -522,7 +534,8 @@ export const translations = {
     // Admin - create/edit feedback
     failedToLoadData: "Failed to load data.",
     genericTryAgainError: "An error occurred. Please try again.",
-    selectRestaurantLocationOnMap: "Please select the restaurant location on the map",
+    selectRestaurantLocationOnMap:
+      "Please select the restaurant location on the map",
     restaurantImageRequired: "Image is required",
     pleaseSelectRestaurantImage: "Please choose a restaurant image",
     nameAndAddressRequired: "Name and address are required",
@@ -537,7 +550,7 @@ export const translations = {
     dataUpdatedSuccess: "Data updated successfully!",
     editDataTitle: "Edit details",
     selectRestaurantDishesHelp:
-      "Select all dishes that this restaurant can offer. This list is used to filter \"All dishes\" on the student page.",
+      'Select all dishes that this restaurant can offer. This list is used to filter "All dishes" on the student page.',
     availableDishes: "Available dishes",
     dishCreatedSuccess: "Dish created successfully!",
     dishUpdatedSuccess: "Dish updated successfully!",
@@ -594,9 +607,12 @@ export const translations = {
     usernameAlreadyExists: "Username already exists",
     clerkCreateAccountError: "Error creating account in Clerk",
     createEmployeeAccountFailed: "Failed to create employee account",
-    onlyAdminsCanCreateEmployeeAccounts: "Only admins can create employee accounts.",
-    onlyAdminsCanUpdateEmployeeAccounts: "Only admins can update employee accounts.",
-    onlyAdminsCanViewEmployeeAccounts: "Only admins can view employee accounts.",
+    onlyAdminsCanCreateEmployeeAccounts:
+      "Only admins can create employee accounts.",
+    onlyAdminsCanUpdateEmployeeAccounts:
+      "Only admins can update employee accounts.",
+    onlyAdminsCanViewEmployeeAccounts:
+      "Only admins can view employee accounts.",
     roleMustBeManagerOrWorker: "Role must be manager or worker.",
     clerkUpdateUserError: "Error updating Clerk user",
     updateEmployeeAccountFailed: "Failed to update employee account",
@@ -620,8 +636,10 @@ export const translations = {
     // Student restaurant tabs
     tabCurrentOffer: "Current offer",
     tabAllDishes: "All dishes",
-    restaurantClosedBanner: "RESTAURANT IS CURRENTLY CLOSED - Outside opening hours",
-    noAvailableDishesInRestaurant: "There are currently no available dishes in this restaurant.",
+    restaurantClosedBanner:
+      "RESTAURANT IS CURRENTLY CLOSED - Outside opening hours",
+    noAvailableDishesInRestaurant:
+      "There are currently no available dishes in this restaurant.",
     noOtherDishes: "No other dishes.",
 
     // Subscriptions
@@ -638,7 +656,8 @@ export const translations = {
 
     // Worker
     todayOfferTitle: "Today's offer",
-    noActiveMenuOrClosed: "There is currently no active menu, or the restaurant is closed.",
+    noActiveMenuOrClosed:
+      "There is currently no active menu, or the restaurant is closed.",
     available: "Available",
     unavailable: "Unavailable",
 
@@ -664,13 +683,14 @@ export const translations = {
     // Manager - polls create
     backToPollHistory: "Back to history",
     createNewPollTitle: "Create new poll",
-    sendPollSubtitle: "Send a poll to students who are subscribed to your dishes.",
+    sendPollSubtitle:
+      "Send a poll to students who are subscribed to your dishes.",
     basicInfoTitle: "Basic information",
     pollTitleLabel: "Poll title",
     pollTitlePlaceholder: "e.g. Food satisfaction survey - January",
     questionsTitle: "Questions",
     questionsScaleHint:
-      "For each question, students will be able to select a rating from \"Strongly disagree\" to \"Strongly agree\".",
+      'For each question, students will be able to select a rating from "Strongly disagree" to "Strongly agree".',
     questionLabel: "Question {number}",
     questionPlaceholder: "e.g. Are you satisfied with the portion size?",
     addQuestion: "Add question",
@@ -705,7 +725,8 @@ export const translations = {
     saveChanges: "Save changes",
     changePassword: "Change password",
     restaurantLabel: "Restaurant",
-    invalidTimeForDay: "Invalid time for {day}: end time must be after start time.",
+    invalidTimeForDay:
+      "Invalid time for {day}: end time must be after start time.",
     workingHoursSaved: "Working hours saved!",
     workingHoursSaveError: "Error saving working hours.",
 
@@ -734,7 +755,8 @@ export const translations = {
     signIn: "Sign in",
     username: "Username",
     password: "Password",
-    loginFailedCheckCredentials: "Login failed. Please check your username and password.",
+    loginFailedCheckCredentials:
+      "Login failed. Please check your username and password.",
     invalidUsernameOrPassword: "Invalid username or password",
 
     // Common phrases
@@ -762,9 +784,10 @@ export function t(
   vars?: Record<string, string | number>,
 ) {
   const table = translations[lang] ?? translations[DEFAULT_LANG];
-  const template = (table as Record<string, string>)[key]
-    ?? (translations[DEFAULT_LANG] as Record<string, string>)[key]
-    ?? key;
+  const template =
+    (table as Record<string, string>)[key] ??
+    (translations[DEFAULT_LANG] as Record<string, string>)[key] ??
+    key;
   return format(template, vars);
 }
 

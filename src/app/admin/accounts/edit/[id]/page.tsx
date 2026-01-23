@@ -171,9 +171,9 @@ export default function EditWorkerManagerAccountPage({
           }
         } else {
           setError(
-            ("errorKey" in result && result.errorKey && t(result.errorKey))
-            || result.error
-            || t("accountLoadError"),
+            ("errorKey" in result && result.errorKey && t(result.errorKey)) ||
+              result.error ||
+              t("accountLoadError"),
           );
         }
       } catch (err) {
@@ -219,9 +219,9 @@ export default function EditWorkerManagerAccountPage({
         setTimeout(() => router.push("/admin/accounts"), 2000);
       } else {
         setError(
-          ("errorKey" in result && result.errorKey && t(result.errorKey))
-          || result.error
-          || t("accountUpdateGenericError"),
+          ("errorKey" in result && result.errorKey && t(result.errorKey)) ||
+            result.error ||
+            t("accountUpdateGenericError"),
         );
       }
     } catch (err) {
@@ -257,9 +257,9 @@ export default function EditWorkerManagerAccountPage({
         setPasswords({ newPassword: "", confirmPassword: "" });
       } else {
         setError(
-          ("errorKey" in result && result.errorKey && t(result.errorKey))
-          || result.error
-          || t("passwordChangeError"),
+          ("errorKey" in result && result.errorKey && t(result.errorKey)) ||
+            result.error ||
+            t("passwordChangeError"),
         );
       }
     } catch (err) {
@@ -883,7 +883,7 @@ export default function EditWorkerManagerAccountPage({
                   borderRadius: 2,
                 }}
               >
-              {t("changePassword")}
+                {t("changePassword")}
               </Button>
             </Box>
 
@@ -925,7 +925,9 @@ export default function EditWorkerManagerAccountPage({
           sx: { borderRadius: 3, width: "100%", maxWidth: 400 },
         }}
       >
-        <DialogTitle sx={{ fontWeight: 700 }}>{t("changePassword")}</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 700 }}>
+          {t("changePassword")}
+        </DialogTitle>
         <DialogContent>
           <TextField
             autoFocus

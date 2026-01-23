@@ -426,7 +426,7 @@ export default function AnnouncementChatPage() {
               </label>
               <InputBase
                 fullWidth
-                  placeholder={t("enterMessagePlaceholder")}
+                placeholder={t("enterMessagePlaceholder")}
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
                 onKeyDown={handleKeyDown}
