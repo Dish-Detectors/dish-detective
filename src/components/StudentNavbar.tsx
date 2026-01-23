@@ -52,9 +52,9 @@ export default function StudentNavbar({
 
   const getIconButtonStyle = (path: string) => ({
     bgcolor: isActive(path) ? "primary.main" : "transparent",
-    color: isActive(path) ? "white" : "text.primary",
+    color: isActive(path) ? "white" : "text.secondary", // Changed text.primary to text.secondary for better dark mode visibility
     "&:hover": {
-      bgcolor: isActive(path) ? "primary.dark" : "grey.100",
+      bgcolor: isActive(path) ? "primary.dark" : "action.hover", // Changed grey.100 to action.hover
     },
   });
 
@@ -65,28 +65,32 @@ export default function StudentNavbar({
         position: "fixed",
         ...(isMobile
           ? {
-              top: "auto",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              width: "100%",
-              height: "64px",
-              boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
-            }
+            top: "auto",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            width: "100%",
+            height: "64px",
+            boxShadow: "0 -2px 8px rgba(0,0,0,0.12)",
+          }
           : {
-              top: `${headerHeight}px`,
-              left: 0,
-              bottom: 0,
-              width: `${navWidth}px`,
-              boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
-            }),
-        bgcolor: "common.white",
+            top: `${headerHeight}px`,
+            left: 0,
+            bottom: 0,
+            width: `${navWidth}px`,
+            boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
+          }),
+        bgcolor: "background.paper", // Changed from common.white
         display: "flex",
         flexDirection: isMobile ? "row" : "column",
         justifyContent: isMobile ? "space-around" : "center",
         alignItems: "center",
         p: isMobile ? 1 : 2,
         zIndex: (theme) => theme.zIndex.drawer + 1, // Ensure navbar is above content
+        borderRight: isMobile ? "none" : 1,
+        borderTop: isMobile ? 1 : "none",
+        borderColor: "divider",
+        transition: "background-color 0.3s ease",
       }}
     >
       <Stack
@@ -112,9 +116,9 @@ export default function StudentNavbar({
         <IconButton
           onClick={handleToggleNotif}
           sx={{
-            color: notifAnchor ? "primary.main" : "text.primary",
-            bgcolor: notifAnchor ? "grey.100" : "transparent",
-            "&:hover": { bgcolor: "grey.100" },
+            color: notifAnchor ? "primary.main" : "text.secondary", // Changed from text.primary
+            bgcolor: notifAnchor ? "action.selected" : "transparent", // Changed from grey.100
+            "&:hover": { bgcolor: "action.hover" }, // Changed from grey.100
           }}
         >
           <Badge badgeContent={unreadCount} color="error">

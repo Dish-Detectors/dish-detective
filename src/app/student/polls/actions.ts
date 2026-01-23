@@ -5,6 +5,7 @@ import dbConnect from "@/utils/dbConnect";
 import Poll from "@/models/Poll";
 import Restaurant from "@/models/Restaurant";
 import PollAnswer from "@/models/PollAnswer";
+import NotificationModel from "@/models/Notification";
 import mongoose from "mongoose";
 
 export async function getPoll(pollId: string) {
@@ -103,6 +104,18 @@ export async function submitPollAnswers(
       userId,
       answers: formattedAnswers,
     });
+
+    // Automatically delete the notification for this poll
+    try {
+      // Find and delete the notification sent to this user for this poll
+      const deleteResult = await NotificationModel.deleteOne({
+        pollId: pollId,
+        targetUserId: userId,
+      });
+      // We don't really care deeply if it fails or finds nothing, it's just cleanup
+    } catch (notifError) {
+      console.error("Error cleaning up poll notification:", notifError);
+    }
 
     return { success: true };
   } catch (error) {

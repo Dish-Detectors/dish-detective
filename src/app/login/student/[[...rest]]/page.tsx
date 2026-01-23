@@ -9,12 +9,15 @@ import {
   Button,
   Alert,
   CircularProgress,
+  useTheme,
 } from "@mui/material";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
 
 export default function Page() {
   const { signUp, isLoaded } = useSignUp();
   const router = useRouter();
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === "dark";
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -71,7 +74,7 @@ export default function Page() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          bgcolor: "#f5f5f5",
+          bgcolor: "background.default",
         }}
       >
         <PancakeStackLoader />
@@ -86,18 +89,19 @@ export default function Page() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundImage: "url(/BackgroundMan.svg)",
+        backgroundImage: `url(/${isDarkMode ? "BackgroundMan-dark" : "BackgroundMan"}.svg)`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         p: 3,
+        bgcolor: "background.default",
       }}
     >
       <Box
         sx={{
           maxWidth: 500,
           width: "100%",
-          bgcolor: "white",
+          bgcolor: "background.paper",
           borderRadius: 3,
           p: 4,
           boxShadow: 1,
@@ -144,12 +148,29 @@ export default function Page() {
             textTransform: "none",
             fontSize: "1.1rem",
             fontWeight: 600,
-            borderColor: "#dadce0",
-            color: "#3c4043",
-            "&:hover": {
-              bgcolor: "#f8f9fa",
-              borderColor: "#dadce0",
-            },
+            transition: "all 0.2s ease",
+            ...(isDarkMode
+              ? {
+                // Dark Mode Google Button Styles
+                bgcolor: "#131314",
+                borderColor: "#8e918f",
+                color: "#e3e3e3",
+                "&:hover": {
+                  bgcolor: "#131314", // Keep generic background, lighten via opacity or overlay in real implementations, but here simple
+                  borderColor: "#d2e3fc",
+                  backgroundImage:
+                    "linear-gradient(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08))",
+                },
+              }
+              : {
+                // Light Mode Google Button Styles
+                borderColor: "#dadce0",
+                color: "#3c4043",
+                "&:hover": {
+                  bgcolor: "#f8f9fa",
+                  borderColor: "#dadce0",
+                },
+              }),
           }}
         >
           {loading ? "Prijava..." : "Prijavi se s Google računom"}

@@ -12,7 +12,7 @@ export default function SSOCallback() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        bgcolor: "#f5f5f5",
+        bgcolor: "background.default",
       }}
     >
       <Box sx={{ width: 200, height: 200 }}>

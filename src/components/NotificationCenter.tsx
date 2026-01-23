@@ -106,181 +106,201 @@ const SwipeableNotificationItem = ({
   return (
     <ListItem
       alignItems="flex-start"
-      onMouseDown={handleStart}
-      onMouseMove={handleMove}
-      onMouseUp={handleEnd}
-      onMouseLeave={handleEnd}
-      onTouchStart={handleStart}
-      onTouchMove={handleMove}
-      onTouchEnd={handleEnd}
-      onClick={(e) => {
-        // Only trigger click if no significant swipe happened
-        if (Math.abs(offsetX) < 10) {
-          onClick();
-        }
-      }}
       sx={{
-        px: 2,
-        py: isClosing ? 0 : 2.5,
+        p: 0, // Remove padding from ListItem, move to content
         borderBottom: isClosing
           ? "0px solid transparent"
-          : "1px solid rgba(0,0,0,0.04)",
+          : "1px solid", // Use divider color logic via theme usually, but keeping simple for now
+        borderColor: "divider",
         maxHeight: isClosing ? 0 : 500,
-        bgcolor: "transparent",
-        transition: isSwiping
-          ? "none"
-          : "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-        cursor: "pointer",
-        transform: `translateX(${offsetX}px)`,
-        opacity: isClosing ? 0 : Math.max(0.3, 1 - Math.abs(offsetX) / 400),
-        "&:hover": {
-          bgcolor: "rgba(0,0,0,0.02)",
-        },
-        pr: 4,
+        transition: "max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s",
+        opacity: isClosing ? 0 : 1, // Opacity fade on close
         position: "relative",
-        userSelect: "none",
-        borderLeft: notif.read ? "4px solid transparent" : "4px solid #56aaf5",
-        overflow: "hidden",
+        overflow: "hidden", // Ensure background doesn't spill
       }}
     >
-      {/* Background deletion indicator */}
-      {Math.abs(offsetX) > 20 && (
-        <Box
-          sx={{
+      {/* Background Layer (Red Delete Area) */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0, // Full width background
+          bgcolor: "error.main",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: offsetX > 0 ? "flex-start" : "flex-end", // Icon follows swipe direction
+          px: 3,
+          zIndex: 0,
+        }}
+      >
+        <DeleteOutlineIcon sx={{ color: "white", fontSize: 28 }} />
+      </Box>
+
+      {/* Foreground Layer (Content) */}
+      <Box
+        onMouseDown={handleStart}
+        onMouseMove={handleMove}
+        onMouseUp={handleEnd}
+        onMouseLeave={handleEnd}
+        onTouchStart={handleStart}
+        onTouchMove={handleMove}
+        onTouchEnd={handleEnd}
+        onClick={(e) => {
+          if (Math.abs(offsetX) < 10) {
+            onClick();
+          }
+        }}
+        sx={{
+          width: "100%",
+          bgcolor: "background.paper", // Solid background to cover red layer
+          p: 2,
+          pr: 4,
+          cursor: "pointer",
+          transform: `translateX(${offsetX}px)`,
+          transition: isSwiping
+            ? "none"
+            : "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+          position: "relative",
+          zIndex: 1,
+          borderLeft: notif.read ? "4px solid transparent" : "4px solid #56aaf5", // Keep read indicator
+          display: "flex",
+          alignItems: "flex-start",
+          "&::after": {
+            content: '""',
             position: "absolute",
             top: 0,
-            left: offsetX > 0 ? 0 : "auto",
-            right: offsetX < 0 ? 0 : "auto",
-            height: "100%",
-            width: Math.abs(offsetX),
-            bgcolor: "error.main",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: offsetX > 0 ? "flex-start" : "flex-end",
-            px: 2,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            bgcolor: "action.hover",
+            opacity: 0,
             transition: "opacity 0.2s",
-            opacity: Math.min(1, Math.abs(offsetX) / 150),
-            zIndex: -1,
-          }}
-        >
-          <DeleteOutlineIcon sx={{ color: "white" }} />
-        </Box>
-      )}
-
-      {notif.imageUrl && (
-        <Box
-          component="img"
-          src={notif.imageUrl}
-          onClick={(e: React.MouseEvent) => {
-            e.stopPropagation();
-            setPreviewImage(notif.imageUrl || null);
-          }}
-          sx={{
-            width: 54,
-            height: 54,
-            borderRadius: 3,
-            objectFit: "cover",
-            mr: 2,
-            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-            cursor: "pointer",
-            "&:hover": { transform: "scale(1.05)" },
-            transition: "transform 0.2s",
-          }}
-        />
-      )}
-
-      {/* Attachment Rendering */}
-      {notif.attachment && (
-        <Box sx={{ mr: 2 }}>
-          {notif.attachment.type.startsWith("image/") ? (
-            <Box
-              component="img"
-              src={notif.attachment.url}
-              onClick={(e: React.MouseEvent) => {
-                e.stopPropagation();
-                setPreviewImage(notif.attachment?.url || null);
-              }}
-              sx={{
-                width: 54,
-                height: 54,
-                borderRadius: 3,
-                objectFit: "cover",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-                cursor: "pointer",
-                "&:hover": { transform: "scale(1.05)" },
-                transition: "transform 0.2s",
-              }}
-            />
-          ) : (
-            <IconButton
-              component="a"
-              href={notif.attachment.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              sx={{
-                width: 54,
-                height: 54,
-                bgcolor: "grey.50",
-                borderRadius: 3,
-                border: "1px solid rgba(0,0,0,0.05)",
-                "&:hover": { bgcolor: "grey.100" },
-              }}
-            >
-              <DownloadIcon color="primary" />
-            </IconButton>
-          )}
-        </Box>
-      )}
-      <Box sx={{ flexGrow: 1 }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            mb: 0.5,
-          }}
-        >
-          <Typography
-            variant="subtitle2"
-            fontWeight={700}
+            pointerEvents: "none",
+            zIndex: 0, // Behind content text but above background
+          },
+          "&:hover::after": {
+            opacity: 1,
+          },
+        }}
+      >
+        {notif.imageUrl && (
+          <Box
+            component="img"
+            src={notif.imageUrl}
+            onClick={(e: React.MouseEvent) => {
+              e.stopPropagation();
+              setPreviewImage(notif.imageUrl || null);
+            }}
             sx={{
-              color: notif.read ? "text.primary" : "primary.main",
-              fontSize: "0.95rem",
-              lineHeight: 1.2,
+              width: 54,
+              height: 54,
+              borderRadius: 3,
+              objectFit: "cover",
+              mr: 2,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+              cursor: "pointer",
+              "&:hover": { transform: "scale(1.05)" },
+              transition: "transform 0.2s",
+            }}
+          />
+        )}
+
+        {/* Attachment Rendering */}
+        {notif.attachment && (
+          <Box sx={{ mr: 2 }}>
+            {notif.attachment.type.startsWith("image/") ? (
+              <Box
+                component="img"
+                src={notif.attachment.url}
+                onClick={(e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  setPreviewImage(notif.attachment?.url || null);
+                }}
+                sx={{
+                  width: 54,
+                  height: 54,
+                  borderRadius: 3,
+                  objectFit: "cover",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                  cursor: "pointer",
+                  "&:hover": { transform: "scale(1.05)" },
+                  transition: "transform 0.2s",
+                }}
+              />
+            ) : (
+              <IconButton
+                component="a"
+                href={notif.attachment.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                sx={{
+                  width: 54,
+                  height: 54,
+                  bgcolor: "action.hover", // Changed from grey.50
+                  borderRadius: 3,
+                  border: "1px solid",
+                  borderColor: "divider", // Changed from rgba(0,0,0,0.05)
+                  "&:hover": { bgcolor: "action.selected" }, // Changed from grey.100
+                }}
+              >
+                <DownloadIcon color="primary" />
+              </IconButton>
+            )}
+          </Box>
+        )}
+        <Box sx={{ flexGrow: 1 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              mb: 0.5,
             }}
           >
-            {notif.title || "Obavijest"}
-          </Typography>
-        </Box>
+            <Typography
+              variant="subtitle2"
+              fontWeight={700}
+              sx={{
+                color: notif.read ? "text.primary" : "primary.main",
+                fontSize: "0.95rem",
+                lineHeight: 1.2,
+              }}
+            >
+              {notif.title || "Obavijest"}
+            </Typography>
+          </Box>
 
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{
-            mb: 1,
-            lineHeight: 1.4,
-            fontSize: "0.85rem",
-            display: "-webkit-box",
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}
-        >
-          {notif.description}
-        </Typography>
-
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Typography
-            variant="caption"
-            sx={{ color: "text.disabled", fontWeight: 500 }}
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              mb: 1,
+              lineHeight: 1.4,
+              fontSize: "0.85rem",
+              display: "-webkit-box",
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
           >
-            {new Date(notif.createdAt).toLocaleString("hr-HR", {
-              day: "2-digit",
-              month: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+            {notif.description}
           </Typography>
+
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Typography
+              variant="caption"
+              sx={{ color: "text.disabled", fontWeight: 500 }}
+            >
+              {new Date(notif.createdAt).toLocaleString("hr-HR", {
+                day: "2-digit",
+                month: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </Typography>
+          </Box>
         </Box>
       </Box>
     </ListItem>
@@ -427,8 +447,19 @@ export default function NotificationCenter({
       targetUrl = `/student/restaurants/${notif.restaurantId}`;
     }
 
-    // Mark as read if unread
-    if (!notif.read) {
+    // Mark as read if unread OR delete if it's a "consumable" notification like restaurant offer
+    if (notif.restaurantId) {
+      // Auto-delete restaurant notifications as they are one-time "alerts"
+      try {
+        await deleteNotification(notif._id);
+        setNotifications((prev) =>
+          prev.filter((n) => (n as any)._id !== notif._id),
+        );
+        if (onRead) onRead();
+      } catch (error) {
+        console.error("Failed to delete restaurant notification on click", error);
+      }
+    } else if (!notif.read) {
       try {
         await markNotificationAsRead(notif._id);
         setNotifications((prev) =>
@@ -505,11 +536,15 @@ export default function NotificationCenter({
               display: "flex",
               flexDirection: "column",
               zIndex: 1300,
-              bgcolor: "rgba(255, 255, 255, 0.8)",
+              bgcolor: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "rgba(30, 41, 59, 0.9)"
+                  : "rgba(255, 255, 255, 0.9)", // Theme aware background
               backdropFilter: "blur(20px) saturate(180%)",
               WebkitBackdropFilter: "blur(20px) saturate(180%)",
               boxShadow: "0 20px 50px rgba(0,0,0,0.15)",
-              border: "1px solid rgba(255,255,255,0.4)",
+              border: "1px solid",
+              borderColor: "divider", // Changed from rgba(255,255,255,0.4)
               transition: "top 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
               "@media (max-width: 600px)": {
                 left: "4vw",
@@ -525,8 +560,9 @@ export default function NotificationCenter({
             <Box
               sx={{
                 p: 2,
-                bgcolor: "white",
-                borderBottom: "1px solid #f0f0f0",
+                bgcolor: "background.paper", // Changed from white
+                borderBottom: "1px solid",
+                borderColor: "divider", // Changed from #f0f0f0
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",

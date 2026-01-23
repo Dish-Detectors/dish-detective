@@ -8,10 +8,6 @@
   --animation-duration: 6000ms;
 }
 
-body {
-  background-color: var(--color-bg);
-  overflow: hidden;
-}
 
 .loader-container {
   display: flex;
@@ -104,45 +100,57 @@ body {
 .falling-element:nth-child(8) {
   animation-delay: 0.4s;
 }
+
 .falling-element:nth-child(7) {
   animation-delay: 0.62s;
 }
+
 .falling-element:nth-child(6) {
   animation-delay: 0.84s;
 }
+
 .falling-element:nth-child(5) {
   animation-delay: 1.06s;
 }
+
 .falling-element:nth-child(4) {
   animation-delay: 1.28s;
 }
+
 .falling-element:nth-child(3) {
   animation-delay: 1.5s;
 }
+
 .falling-element:nth-child(2) {
   animation-delay: 1.72s;
 }
+
 .falling-element:nth-child(1) {
   animation-delay: 1.94s;
 }
 
 @keyframes element-drop {
+
   0%,
   100% {
     transform: translateY(-100vh) scaleY(0.7);
     opacity: 1;
   }
+
   11% {
     transform: translateY(20%) scaleY(1.2);
   }
+
   13% {
     transform: translateY(-30%) scaleY(0.9);
   }
+
   14%,
   67% {
     transform: translateY(0%) scaleY(1);
     opacity: 1;
   }
+
   68% {
     opacity: 0;
     transition: none;
@@ -154,6 +162,7 @@ body {
   0% {
     transform: translateX(100vw);
   }
+
   15%,
   100% {
     transform: translateX(0);
@@ -164,6 +173,7 @@ body {
   65% {
     transform: translateX(0);
   }
+
   85%,
   100% {
     transform: translateX(-100vw);

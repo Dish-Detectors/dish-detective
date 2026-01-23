@@ -21,7 +21,26 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="hr">
+      <html lang="hr" suppressHydrationWarning>
+        <head>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  try {
+                    var localValue = localStorage.getItem('themeMode');
+                    var supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+                    if (localValue === 'dark' || (!localValue && supportDarkMode)) {
+                      document.documentElement.classList.add('dark');
+                    } else {
+                      document.documentElement.classList.remove('dark');
+                    }
+                  } catch (e) {}
+                })();
+              `,
+            }}
+          />
+        </head>
         <body suppressHydrationWarning={true}>
           <ThemeRegistry>
             <Header />
