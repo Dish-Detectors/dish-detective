@@ -42,7 +42,7 @@ export async function sendAnnouncement(
       description: text,
       type: type,
       postedBy: userId,
-      attachment: attachment,
+      attachment: attachment || null,
       // No targetUserId means it's a broadcast
     });
 
@@ -61,7 +61,9 @@ export async function sendAnnouncement(
           },
           webpush: {
             fcmOptions: {
-              link: "/student",
+              link: process.env.NEXT_PUBLIC_APP_URL
+                ? `${process.env.NEXT_PUBLIC_APP_URL}/student`
+                : "https://dishdetective.me/student",
             },
           },
         });
@@ -120,14 +122,15 @@ export async function getAnnouncements(type: "worker" | "student") {
           }),
           // We mark all these as "isAdmin: true" because they are sent by managers
           isAdmin: true,
-          file: notif.attachment
-            ? {
+          file:
+            notif.attachment && notif.attachment.url
+              ? {
                 name: notif.attachment.name,
                 date: new Date(notif.createdAt).toLocaleDateString(), // Use creation date as file date
                 size: notif.attachment.size,
                 url: notif.attachment.url,
               }
-            : undefined,
+              : undefined,
         };
       }),
     );
