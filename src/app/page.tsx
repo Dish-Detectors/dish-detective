@@ -285,6 +285,7 @@ export default function Home() {
         paddingLeft: { xs: 0, lg: 10 },
         bgcolor: "black",
         overflowX: "hidden", // Prevent horizontal scroll
+        overflowY: "hidden", // Prevent vertical scroll
       }}
     >
       <Box
@@ -341,7 +342,7 @@ export default function Home() {
             alignItems: "center",
             // On mobile, use space-evenly to distribute available vertical space
             justifyContent: { xs: "space-evenly", lg: "space-between" },
-            gap: { xs: 2, lg: 8 }, // Smaller gap on mobile
+            gap: { xs: 1, lg: 12 }, // Smaller vertical gap on mobile, larger on desktop
             pr: { xs: 0, lg: "clamp(70px, 2vw, 180px)" },
             pt: { xs: 2, lg: 0 }, // Minimal top padding to push text up
             pb: { xs: 2, lg: 0 }, // Reduced bottom padding (was 4)
@@ -376,7 +377,7 @@ export default function Home() {
             <Typography
               variant="h5"
               sx={{
-                mb: 2, // Reduced margin (was 3)
+                mb: { xs: 1, sm: 2 }, // Smaller bottom margin on mobile
                 color: "lightgrey",
                 letterSpacing: 1.2,
                 fontSize: { xs: "1rem", sm: "1.5rem" }, // Smaller subtitle
@@ -416,8 +417,8 @@ export default function Home() {
                 sx={{
                   fontWeight: 600,
                   borderRadius: 999,
-                  width: { xs: "100%", sm: "auto", lg: "25%" },
-                  minWidth: { sm: 200 },
+                  width: { xs: "100%", sm: "auto", lg: 220 },
+                  minWidth: { sm: 140 },
                   px: { sm: 4 },
                   minHeight: 45,
                   color: "white",
@@ -429,31 +430,33 @@ export default function Home() {
             </Stack>
           </Box>
 
-          <Box
-            sx={{
-              position: "relative",
-              width: cardSwapLayout.wrapperWidth,
-              height: cardSwapLayout.wrapperHeight,
-              flex: "0 1 auto", // Allow shrinking if absolutely needed
-              display: "block",
-              mx: "auto",
-              mt: { xs: 8, lg: 0 }, // Verified gap on mobile
-            }}
-            aria-hidden="true"
-          >
-            <CardSwap
-              appearDelayMs={250}
-              width={cardSwapLayout.cardWidth}
-              height={cardSwapLayout.cardHeight}
-              cardDistance={cardSwapLayout.cardDistance}
-              verticalDistance={cardSwapLayout.verticalDistance}
-              delay={5200}
-              pauseOnHover
-              staggerFadeIn
-              staggerFadeInDelayMs={60}
-              staggerFadeInEachMs={120}
-              staggerFadeInDurationSec={0.55}
+          {!isMobile && (
+            <Box
+              sx={{
+                position: "relative",
+                width: cardSwapLayout.wrapperWidth,
+                height: cardSwapLayout.wrapperHeight,
+                flex: "0 1 auto", // Allow shrinking if absolutely needed
+                display: "block",
+                mx: { xs: "auto", lg: 0 },
+                ml: { lg: "auto" },
+                mt: { xs: 8, lg: 0 }, // Verified gap on mobile
+              }}
+              aria-hidden="true"
             >
+              <CardSwap
+                appearDelayMs={250}
+                width={cardSwapLayout.cardWidth}
+                height={cardSwapLayout.cardHeight}
+                cardDistance={cardSwapLayout.cardDistance}
+                verticalDistance={cardSwapLayout.verticalDistance}
+                delay={5200}
+                pauseOnHover
+                staggerFadeIn
+                staggerFadeInDelayMs={60}
+                staggerFadeInEachMs={120}
+                staggerFadeInDurationSec={0.55}
+              >
               <Card
                 style={{
                   background:
@@ -666,12 +669,13 @@ export default function Home() {
                   </Box>
                 </Box>
               </Card>
-            </CardSwap>
-          </Box>
+              </CardSwap>
+            </Box>
+          )}
 
           {/* Mobile Button - Shown ONLY on mobile, after cards */}
           <Stack
-            spacing={2}
+            spacing={1}
             sx={{
               width: "100%",
               alignItems: "center",
@@ -691,7 +695,7 @@ export default function Home() {
               sx={{
                 fontWeight: 600,
                 borderRadius: 999,
-                width: "90%",
+                width: "75%",
                 minHeight: 50,
                 color: "white",
                 textTransform: "none",
