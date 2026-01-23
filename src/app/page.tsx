@@ -406,7 +406,7 @@ export default function Home() {
               flex: "0 1 auto", // Allow shrinking if absolutely needed
               display: "block",
               mx: "auto",
-              mt: { xs: 1, lg: 0 }, // Reduced margin (was 4)
+              mt: { xs: 8, lg: 0 }, // Verified gap on mobile
             }}
             aria-hidden="true"
           >
