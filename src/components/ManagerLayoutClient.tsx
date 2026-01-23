@@ -22,7 +22,8 @@ export default function ManagerLayoutClient({
     return (
       <Box
         sx={{
-          height: "100vh",
+          height: "100%",
+          minHeight: 0,
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -38,6 +39,10 @@ export default function ManagerLayoutClient({
     <Box
       sx={{
         display: "flex",
+        height: "100%",
+        minHeight: 0,
+        width: "100%",
+        overflow: "hidden",
       }}
     >
       <ManagerNavbar isMobile={isMobile} />
@@ -45,9 +50,13 @@ export default function ManagerLayoutClient({
         component="main"
         sx={{
           flexGrow: 1,
+          height: "100%",
+          minHeight: 0,
           pl: isMobile ? 0 : `${navWidth}px`,
           width: isMobile ? "100%" : `calc(100% - ${navWidth}px)`,
           pb: isMobile ? "64px" : 0,
+          boxSizing: "border-box",
+          overflow: "hidden",
         }}
       >
         {children}

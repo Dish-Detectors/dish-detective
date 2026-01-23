@@ -204,14 +204,17 @@ export default function AnnouncementChatPage() {
   return (
     <Box
       sx={{
-        minHeight: "100vh",
+        height: "100%",
+        minHeight: 0,
         bgcolor: "#f5f5f5",
-        pt: 4,
-        pb: 2
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+        boxSizing: "border-box",
       }}
     >
       {/* Header */}
-      <Box sx={{ px: isMobile ? 3 : 5, mb: 4 }}>
+      <Box sx={{ px: isMobile ? 3 : 5, pt: 4, pb: 2, flexShrink: 0 }}>
         <Typography
           variant="h4"
           fontWeight="bold"
@@ -231,7 +234,11 @@ export default function AnnouncementChatPage() {
           display: "flex",
           flexDirection: isMobile ? "column" : "row",
           gap: 4,
-          height: isMobile ? "auto" : `calc(100vh - 250px)`, // Increased offset to clear footer
+          flex: 1,
+          minHeight: 0,
+          overflow: "hidden",
+          pb: { xs: 4, sm: 3 },
+          boxSizing: "border-box",
         }}
       >
         {/* Sidebar */}
@@ -263,7 +270,8 @@ export default function AnnouncementChatPage() {
             flexDirection: "column",
             overflow: "hidden",
             position: "relative",
-            height: "100%",
+            minHeight: 0,
+            mb: { xs: 2, sm: 3 },
           }}
         >
           {/* Messages Area */}

@@ -150,7 +150,8 @@ export default function ManagerPage() {
     return (
       <Box
         sx={{
-          height: "100vh",
+          height: "100%",
+          minHeight: 0,
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -167,12 +168,15 @@ export default function ManagerPage() {
       <Box
         sx={{
           flexGrow: 1,
-          minHeight: "100vh",
+          height: "100%",
+          minHeight: 0,
           display: "flex",
           flexDirection: "column",
           bgcolor: "#f5f5f5",
           justifyContent: "flex-start",
           p: 3,
+          boxSizing: "border-box",
+          overflow: "hidden",
         }}
       >
         <Typography
@@ -185,7 +189,7 @@ export default function ManagerPage() {
 
         <Divider sx={{ mb: 4, borderBottomWidth: 2 }} />
 
-        <Box sx={{ flexGrow: 1, py: 4 }}>
+        <Box sx={{ flex: 1, minHeight: 0, overflowY: "auto", py: 4 }}>
           <MobileActionCard
             onClick={() => router.push("/manager/menu")}
             icon={<MenuBookIcon sx={{ fontSize: 32, color: "text.primary" }} />}
@@ -234,11 +238,14 @@ export default function ManagerPage() {
   return (
     <Box
       sx={{
-        height: `calc(100vh - ${headerHeight}px)`,
+        height: "100%",
+        minHeight: 0,
         bgcolor: "#f5f5f5",
         p: 5,
         display: "flex",
         flexDirection: "column",
+        boxSizing: "border-box",
+        overflow: "hidden",
       }}
     >
       <Typography
@@ -249,16 +256,19 @@ export default function ManagerPage() {
         {tr("welcomeWithName", { name: name ? `, ${name}` : "" })}
       </Typography>
 
-      <Box sx={{ mt: -3 }}>
+      <Box sx={{ mt: { xs: 0, md: -3 } }}>
         <Divider sx={{ borderBottomWidth: 2 }} />
       </Box>
 
       <Box
         sx={{
           flex: 1,
+          minHeight: 0,
+          overflowY: "auto",
           px: { xs: 2, sm: 5 },
+          pt: { xs: 3, sm: 4, md: 6 },
           display: "flex",
-          alignItems: "center",
+          alignItems: { xs: "flex-start", md: "center" },
           justifyContent: "center",
         }}
       >
@@ -270,7 +280,7 @@ export default function ManagerPage() {
             flexWrap: "wrap",
             gap: 3.5,
             justifyContent: "center",
-            mt: -7,
+            mt: { xs: 0, md: -4 },
           }}
         >
           <Box sx={{ flex: "1 1 300px" }}>
