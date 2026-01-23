@@ -131,10 +131,6 @@ export default async function RestaurantOfferPage({
     );
   }
 
-  // Coordinates are [longitude, latitude]
-  const [lng, lat] = restaurant.location.coordinates;
-  const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-
   // Check if restaurant is currently open
   const now = new Date();
   const currentDay = now.getDay(); // 0-6

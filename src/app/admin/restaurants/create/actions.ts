@@ -1,7 +1,6 @@
 "use server";
 
 import Restaurant, {
-  Location,
   IWorkingDay,
 } from "../../../../models/Restaurant";
 import dbConnect from "../../../../utils/dbConnect";
@@ -22,7 +21,6 @@ type RestaurantInput = {
   manager?: string;
   imageUrl: string;
   workingHours: IWorkingDay[];
-  location: Location;
   initialStaff?: {
     id: string;
     role: "manager" | "worker";
@@ -46,7 +44,6 @@ export async function createRestaurant(
       name: input.name.trim(),
       address: input.address.trim(),
       manager: input.manager?.trim(),
-      location: input.location,
       imageUrl: input.imageUrl.trim(),
       workingHours: input.workingHours || [],
     });

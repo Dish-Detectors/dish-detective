@@ -1,10 +1,5 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-export interface Location {
-  type: "Point";
-  coordinates: [number, number]; // [longitude, latitude]
-}
-
 export interface IShift {
   start: string; // HH:mm
   end: string; // HH:mm
@@ -21,7 +16,6 @@ export interface IRestaurant extends Document {
   imageUrl: string;
   workingHours: IWorkingDay[];
   availableDishes: mongoose.Types.ObjectId[];
-  location: Location;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -76,23 +70,6 @@ const restaurantSchema = new Schema<IRestaurant>(
           return val.length > 0;
         },
         message: "Working hours cannot be empty",
-      },
-    },
-    location: {
-      type: {
-        type: String,
-        enum: ["Point"],
-        required: true,
-      },
-      coordinates: {
-        type: [Number],
-        required: true,
-        validate: {
-          validator: function (arr: number[]) {
-            return arr.length === 2;
-          },
-          message: "Coordinates must contain exactly [longitude, latitude]",
-        },
       },
     },
   },
