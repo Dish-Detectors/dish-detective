@@ -8,8 +8,8 @@ import StudentNavbar, {
 } from "@/components/StudentNavbar";
 import NotificationSync from "@/components/NotificationSync";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
-import PancakeStackLoader from "@/components/PancakeStackLoader";
-
+// import PancakeStackLoader from "@/components/PancakeStackLoader"; // No longer used
+import RestaurantSkeletonGrid from "@/components/RestaurantSkeletonGrid";
 
 export default function StudentLayoutClient({
   children,
@@ -28,16 +28,31 @@ export default function StudentLayoutClient({
 
   if (!mounted) {
     return (
-      <Box
-        sx={{
+      <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "background.default" }}>
+        {/* Navbar Skeleton */}
+        <Box sx={{
+          width: { xs: "100%", sm: navWidth },
+          height: { xs: 64, sm: "100vh" },
+          position: "fixed",
+          [isMobile ? "bottom" : "top"]: 0,
+          left: 0,
+          bgcolor: "background.paper",
+          borderRight: isMobile ? 0 : 1,
+          borderTop: isMobile ? 1 : 0,
+          borderColor: "divider",
+          zIndex: 1200
+        }} />
+
+        {/* Main Content Skeleton */}
+        <Box sx={{
+          flexGrow: 1,
+          ml: { xs: 0, sm: `${navWidth}px` },
+          mb: { xs: 8, sm: 0 },
           height: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          bgcolor: "background.default",
-        }}
-      >
-        <PancakeStackLoader />
+          overflow: "hidden"
+        }}>
+          <RestaurantSkeletonGrid />
+        </Box>
       </Box>
     );
   }
