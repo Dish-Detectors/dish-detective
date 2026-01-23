@@ -17,6 +17,28 @@ const isManagerRoute = createRouteMatcher(["/manager(.*)"]);
 const isStudentRoute = createRouteMatcher(["/student(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
+  const host = req.headers.get("host") || "";
+  const isEmployeeSubdomain = host.startsWith("employee.");
+  const url = req.nextUrl.clone();
+
+  // If on employee subdomain and trying to go to root or student login, redirect to employee login
+  if (isEmployeeSubdomain) {
+    if (
+      url.pathname === "/" ||
+      url.pathname.startsWith("/login/student") ||
+      url.pathname.startsWith("/sign-in")
+    ) {
+      url.pathname = "/login/employee";
+      return NextResponse.redirect(url);
+    }
+  }
+
+  // If on main domain and trying to go to employee login, redirect to student login
+  if (!isEmployeeSubdomain && url.pathname.startsWith("/login/employee")) {
+    url.pathname = "/login/student";
+    return NextResponse.redirect(url);
+  }
+
   if (isPublicRoute(req)) {
     return;
   }

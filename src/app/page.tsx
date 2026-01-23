@@ -154,6 +154,14 @@ export default function Home() {
     };
   }, [fullSubtitle, homeRevealDone]);
 
+  const [isEmployeeDomain, setIsEmployeeDomain] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsEmployeeDomain(window.location.hostname.startsWith("employee."));
+    }
+  }, []);
+
   // Redirect logged-in users to their dashboard
   useEffect(() => {
     async function checkUserRole() {
@@ -334,7 +342,13 @@ export default function Home() {
           <Button
             variant="contained"
             color="primary"
-            onClick={(e) => setAnchorEl(e.currentTarget)}
+            onClick={() => {
+              if (isEmployeeDomain) {
+                router.push("/login/employee");
+              } else {
+                router.push("/login/student");
+              }
+            }}
             fullWidth
             sx={{
               fontWeight: 600,
@@ -345,44 +359,6 @@ export default function Home() {
           >
             Prijava
           </Button>
-
-          <Menu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={() => setAnchorEl(null)}
-            // We make the menu open upwards on short screens
-            // TODO: Think of a better responsive fix, I guess?
-            anchorOrigin={{
-              vertical: isShortScreen ? "top" : "bottom",
-              horizontal: "center",
-            }}
-            transformOrigin={{
-              vertical: isShortScreen ? "bottom" : "top",
-              horizontal: "center",
-            }}
-            slotProps={{
-              list: {
-                disablePadding: true,
-              },
-              paper: {
-                sx: { minWidth: 300, mt: 1, borderRadius: 2 },
-              },
-            }}
-          >
-            <MenuItem
-              onClick={() => router.push("/login/employee")}
-              sx={{ fontSize: "1.2rem", py: 1.2 }}
-            >
-              <RestaurantIcon fontSize="small" sx={{ mr: 1 }} /> Radnik u menzi
-            </MenuItem>
-            <Box sx={{ borderBottom: "1px solid black", my: 0 }} />
-            <MenuItem
-              onClick={() => router.push("/login/student")}
-              sx={{ fontSize: "1.2rem", py: 1.2 }}
-            >
-              <SchoolIcon fontSize="small" sx={{ mr: 1 }} /> Student
-            </MenuItem>
-          </Menu>
         </Box>
       </Box>
     );
@@ -488,7 +464,13 @@ export default function Home() {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={(e) => setAnchorEl(e.currentTarget)}
+                onClick={() => {
+                  if (isEmployeeDomain) {
+                    router.push("/login/employee");
+                  } else {
+                    router.push("/login/student");
+                  }
+                }}
                 sx={{
                   fontWeight: 600,
                   borderRadius: 999,
@@ -500,45 +482,6 @@ export default function Home() {
               >
                 Prijava
               </Button>
-
-              <Menu
-                anchorEl={anchorEl}
-                open={open}
-                onClose={() => setAnchorEl(null)}
-                slotProps={{
-                  list: {
-                    disablePadding: true,
-                  },
-                  paper: {
-                    sx: { minWidth: 300, mt: 1, borderRadius: 2 },
-                  },
-                }}
-              >
-                <MenuItem
-                  onClick={() => router.push("/login/employee")}
-                  sx={{
-                    fontSize: "1rem",
-                    py: 1.2,
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  <RestaurantIcon fontSize="small" sx={{ mr: 1 }} /> Radnik u
-                  menzi
-                </MenuItem>
-                <Box sx={{ borderBottom: "1px solid black", my: 0 }} />
-                <MenuItem
-                  onClick={() => router.push("/login/student")}
-                  sx={{
-                    fontSize: "1rem",
-                    py: 1.2,
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  <SchoolIcon fontSize="small" sx={{ mr: 1 }} /> Student
-                </MenuItem>
-              </Menu>
             </Stack>
           </Box>
 
