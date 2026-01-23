@@ -49,6 +49,7 @@ export async function createEmployeeAccount({
       publicMetadata: {
         role: role ?? null,
         restaurantId: restaurantId ?? null,
+        isEmployee: true,
       },
     });
 

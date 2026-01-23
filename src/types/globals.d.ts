@@ -5,6 +5,7 @@ declare global {
     metadata: {
       role?: UserRole;
       restaurantId?: string;
+      isEmployee?: boolean;
     };
   }
 }
