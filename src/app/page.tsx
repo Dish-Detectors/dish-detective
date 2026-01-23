@@ -401,10 +401,10 @@ export default function Home() {
               position: "relative",
               width: cardSwapLayout.wrapperWidth,
               height: cardSwapLayout.wrapperHeight,
-              flex: "0 0 auto",
+              flex: "0 1 auto", // Allow shrinking if absolutely needed
               display: "block",
               mx: "auto",
-              mt: { xs: 4, lg: 0 },
+              mt: { xs: 1, lg: 0 }, // Reduced margin (was 4)
             }}
             aria-hidden="true"
           >
