@@ -118,8 +118,13 @@ export async function sendDishNotification(
     const restaurant = await Restaurant.findById(menu.restaurantId);
     if (!restaurant) throw new Error("Restaurant not found");
 
-    const title = "Tvoje jelo je dostupno! 🍲";
-    const body = `${dish.name} je sada dostupan u restoranu ${restaurant.name} (od ${availableFrom}).`;
+    const titleEn = "Your dish is available!";
+    const titleHr = "Tvoje jelo je dostupno!";
+    const title = `${titleEn} / ${titleHr} 🍲`;
+
+    const bodyEn = `${dish.name} is now available at ${restaurant.name} (from ${availableFrom}).`;
+    const bodyHr = `${dish.name} je sada dostupan u restoranu ${restaurant.name} (od ${availableFrom}).`;
+    const body = `${bodyEn} / ${bodyHr}`;
 
     const imageUrl = dish.imageUrl || "";
 
@@ -164,8 +169,16 @@ export async function sendDishNotification(
     // Save to database for each subscribed student
     const notificationPromises = subscribers.map((sub) =>
       Notification.create({
-        title: title,
-        description: body,
+        title: titleEn,
+        titleKey: "dishAvailableTitle",
+        titleParams: {},
+        description: bodyEn,
+        descriptionKey: "dishAvailableDescription",
+        descriptionParams: {
+          dishName: dish.name,
+          restaurantName: restaurant.name,
+          availableFrom,
+        },
         imageUrl: imageUrl,
         type: "student",
         postedBy: userId,
@@ -195,8 +208,10 @@ export async function sendPollNotifications(params: {
   await dbConnect();
 
   try {
-    const title = "Nova anketa dostupna! 📊";
-    const body = `Imamo nekoliko pitanja o hrani u restoranu ${params.restaurantName}: "${params.pollTitle}"`;
+    const title = "New poll available! / Nova anketa dostupna! 📊";
+    const body =
+      `We have a few questions about food at ${params.restaurantName}: "${params.pollTitle}"` +
+      ` / Imamo nekoliko pitanja o hrani u restoranu ${params.restaurantName}: "${params.pollTitle}"`;
     const pollLink = `/student/polls/${params.pollId}`;
 
     const messages = params.targetUserIds.map((targetUserId) => ({

@@ -28,9 +28,11 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import PollIcon from "@mui/icons-material/Poll";
 import { useRouter } from "next/navigation";
 import { fetchManagerPolls } from "./actions";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function PollsListingPage() {
   const router = useRouter();
+  const { lang, t } = useI18n();
   const [polls, setPolls] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
@@ -51,7 +53,7 @@ export default function PollsListingPage() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleString("hr-HR", {
+    return date.toLocaleString(lang === "HR" ? "hr-HR" : "en-GB", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -61,7 +63,9 @@ export default function PollsListingPage() {
   };
 
   const filteredPolls = polls.filter((poll) =>
-    (poll.title || "Anketa").toLowerCase().includes(searchQuery.toLowerCase()),
+    (poll.title || t("pollDefaultTitle"))
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase()),
   );
 
   if (loading) {
@@ -113,16 +117,16 @@ export default function PollsListingPage() {
             gutterBottom
             sx={{ color: "#212222" }}
           >
-            Povijest anketa
+            {t("pollsHistoryTitle")}
           </Typography>
           <Typography color="text.secondary" sx={{ mb: 3 }}>
-            Pregledajte rezultate i statistiku vaših anketa.
+            {t("pollsHistorySubtitle")}
           </Typography>
 
           <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
             <TextField
               fullWidth
-              placeholder="Pretraži ankete po naslovu..."
+              placeholder={t("searchPollsByTitlePlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               slotProps={{
@@ -154,7 +158,7 @@ export default function PollsListingPage() {
                 "&:hover": { boxShadow: "0 4px 12px rgba(0,0,0,0.1)" },
               }}
             >
-              Nova anketa
+              {t("newPoll")}
             </Button>
           </Stack>
         </Box>
@@ -165,14 +169,14 @@ export default function PollsListingPage() {
           <Paper sx={{ p: 4, textAlign: "center", borderRadius: 3 }}>
             <PollIcon sx={{ fontSize: 64, color: "text.disabled", mb: 2 }} />
             <Typography variant="h6" color="text.secondary">
-              Još uvijek niste kreirali nijednu anketu.
+              {t("noPollsCreatedYet")}
             </Typography>
           </Paper>
         ) : filteredPolls.length === 0 ? (
           <Paper sx={{ p: 4, textAlign: "center", borderRadius: 3 }}>
             <SearchIcon sx={{ fontSize: 64, color: "text.disabled", mb: 2 }} />
             <Typography variant="h6" color="text.secondary">
-              Nema rezultata za vašu pretragu.
+              {t("noResultsForSearch")}
             </Typography>
           </Paper>
         ) : (
@@ -212,10 +216,13 @@ export default function PollsListingPage() {
                         fontWeight={600}
                         sx={{ color: "#212222" }}
                       >
-                        {poll.title || "Anketa"}
+                        {poll.title || t("pollDefaultTitle")}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {poll.questions.length} pitanja •{" "}
+                        {t("questionsCountLabel", {
+                          count: poll.questions.length,
+                        })}{" "}
+                        •{" "}
                         {formatDate(poll.createdAt)}
                       </Typography>
                     </Box>

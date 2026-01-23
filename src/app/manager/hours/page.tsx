@@ -21,23 +21,14 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
 import { getManagerRestaurant, saveWorkingHours } from "./actions";
 import { IWorkingDay, IShift } from "@/models/Restaurant";
-
-const DAYS = ["NED", "PON", "UTO", "SRI", "ČET", "PET", "SUB"];
-const DAY_LABELS = [
-  "Nedjelja",
-  "Ponedjeljak",
-  "Utorak",
-  "Srijeda",
-  "Četvrtak",
-  "Petak",
-  "Subota",
-];
+import { useI18n } from "@/components/I18nProvider";
 
 interface WorkingHoursData {
   [day: number]: IShift[];
 }
 
 export default function WorkingHoursPage() {
+  const { t } = useI18n();
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
   const [selectedDay, setSelectedDay] = useState<number>(1); // Monday default
   const [workingHours, setWorkingHours] = useState<WorkingHoursData>({});
@@ -52,6 +43,25 @@ export default function WorkingHoursPage() {
   useEffect(() => {
     loadData();
   }, []);
+
+  const DAYS = [
+    t("daySunShort"),
+    t("dayMonShort"),
+    t("dayTueShort"),
+    t("dayWedShort"),
+    t("dayThuShort"),
+    t("dayFriShort"),
+    t("daySatShort"),
+  ];
+  const DAY_LABELS = [
+    t("daySunday"),
+    t("dayMonday"),
+    t("dayTuesday"),
+    t("dayWednesday"),
+    t("dayThursday"),
+    t("dayFriday"),
+    t("daySaturday"),
+  ];
 
   const loadData = async () => {
     setLoading(true);
@@ -124,7 +134,9 @@ export default function WorkingHoursPage() {
         if (shift.start && shift.end && shift.start >= shift.end) {
           setSnackbar({
             open: true,
-            message: `Neispravno vrijeme za ${DAY_LABELS[parseInt(day)]}: Kraj mora biti nakon početka.`,
+            message: t("invalidTimeForDay", {
+              day: DAY_LABELS[parseInt(day)],
+            }),
             severity: "error",
           });
           return;
@@ -138,16 +150,20 @@ export default function WorkingHoursPage() {
       if (res.success) {
         setSnackbar({
           open: true,
-          message: "Radno vrijeme uspješno spremljeno!",
+          message: t("workingHoursSaved"),
           severity: "success",
         });
       } else {
-        throw new Error(res.error || "Failed to save");
+        const message =
+          ("errorKey" in res && res.errorKey && t(res.errorKey))
+          || ("error" in res && res.error)
+          || t("workingHoursSaveError");
+        throw new Error(message);
       }
     } catch (error: any) {
       setSnackbar({
         open: true,
-        message: error.message || "Greška pri spremanju radnog vremena.",
+        message: error.message || t("workingHoursSaveError"),
         severity: "error",
       });
     } finally {
@@ -196,7 +212,7 @@ export default function WorkingHoursPage() {
           flexShrink: 0,
         }}
       >
-        Radno vrijeme
+        {t("workingHours")}
       </Typography>
 
       <Divider sx={{ mb: 4 }} />
@@ -269,7 +285,7 @@ export default function WorkingHoursPage() {
                   color="text.secondary"
                   sx={{ textAlign: "center", py: 4 }}
                 >
-                  Nema definiranih smjena za ovaj dan. Restoran je zatvoren.
+                  {t("noShiftsDefined")}
                 </Typography>
               ) : (
                 currentShifts.map((shift, index) => (
@@ -302,7 +318,7 @@ export default function WorkingHoursPage() {
                       }}
                     >
                       <TextField
-                        label="Početak"
+                        label={t("shiftStart")}
                         type="time"
                         size="small"
                         value={shift.start}
@@ -325,10 +341,10 @@ export default function WorkingHoursPage() {
                         color="text.secondary"
                         sx={{ display: { xs: "none", sm: "block" } }}
                       >
-                        do
+                        {t("timeTo")}
                       </Typography>
                       <TextField
-                        label="Kraj"
+                        label={t("shiftEnd")}
                         type="time"
                         size="small"
                         value={shift.end}
@@ -377,7 +393,7 @@ export default function WorkingHoursPage() {
                   fontWeight: 600,
                 }}
               >
-                Dodaj smjenu
+                {t("addShift")}
               </Button>
               <Button
                 variant="contained"
@@ -393,7 +409,7 @@ export default function WorkingHoursPage() {
                   "&:hover": { boxShadow: "0 4px 12px rgba(0,0,0,0.15)" },
                 }}
               >
-                {saving ? <PancakeStackLoader /> : "Spremi promjene"}
+                {saving ? <PancakeStackLoader /> : t("saveChanges")}
               </Button>
             </Stack>
           </Paper>
