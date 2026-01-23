@@ -124,7 +124,8 @@ export default function StudentDishCard({
         borderRadius: 4,
         boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
         overflow: "hidden",
-        transition: "transform 0.2s ease-in-out",
+        transition:
+          "transform 0.2s ease-in-out, background-color 0.3s ease, color 0.3s ease",
         "&:hover": {
           transform: "translateY(-4px)",
           boxShadow: "0 12px 32px rgba(0,0,0,0.12)",
@@ -207,7 +208,7 @@ export default function StudentDishCard({
             alignItems: "center",
             gap: 1,
             color: "text.secondary",
-            bgcolor: "grey.100",
+            bgcolor: "action.hover", // Changed from grey.100
             py: 0.8,
             px: 1.5,
             borderRadius: 1.5,
@@ -228,12 +229,13 @@ export default function StudentDishCard({
             mt: 2.5,
             p: 2,
             borderRadius: 3,
-            bgcolor: "grey.50",
+            bgcolor: "background.default", // Changed from grey.50 for better theme support
             border: "1px solid",
-            borderColor: "grey.200",
+            borderColor: "divider", // Changed from grey.200
             display: "flex",
             flexDirection: "column",
             gap: 2,
+            transition: "background-color 0.3s ease, border-color 0.3s ease",
           }}
         >
           {isOffer && (

@@ -9,6 +9,7 @@ import {
   Stack,
   Divider,
   Chip,
+  CardMedia,
 } from "@mui/material";
 import { auth } from "@clerk/nextjs/server";
 import { getRestaurantOffer } from "@/app/student/action";
@@ -171,121 +172,132 @@ export default async function RestaurantOfferPage({
           p: { xs: 3, md: 4 },
           mb: 5,
           borderRadius: 4,
-          bgcolor: "white",
+          bgcolor: "background.paper", // Changed from "white"
           border: "1px solid",
-          borderColor: "divider",
+          transition: "background-color 0.3s ease, color 0.3s ease",
+          padding: 0, // Remove padding from Paper to let image stretch full width
+          overflow: "hidden", // Ensure border radius clips image
         }}
       >
-        <Grid container spacing={4} alignItems="flex-start">
-          <Grid size={{ xs: 12, md: 7 }}>
-            <Box
-              sx={{
-                mb: 1,
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-                flexWrap: "wrap",
-              }}
-            >
-              <Typography variant="h3" fontWeight="800">
-                {restaurant.name}
-              </Typography>
-              <Chip
-                label={isOpen ? "OTVORENO" : "ZATVORENO - Van radnog vremena"}
-                color={isOpen ? "success" : "error"}
-                sx={{ fontWeight: 700, borderRadius: 2 }}
-              />
-            </Box>
-            <Stack
-              direction="row"
-              alignItems="center"
-              spacing={1}
-              sx={{ mb: 3 }}
-            >
-              <LocationOnIcon color="action" />
-              <Typography variant="h6" color="text.secondary">
-                {restaurant.address}
-              </Typography>
-            </Stack>
+        <CardMedia
+          component="img"
+          image={restaurant.imageUrl || "/placeholder-restaurant.jpg"}
+          alt={restaurant.name}
+          sx={{
+            width: "100%",
+            height: { xs: 200, md: 300 },
+            objectFit: "cover",
+          }}
+        />
+        <Box sx={{ p: { xs: 3, md: 4 } }}>
+          <Grid container spacing={4} alignItems="stretch">
+            <Grid size={{ xs: 12, md: 7 }} sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+              <Box>
+                <Box
+                  sx={{
+                    mb: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <Typography variant="h3" fontWeight="800">
+                    {restaurant.name}
+                  </Typography>
+                  <Chip
+                    label={isOpen ? "OTVORENO" : "ZATVORENO - Van radnog vremena"}
+                    color={isOpen ? "success" : "error"}
+                    sx={{ fontWeight: 700, borderRadius: 2 }}
+                  />
+                </Box>
+              </Box>
 
-            <Button
-              variant="contained"
-              size="large"
-              startIcon={<NavigationIcon />}
-              component="a"
-              href={googleMapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              sx={{
-                borderRadius: 3,
-                textTransform: "none",
-                fontSize: "1rem",
-                fontWeight: 600,
-                px: 4,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-              }}
-            >
-              Navigiraj
-            </Button>
-          </Grid>
-
-          <Grid size={{ xs: 12, md: 5 }}>
-            <Box
-              sx={{
-                bgcolor: "grey.50",
-                p: 3,
-                borderRadius: 3,
-                border: "1px solid",
-                borderColor: "divider",
-              }}
-            >
-              <Stack
-                direction="row"
-                alignItems="center"
-                spacing={1}
-                sx={{ mb: 2 }}
+              <Box
+                sx={{
+                  flex: 1,
+                  mt: 3,
+                  position: "relative",
+                  borderRadius: 3,
+                  overflow: "hidden",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                  border: "1px solid",
+                  borderColor: "divider",
+                  minHeight: 200,
+                }}
               >
-                <AccessTimeIcon color="primary" />
-                <Typography variant="h6" fontWeight="700">
-                  Radno Vrijeme
-                </Typography>
-              </Stack>
-              <Stack spacing={1.5}>
-                {sortedSubHours.map((wh) => (
-                  <Box
-                    key={wh.day}
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      fontSize: "0.95rem",
-                    }}
-                  >
-                    <Typography
-                      color="text.secondary"
-                      fontWeight={
-                        new Date().getDay() === wh.day ? "bold" : "normal"
-                      }
+                <iframe
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  style={{ border: 0, width: "100%", height: "100%" }}
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(
+                    restaurant.name + " " + restaurant.address,
+                  )}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                  allowFullScreen
+                ></iframe>
+              </Box>
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 5 }}>
+              <Box
+                sx={{
+                  bgcolor: "background.default", // Changed from "grey.50"
+                  p: 3,
+                  borderRadius: 3,
+                  border: "1px solid",
+                  borderColor: "divider",
+                  transition: "background-color 0.3s ease, color 0.3s ease",
+                }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  spacing={1}
+                  sx={{ mb: 2 }}
+                >
+                  <AccessTimeIcon color="primary" />
+                  <Typography variant="h6" fontWeight="700">
+                    Radno Vrijeme
+                  </Typography>
+                </Stack>
+                <Stack spacing={1.5}>
+                  {sortedSubHours.map((wh) => (
+                    <Box
+                      key={wh.day}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        fontSize: "0.95rem",
+                      }}
                     >
-                      {DAYS[wh.day]}
-                    </Typography>
-                    <Typography
-                      fontWeight={
-                        new Date().getDay() === wh.day ? "bold" : "medium"
-                      }
-                      color={
-                        new Date().getDay() === wh.day
-                          ? "primary.main"
-                          : "text.primary"
-                      }
-                    >
-                      {wh.shifts.map((s) => `${s.start} - ${s.end}`).join(", ")}
-                    </Typography>
-                  </Box>
-                ))}
-              </Stack>
-            </Box>
+                      <Typography
+                        color="text.secondary"
+                        fontWeight={
+                          new Date().getDay() === wh.day ? "bold" : "normal"
+                        }
+                      >
+                        {DAYS[wh.day]}
+                      </Typography>
+                      <Typography
+                        fontWeight={
+                          new Date().getDay() === wh.day ? "bold" : "medium"
+                        }
+                        color={
+                          new Date().getDay() === wh.day
+                            ? "primary.main"
+                            : "text.primary"
+                        }
+                      >
+                        {wh.shifts.map((s) => `${s.start} - ${s.end}`).join(", ")}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Stack>
+              </Box>
+            </Grid>
           </Grid>
-        </Grid>
+        </Box>
       </Paper>
 
       <RestaurantMenuTabs
@@ -306,8 +318,8 @@ export default async function RestaurantOfferPage({
             allergens: dish.allergens?.map((a: any) => a.name) || [],
             lastServed: lastServedMap.has(dish._id.toString())
               ? lastServedMap
-                  .get(dish._id.toString())!
-                  .toLocaleDateString("hr-HR")
+                .get(dish._id.toString())!
+                .toLocaleDateString("hr-HR")
               : "Nikada do sada",
             rating: ratingInfo.avg,
             ratingCount: ratingInfo.count,
@@ -318,6 +330,6 @@ export default async function RestaurantOfferPage({
         isOpen={isOpen}
         restaurantId={id}
       />
-    </Container>
+    </Container >
   );
 }
