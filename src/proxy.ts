@@ -56,7 +56,6 @@ export default clerkMiddleware(async (auth, req) => {
 
   const response = await handleRedirects(isEmployeeSubdomain, url);
   if (response) {
-    // Also set the language cookie on redirect (only if missing)
     if (langToSet) response.cookies.set(LANG_COOKIE, langToSet, { path: "/" });
     return response;
   }
@@ -76,6 +75,32 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   const role = (sessionClaims as any)?.metadata?.role || "student";
+  const isEmployee = ["admin", "manager", "worker"].includes(role);
+
+  const MAIN_DOMAIN = "dishdetective.me";
+  const EMPLOYEE_DOMAIN = "employee.dishdetective.me";
+
+  // Strict domain checks to avoid affecting localhost/preview envs
+  const isOnMainDomain = host === MAIN_DOMAIN || host === `www.${MAIN_DOMAIN}`;
+  const isOnEmployeeDomain = host === EMPLOYEE_DOMAIN;
+
+  // 1. Employee on Main Domain -> Redirect to Employee Domain
+  if (isEmployee && isOnMainDomain) {
+    const redirectUrl = new URL(req.url);
+    redirectUrl.hostname = EMPLOYEE_DOMAIN;
+    redirectUrl.protocol = "https";
+    redirectUrl.port = "";
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  // 2. Student on Employee Domain -> Redirect to Main Domain
+  if (!isEmployee && isOnEmployeeDomain) {
+    const redirectUrl = new URL(req.url);
+    redirectUrl.hostname = MAIN_DOMAIN;
+    redirectUrl.protocol = "https";
+    redirectUrl.port = "";
+    return NextResponse.redirect(redirectUrl);
+  }
 
   // Define which roles can access which paths
   const rolePaths: Record<string, string> = {
@@ -97,7 +122,7 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.redirect(new URL(currentRolePath, req.url));
   }
 
-  // Normal pass-through; still ensure language cookie exists.
+  // Normal pass-through
   const res = NextResponse.next();
   if (langToSet) res.cookies.set(LANG_COOKIE, langToSet, { path: "/" });
   return res;
@@ -105,9 +130,7 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
     "/(api|trpc)(.*)",
   ],
 };
