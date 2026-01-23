@@ -17,6 +17,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { useRouter } from "next/navigation";
 import { getPollResults } from "../actions";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function PollResultsPage({
   params,
@@ -24,6 +25,7 @@ export default function PollResultsPage({
   params: Promise<{ id: string }>;
 }) {
   const router = useRouter();
+  const { lang, t } = useI18n();
   const resolvedParams = use(params);
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -44,7 +46,7 @@ export default function PollResultsPage({
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleString("hr-HR", {
+    return date.toLocaleString(lang === "HR" ? "hr-HR" : "en-GB", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -69,7 +71,7 @@ export default function PollResultsPage({
           onClick={() => router.back()}
           sx={{ mb: 2 }}
         >
-          Povratak
+          {t("back")}
         </Button>
         <Alert severity="error">{error || "Poll not found"}</Alert>
       </Box>
@@ -102,7 +104,7 @@ export default function PollResultsPage({
           onClick={() => router.push("/manager/polls")}
           sx={{ mb: 2 }}
         >
-          Sve ankete
+          {t("allPolls")}
         </Button>
       </Box>
 
@@ -110,11 +112,11 @@ export default function PollResultsPage({
         <Box sx={{ maxWidth: 900, mx: "auto" }}>
           <Box sx={{ mb: 4 }}>
             <Typography variant="h4" fontWeight={700} gutterBottom>
-              {poll.title || "Rezultati ankete"}
+              {poll.title || t("pollResultsTitle")}
             </Typography>
             <Typography color="text.secondary">
-              Kreirano: {formatDate(poll.createdAt)} • Ukupno odgovora:{" "}
-              <strong>{totalAnswers}</strong>
+              {t("createdLabel", { date: formatDate(poll.createdAt) })} •{" "}
+              {t("totalAnswersLabel", { count: totalAnswers })}
             </Typography>
           </Box>
 
@@ -124,7 +126,7 @@ export default function PollResultsPage({
                 sx={{ fontSize: 48, color: "text.disabled", mb: 2 }}
               />
               <Typography variant="h6" color="text.secondary">
-                Još uvijek nema odgovora na ovu anketu.
+                {t("noAnswersYet")}
               </Typography>
             </Paper>
           ) : (
@@ -145,13 +147,13 @@ export default function PollResultsPage({
                         {
                           scaleType: "band",
                           data: ["1", "2", "3", "4", "5"],
-                          label: "Ocjena (1-5)",
+                          label: t("ratingScaleLabel"),
                         },
                       ]}
                       series={[
                         {
                           data: result.data.map((d: any) => d.count),
-                          label: "Broj studenata",
+                          label: t("studentCountLabel"),
                           color: "#2E7D32", // Success green
                         },
                       ]}
@@ -168,10 +170,10 @@ export default function PollResultsPage({
                     }}
                   >
                     <Typography variant="caption" color="text.secondary">
-                      1 - U potpunosti se ne slažem
+                      1 - {t("stronglyDisagree")}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      5 - U potpunosti se slažem
+                      5 - {t("stronglyAgree")}
                     </Typography>
                   </Box>
                 </Paper>

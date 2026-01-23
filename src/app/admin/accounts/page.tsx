@@ -8,6 +8,7 @@ import {
   InputAdornment,
   IconButton,
   Typography,
+  Divider,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -23,6 +24,7 @@ import EmployeeCard from "@/components/EmployeeCard";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
 import { navWidth } from "@/components/AdminNavbar";
 import { getAllEmployees, deleteEmployee } from "./actions";
+import { useI18n } from "@/components/I18nProvider";
 
 type EmployeeData = {
   id: string;
@@ -35,6 +37,7 @@ type EmployeeData = {
 };
 
 export default function WorkerManagerAccountsPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -104,11 +107,15 @@ export default function WorkerManagerAccountsPage() {
           filteredEmployees.filter((emp) => emp.id !== employeeToDelete),
         );
       } else {
-        alert(result.error || "Greška prilikom brisanja");
+        const message =
+          ("errorKey" in result && result.errorKey && t(result.errorKey)) ||
+          result.error ||
+          t("deleteFailed");
+        alert(message);
       }
     } catch (error) {
       console.error("Error deleting employee:", error);
-      alert("Greška prilikom brisanja");
+      alert(t("deleteFailed"));
     } finally {
       setDeleting(false);
       setDeleteDialogOpen(false);
@@ -151,74 +158,108 @@ export default function WorkerManagerAccountsPage() {
         px: { xs: 3, sm: 5 },
         py: { xs: 3, sm: 5 },
         pt: 0,
-        pb: { xs: "130px", sm: 10 }, // Extra padding for mobile navbar and desktop spacing
+        pb: 0,
         overflow: "hidden",
       }}
     >
-      <Typography
-        variant="h4"
-        sx={{
-          fontWeight: 780,
-          mb: 4,
-          color: "#212222",
-          flexShrink: 0,
-        }}
-      >
-        Upravljaj računima
-      </Typography>
-
       <Box
         sx={{
-          display: "flex",
-          gap: 2,
-          mb: 4,
-          maxWidth: { xs: "100%", sm: 600 },
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", sm: "1fr auto 1fr" },
+          alignItems: "center",
+          columnGap: 3,
+          rowGap: 2,
+          mb: 2,
           flexShrink: 0,
         }}
       >
-        <TextField
-          fullWidth
-          placeholder="Search"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ color: "#999" }} />
-                </InputAdornment>
-              ),
-            },
-          }}
+        <Typography
+          variant="h4"
           sx={{
-            bgcolor: "white",
-            borderRadius: 10,
-            "& .MuiOutlinedInput-root": {
-              borderRadius: 10,
-              "& fieldset": {
-                borderColor: "#e0e0e0",
-              },
-            },
+            fontWeight: 780,
+            color: "#212222",
+            flexShrink: 0,
+            lineHeight: 1.2,
+            justifySelf: "start",
+          }}
+        >
+          {t("manageAccountsTitle")}
+        </Typography>
+
+        <Divider
+          sx={{
+            display: { xs: "block", sm: "none" },
+            mb: 1,
+            borderBottomWidth: 2,
           }}
         />
 
-        <IconButton
-          onClick={handleAddNew}
+        <Box
           sx={{
-            bgcolor: "white",
-            border: "1px solid #e0e0e0",
-            width: 56,
-            height: 56,
-            borderRadius: "50%",
-            "&:hover": {
-              bgcolor: "#e0e0e0",
-            },
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            width: { xs: "100%", sm: "auto" },
+            justifySelf: { xs: "stretch", sm: "center" },
           }}
-          aria-label="add employee"
         >
-          <AddIcon />
-        </IconButton>
+          <TextField
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={t("search")}
+            size="small"
+            sx={{
+              width: { xs: "100%", sm: 340, md: 440 },
+              maxWidth: "100%",
+              bgcolor: "white",
+              borderRadius: 999,
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 999,
+                "& fieldset": {
+                  borderColor: "#e0e0e0",
+                },
+                "&:hover fieldset": {
+                  borderColor: "primary.main",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "primary.main",
+                },
+              },
+            }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: "#999" }} />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+
+          <IconButton
+            onClick={handleAddNew}
+            sx={{
+              bgcolor: "white",
+              border: "1px solid #e0e0e0",
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
+              flexShrink: 0,
+              "&:hover": {
+                bgcolor: "#e0e0e0",
+              },
+            }}
+            aria-label={t("addEmployeeAria")}
+          >
+            <AddIcon />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ display: { xs: "none", sm: "block" } }} />
       </Box>
+
+      <Divider sx={{ display: { xs: "none", sm: "block" }, mb: 4 }} />
 
       <Box
         sx={{
@@ -238,7 +279,7 @@ export default function WorkerManagerAccountsPage() {
             }}
           >
             <Typography variant="body1" color="text.secondary">
-              {searchQuery ? "Nema rezultata pretrage" : "Nema zaposlenika"}
+              {searchQuery ? t("noSearchResults") : t("noEmployees")}
             </Typography>
           </Box>
         ) : (
@@ -290,16 +331,15 @@ export default function WorkerManagerAccountsPage() {
         onClose={cancelDelete}
         aria-labelledby="delete-dialog-title"
       >
-        <DialogTitle id="delete-dialog-title">Potvrda brisanja</DialogTitle>
+        <DialogTitle id="delete-dialog-title">
+          {t("confirmRemovalTitle")}
+        </DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Jeste li sigurni da želite obrisati ovaj račun? Ova radnja se ne
-            može poništiti.
-          </DialogContentText>
+          <DialogContentText>{t("confirmDeleteAccountBody")}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={cancelDelete} disabled={deleting}>
-            Odustani
+            {t("cancel")}
           </Button>
           <Button
             onClick={confirmDelete}
@@ -307,7 +347,7 @@ export default function WorkerManagerAccountsPage() {
             variant="contained"
             disabled={deleting}
           >
-            {deleting ? "Brisanje..." : "Obriši"}
+            {deleting ? t("deleting") : t("delete")}
           </Button>
         </DialogActions>
       </Dialog>

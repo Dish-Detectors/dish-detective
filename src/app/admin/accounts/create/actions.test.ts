@@ -96,7 +96,7 @@ describe("Create Account Server Actions", () => {
       const result = await createEmployeeAccount(validEmployeeData);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Unauthorized");
+      expect(result.errorKey).toBe("unauthorized");
     });
 
     it("should return error when user is not an admin", async () => {
@@ -108,7 +108,7 @@ describe("Create Account Server Actions", () => {
       const result = await createEmployeeAccount(validEmployeeData);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Only admins can create employee accounts");
+      expect(result.errorKey).toBe("onlyAdminsCanCreateEmployeeAccounts");
     });
 
     it("should handle Clerk creation errors", async () => {
@@ -124,9 +124,7 @@ describe("Create Account Server Actions", () => {
       const result = await createEmployeeAccount(validEmployeeData);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe(
-        "Greška prilikom kreiranja računa u Clerk sustavu",
-      );
+      expect(result.errorKey).toBe("clerkCreateAccountError");
     });
   });
 });

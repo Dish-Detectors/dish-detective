@@ -19,22 +19,32 @@ import {
 import { useColorMode } from "@/components/ThemeRegistry";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function Header() {
   const pathname = usePathname();
   const { user } = useUser();
   const { toggleColorMode, mode } = useColorMode();
+  const { lang, setLang, t } = useI18n();
   const isHomepage = pathname === "/";
   const isLoginRoute = pathname.startsWith("/login");
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const toggleLang = () => setLang(lang === "HR" ? "EN" : "HR");
 
   const [showHomepageHeader, setShowHomepageHeader] = useState(false);
 
   // Get the role from the public metadata we just set
   const userRole = user?.publicMetadata?.role as string | undefined;
   // Create the dynamic link. Default to "/" if role isn't found.
-  const homeHref = userRole ? `/${userRole}` : "/";
+  // Students go to /student/restaurants
+  const homeHref =
+    userRole === "student"
+      ? "/student/restaurants"
+      : userRole
+        ? `/${userRole}`
+        : "/";
 
   // State for restaurant name
   const [restaurantName, setRestaurantName] = React.useState<string | null>(
@@ -167,7 +177,28 @@ export default function Header() {
               gap: { xs: 1, md: 2 },
             }}
           >
-            {/* Translate button removed as per user request */}
+            <Button
+              sx={{
+                display: { xs: "flex", sm: "none" },
+                minWidth: 0,
+                padding: 0,
+                bgcolor: "transparent",
+                "&:hover": {
+                  bgcolor: "transparent",
+                },
+              }}
+              disableRipple
+              aria-label={t("language")}
+              onClick={toggleLang}
+            >
+              <Image
+                src="/translate.png"
+                alt="Translate"
+                width={32}
+                height={32}
+                style={{ filter: "invert(1)" }}
+              />
+            </Button>
           </Box>
         </Toolbar>
       </AppBar>
@@ -259,7 +290,7 @@ export default function Header() {
 
           <Button
             sx={{
-              display: { xs: "none", sm: "flex" },
+              display: "flex",
               minWidth: 0,
               padding: 0,
               bgcolor: "transparent",
@@ -268,6 +299,8 @@ export default function Header() {
               },
             }}
             disableRipple
+            aria-label={t("language")}
+            onClick={toggleLang}
           >
             <Image
               src="/translate.png"

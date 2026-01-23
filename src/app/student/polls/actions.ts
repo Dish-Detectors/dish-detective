@@ -11,18 +11,18 @@ import mongoose from "mongoose";
 export async function getPoll(pollId: string) {
   try {
     const { userId } = await auth();
-    if (!userId) return { error: "Unauthorized" };
+    if (!userId) return { errorKey: "unauthorized" };
 
     await dbConnect();
 
     // Validate ID
     if (!mongoose.Types.ObjectId.isValid(pollId)) {
-      return { error: "Invalid poll ID" };
+      return { errorKey: "invalidPollId" };
     }
 
     const poll = await Poll.findById(pollId).lean();
     if (!poll) {
-      return { error: "Anketa nije pronađena." };
+      return { errorKey: "pollNotFound" };
     }
 
     const restaurant = await Restaurant.findById(poll.restaurantId)
@@ -36,16 +36,16 @@ export async function getPoll(pollId: string) {
     });
 
     if (existingAnswer) {
-      return { error: "Već ste ispunili ovu anketu.", alreadyAnswered: true };
+      return { errorKey: "pollAlreadyAnswered", alreadyAnswered: true };
     }
 
     return {
       poll: JSON.parse(JSON.stringify(poll)),
-      restaurantName: restaurant?.name || "Nepoznati restoran",
+      restaurantName: restaurant?.name || "__unknownRestaurant__",
     };
   } catch (error) {
     console.error("Error fetching poll:", error);
-    return { error: "Došlo je do greške prilikom dohvaćanja ankete." };
+    return { errorKey: "pollFetchFailed" };
   }
 }
 
@@ -55,13 +55,13 @@ export async function submitPollAnswers(
 ) {
   try {
     const { userId } = await auth();
-    if (!userId) return { error: "Unauthorized" };
+    if (!userId) return { errorKey: "unauthorized" };
 
     await dbConnect();
 
     // Basic validation
     if (!answers || answers.length === 0) {
-      return { error: "Niste odgovorili na pitanja." };
+      return { errorKey: "pollNoAnswers" };
     }
 
     // Check for duplicates again
@@ -71,7 +71,7 @@ export async function submitPollAnswers(
     });
 
     if (existingAnswer) {
-      return { error: "Već ste ispunili ovu anketu." };
+      return { errorKey: "pollAlreadyAnswered" };
     }
 
     // Save answers
@@ -89,7 +89,7 @@ export async function submitPollAnswers(
     // Better to fetch the poll to ensure data integrity.
 
     const poll = await Poll.findById(pollId);
-    if (!poll) return { error: "Poll not found" };
+    if (!poll) return { errorKey: "pollNotFound" };
 
     const formattedAnswers = answers.map((a) => {
       const questionText = poll.questions[a.questionIndex];
@@ -120,6 +120,6 @@ export async function submitPollAnswers(
     return { success: true };
   } catch (error) {
     console.error("Error submitting poll:", error);
-    return { error: "Neuspješno slanje odgovora." };
+    return { errorKey: "pollSubmitFailed" };
   }
 }

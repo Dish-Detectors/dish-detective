@@ -25,13 +25,13 @@ export async function updateEmployeeAccount({
     // Verify the current user is an admin
     const { userId: currentUserId, sessionClaims } = await auth();
     if (!currentUserId) {
-      return { success: false, error: "Unauthorized" };
+      return { success: false, errorKey: "unauthorized" };
     }
 
     if (sessionClaims?.metadata?.role !== "admin") {
       return {
         success: false,
-        error: "Only admins can update employee accounts",
+        errorKey: "onlyAdminsCanUpdateEmployeeAccounts",
       };
     }
 
@@ -53,7 +53,7 @@ export async function updateEmployeeAccount({
         // ... handle Clerk errors (password, username exists, etc.)
         return {
           success: false,
-          error: "Greška prilikom ažuriranja Clerk korisnika",
+          errorKey: "clerkUpdateUserError",
         };
       }
     }
@@ -84,7 +84,7 @@ export async function updateEmployeeAccount({
     console.error("Error updating employee account:", error);
     return {
       success: false,
-      error: "Neuspješno ažuriranje računa zaposlenika",
+      errorKey: "updateEmployeeAccountFailed",
     };
   }
 }
@@ -94,13 +94,13 @@ export async function getEmployeeAccount(clerkId: string) {
     // Verify the current user is an admin
     const { userId: currentUserId, sessionClaims } = await auth();
     if (!currentUserId) {
-      return { success: false, error: "Unauthorized" };
+      return { success: false, errorKey: "unauthorized" };
     }
 
     if (sessionClaims?.metadata?.role !== "admin") {
       return {
         success: false,
-        error: "Only admins can view employee accounts",
+        errorKey: "onlyAdminsCanViewEmployeeAccounts",
       };
     }
 
@@ -125,7 +125,7 @@ export async function getEmployeeAccount(clerkId: string) {
     console.error("Error fetching employee account:", error);
     return {
       success: false,
-      error: "Neuspješno dohvaćanje podataka o zaposleniku",
+      errorKey: "fetchEmployeeFailed",
     };
   }
 }

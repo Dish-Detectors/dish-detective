@@ -10,6 +10,7 @@ import {
   useMapsLibrary,
 } from "@vis.gl/react-google-maps";
 import { Box, TextField, Typography, Paper } from "@mui/material";
+import { useI18n } from "@/components/I18nProvider";
 
 interface Location {
   lat: number;
@@ -29,6 +30,7 @@ function LocationPickerContent({
   initialAddress,
   onLocationChange,
 }: MapLocationPickerProps) {
+  const { t } = useI18n();
   const [position, setPosition] = useState<Location>(
     initialLocation || ZAGREB_CENTER,
   );
@@ -103,7 +105,8 @@ function LocationPickerContent({
       <TextField
         inputRef={inputRef}
         fullWidth
-        label="Adresa restorana"
+        label={t("restaurantAddressLabel")}
+        placeholder={t("enterLocationPlaceholder")}
         value={address}
         onChange={handleAddressChange}
       />

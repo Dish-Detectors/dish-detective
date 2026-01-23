@@ -12,12 +12,14 @@ import {
   useTheme,
 } from "@mui/material";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function Page() {
   const { signUp, isLoaded } = useSignUp();
   const router = useRouter();
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
+  const { t: tr } = useI18n();
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -61,7 +63,7 @@ export default function Page() {
         return;
       }
 
-      setError("Greška prilikom prijave s Google računom");
+      setError(tr("googleLoginError"));
       setLoading(false);
     }
   };
@@ -70,7 +72,7 @@ export default function Page() {
     return (
       <Box
         sx={{
-          height: "100vh",
+          height: "100%",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -85,7 +87,7 @@ export default function Page() {
   return (
     <Box
       sx={{
-        minHeight: "100vh",
+        height: "100%",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -93,8 +95,10 @@ export default function Page() {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        p: 3,
+        p: { xs: 2, sm: 3 },
         bgcolor: "background.default",
+        boxSizing: "border-box",
+        overflow: "hidden",
       }}
     >
       <Box
@@ -115,7 +119,7 @@ export default function Page() {
             textAlign: "center",
           }}
         >
-          Student login
+          {tr("studentLoginTitle")}
         </Typography>
 
         {error && (
@@ -173,7 +177,7 @@ export default function Page() {
                 }),
           }}
         >
-          {loading ? "Prijava..." : "Prijavi se s Google računom"}
+          {loading ? tr("signingIn") : tr("loginWithGoogle")}
         </Button>
       </Box>
     </Box>

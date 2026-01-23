@@ -7,7 +7,7 @@ import Restaurant from "@/models/Restaurant";
 export async function getManagerRestaurant() {
   const { userId, sessionClaims } = await auth();
   if (!userId || sessionClaims?.metadata?.role !== "manager") {
-    return { success: false, error: "Unauthorized" };
+    return { success: false, errorKey: "unauthorized" };
   }
 
   await dbConnect();
@@ -18,12 +18,12 @@ export async function getManagerRestaurant() {
     const restaurantId = user.publicMetadata?.restaurantId;
 
     if (!restaurantId) {
-      return { success: false, error: "No restaurant assigned" };
+      return { success: false, errorKey: "noRestaurantAssigned" };
     }
 
     const restaurant = await Restaurant.findById(restaurantId).lean();
     if (!restaurant) {
-      return { success: false, error: "Restaurant not found" };
+      return { success: false, errorKey: "restaurantNotFound" };
     }
 
     // Deep clone to remove Mongoose's non-plain objects (like Buffer-based _id)
@@ -46,7 +46,7 @@ export async function saveWorkingHours(
 ) {
   const { userId, sessionClaims } = await auth();
   if (!userId || sessionClaims?.metadata?.role !== "manager") {
-    return { success: false, error: "Unauthorized" };
+    return { success: false, errorKey: "unauthorized" };
   }
 
   await dbConnect();
@@ -60,7 +60,7 @@ export async function saveWorkingHours(
         // Validate time range
         for (const shift of dayShifts) {
           if (shift.start >= shift.end) {
-            throw new Error(`Kraj smjene mora biti nakon početka.`);
+            return { success: false, errorKey: "shiftEndAfterStartError" };
           }
         }
 
@@ -76,7 +76,7 @@ export async function saveWorkingHours(
     });
 
     if (!updated) {
-      return { success: false, error: "Restaurant not found" };
+      return { success: false, errorKey: "restaurantNotFound" };
     }
 
     return { success: true };

@@ -16,7 +16,7 @@ export default async function Page() {
     }
 
     // If they are a student (role === undefined or "student"), we still might want to redirect them
-    // But typically students log in via different route.
+    // But typically students log in via different route. 
     // If a student accidentally comes here and is logged in, redirect them too.
     redirect("/auth/redirect");
   }

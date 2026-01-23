@@ -30,6 +30,7 @@ import { getEmployeeAccount, updateEmployeeAccount } from "../actions";
 import { uploadProfileImage } from "../../upload-image";
 import { getAllRestaurants } from "../../../restaurants/actions";
 import SuccessScreen from "@/components/SuccessScreen";
+import { useI18n } from "@/components/I18nProvider";
 
 type Restaurant = {
   _id: string;
@@ -41,6 +42,7 @@ export default function EditWorkerManagerAccountPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const { t } = useI18n();
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -86,14 +88,14 @@ export default function EditWorkerManagerAccountPage({
 
   const validatePassword = (password: string): string => {
     if (password.length < 8) {
-      return "Lozinka mora imati minimalno 8 znakova";
+      return t("passwordMinLength");
     }
     return "";
   };
 
   const validateConfirmPassword = (confirm: string, pass: string): string => {
     if (confirm !== pass) {
-      return "Lozinke se moraju podudarati";
+      return t("passwordsMustMatch");
     }
     return "";
   };
@@ -168,10 +170,14 @@ export default function EditWorkerManagerAccountPage({
             setImagePreview((result.user as any).imageUrl);
           }
         } else {
-          setError(result.error || "Greška pri učitavanju podataka");
+          setError(
+            ("errorKey" in result && result.errorKey && t(result.errorKey)) ||
+              result.error ||
+              t("accountLoadError"),
+          );
         }
       } catch (err) {
-        setError("Greška pri učitavanju podataka");
+        setError(t("accountLoadError"));
       } finally {
         setLoadingData(false);
       }
@@ -213,17 +219,19 @@ export default function EditWorkerManagerAccountPage({
           await uploadProfileImage(formData);
         }
 
-        setSuccess("Račun uspješno ažuriran!");
+        setSuccess(t("accountUpdatedSuccess"));
         setShowSuccessScreen(true);
         setTimeout(() => router.push("/admin/accounts"), 2000);
       } else {
         setError(
-          result.error || "Došlo je do greške prilikom ažuriranja računa",
+          ("errorKey" in result && result.errorKey && t(result.errorKey)) ||
+            result.error ||
+            t("accountUpdateGenericError"),
         );
       }
     } catch (err) {
       console.error("Error updating account:", err);
-      setError("Došlo je do greške prilikom ažuriranja računa");
+      setError(t("accountUpdateGenericError"));
     } finally {
       setLoading(false);
     }
@@ -249,21 +257,25 @@ export default function EditWorkerManagerAccountPage({
       });
 
       if (result.success) {
-        setSuccess("Lozinka uspješno promijenjena!");
+        setSuccess(t("passwordChangedSuccess"));
         setOpenPasswordDialog(false);
         setPasswords({ newPassword: "", confirmPassword: "" });
       } else {
-        setError(result.error || "Greška pri promjeni lozinke");
+        setError(
+          ("errorKey" in result && result.errorKey && t(result.errorKey)) ||
+            result.error ||
+            t("passwordChangeError"),
+        );
       }
     } catch (err) {
-      setError("Greška pri promjeni lozinke");
+      setError(t("passwordChangeError"));
     } finally {
       setLoading(false);
     }
   };
 
   if (showSuccessScreen) {
-    return <SuccessScreen message="Račun uspješno ažuriran!" />;
+    return <SuccessScreen message={t("accountUpdatedSuccess")} />;
   }
 
   if (loadingData || loadingRestaurants) {
@@ -380,7 +392,7 @@ export default function EditWorkerManagerAccountPage({
                 sx={{ mb: 4, display: "flex", flexDirection: "column", gap: 0 }}
               >
                 <InputBase
-                  placeholder="Ime"
+                  placeholder={t("firstNamePlaceholder")}
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -396,7 +408,7 @@ export default function EditWorkerManagerAccountPage({
                   }}
                 />
                 <InputBase
-                  placeholder="Prezime"
+                  placeholder={t("lastNamePlaceholder")}
                   value={formData.lastName}
                   onChange={(e) =>
                     setFormData({ ...formData, lastName: e.target.value })
@@ -428,7 +440,7 @@ export default function EditWorkerManagerAccountPage({
               <Box component="form" onSubmit={handleSubmit}>
                 <TextField
                   fullWidth
-                  label="Korisničko ime"
+                  label={t("usernameLabel")}
                   value={formData.username}
                   onChange={(e) =>
                     setFormData({ ...formData, username: e.target.value })
@@ -481,7 +493,7 @@ export default function EditWorkerManagerAccountPage({
                       color="text.secondary"
                       fontWeight={600}
                     >
-                      RESTORAN
+                      {t("restaurantLabel").toUpperCase()}
                     </Typography>
                     <Typography
                       variant="body1"
@@ -494,7 +506,7 @@ export default function EditWorkerManagerAccountPage({
                       }}
                     >
                       {restaurants.find((r) => r._id === formData.restaurantId)
-                        ?.name || "Nije dodijeljen"}
+                        ?.name || t("managerUnassigned")}
                     </Typography>
                   </Box>
 
@@ -512,7 +524,7 @@ export default function EditWorkerManagerAccountPage({
                       color="text.secondary"
                       fontWeight={600}
                     >
-                      POZICIJA
+                      {t("positionLabel").toUpperCase()}
                     </Typography>
                     <Typography
                       variant="body1"
@@ -520,10 +532,10 @@ export default function EditWorkerManagerAccountPage({
                       sx={{ mt: 0.5 }}
                     >
                       {formData.role === "manager"
-                        ? "Voditelj"
+                        ? t("roleManager")
                         : formData.role === "worker"
-                          ? "Radnik"
-                          : "Nije dodijeljeno"}
+                          ? t("roleWorker")
+                          : t("managerUnassigned")}
                     </Typography>
                   </Box>
                 </Box>
@@ -542,7 +554,7 @@ export default function EditWorkerManagerAccountPage({
                       bgcolor: "white",
                     }}
                   >
-                    Promijeni lozinku
+                    {t("changePassword")}
                   </Button>
                 </Box>
               </Box>
@@ -600,10 +612,10 @@ export default function EditWorkerManagerAccountPage({
               {loading ? (
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <CircularProgress size={24} color="inherit" />
-                  Ažuriranje...
+                  {t("updating")}
                 </Box>
               ) : (
-                "Spremi promjene"
+                t("saveChanges")
               )}
             </Typography>
           </Box>
@@ -715,7 +727,7 @@ export default function EditWorkerManagerAccountPage({
             }}
           >
             <InputBase
-              placeholder="Ime"
+              placeholder={t("firstNamePlaceholder")}
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
@@ -744,7 +756,7 @@ export default function EditWorkerManagerAccountPage({
               }}
             />
             <InputBase
-              placeholder="Prezime"
+              placeholder={t("lastNamePlaceholder")}
               value={formData.lastName}
               onChange={(e) =>
                 setFormData({ ...formData, lastName: e.target.value })
@@ -789,7 +801,7 @@ export default function EditWorkerManagerAccountPage({
           <Box component="form" onSubmit={handleSubmit}>
             <TextField
               fullWidth
-              label="Korisničko ime"
+              label={t("usernameLabel")}
               value={formData.username}
               onChange={(e) =>
                 setFormData({ ...formData, username: e.target.value })
@@ -841,7 +853,7 @@ export default function EditWorkerManagerAccountPage({
                   color="text.secondary"
                   fontWeight={600}
                 >
-                  RESTORAN
+                  {t("restaurantLabel").toUpperCase()}
                 </Typography>
                 <Typography
                   variant="body1"
@@ -854,7 +866,7 @@ export default function EditWorkerManagerAccountPage({
                   }}
                 >
                   {restaurants.find((r) => r._id === formData.restaurantId)
-                    ?.name || "Nije dodijeljen"}
+                    ?.name || t("managerUnassigned")}
                 </Typography>
               </Box>
 
@@ -872,14 +884,14 @@ export default function EditWorkerManagerAccountPage({
                   color="text.secondary"
                   fontWeight={600}
                 >
-                  POZICIJA
+                  {t("positionLabel").toUpperCase()}
                 </Typography>
                 <Typography variant="body1" fontWeight={500} sx={{ mt: 0.5 }}>
                   {formData.role === "manager"
-                    ? "Voditelj"
+                    ? t("roleManager")
                     : formData.role === "worker"
-                      ? "Radnik"
-                      : "Nije dodijeljeno"}
+                      ? t("roleWorker")
+                      : t("managerUnassigned")}
                 </Typography>
               </Box>
             </Box>
@@ -897,7 +909,7 @@ export default function EditWorkerManagerAccountPage({
                   borderRadius: 2,
                 }}
               >
-                Promijeni lozinku
+                {t("changePassword")}
               </Button>
             </Box>
 
@@ -928,10 +940,10 @@ export default function EditWorkerManagerAccountPage({
               {loading ? (
                 <>
                   <CircularProgress size={24} sx={{ mr: 1 }} color="inherit" />
-                  Ažuriranje...
+                  {t("updating")}
                 </>
               ) : (
-                "Spremi promjene"
+                t("saveChanges")
               )}
             </Button>
           </Box>
@@ -945,12 +957,14 @@ export default function EditWorkerManagerAccountPage({
           sx: { borderRadius: 3, width: "100%", maxWidth: 400 },
         }}
       >
-        <DialogTitle sx={{ fontWeight: 700 }}>Promjena lozinke</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 700 }}>
+          {t("changePassword")}
+        </DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             margin="dense"
-            label="Nova lozinka"
+            label={t("newPasswordLabel")}
             type="password"
             fullWidth
             variant="outlined"
@@ -962,7 +976,7 @@ export default function EditWorkerManagerAccountPage({
           />
           <TextField
             margin="dense"
-            label="Potvrdi novu lozinku"
+            label={t("confirmNewPasswordLabel")}
             type="password"
             fullWidth
             variant="outlined"
@@ -979,7 +993,7 @@ export default function EditWorkerManagerAccountPage({
             onClick={() => setOpenPasswordDialog(false)}
             sx={{ textTransform: "none", color: "text.secondary" }}
           >
-            Odustani
+            {t("cancel")}
           </Button>
           <Button
             onClick={handlePasswordSubmit}
@@ -992,7 +1006,7 @@ export default function EditWorkerManagerAccountPage({
             }
             sx={{ textTransform: "none", boxShadow: 0, borderRadius: 2 }}
           >
-            Promijeni
+            {t("change")}
           </Button>
         </DialogActions>
       </Dialog>

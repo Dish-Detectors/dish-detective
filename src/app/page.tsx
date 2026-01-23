@@ -22,19 +22,19 @@ import HomeRevealGate from "@/components/HomeRevealGate";
 import CardSwap, { Card } from "@/components/CardSwap";
 import Aurora from "@/components/Aurora";
 import { getUserRole } from "./actions";
-import { getTranslation, getCurrentLang } from "@/utils/i18n";
 import { LANDING_IMAGES } from "@/constants/assets";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function Home() {
   const router = useRouter();
   const { isLoaded, isSignedIn, user } = useUser();
   const [checkingRole, setCheckingRole] = useState(true);
+  const { t: tr } = useI18n();
 
   const [isEmployeeDomain, setIsEmployeeDomain] = useState(false);
 
-  const [t, setT] = useState(getTranslation("HR"));
   // Typewriter effect for subtitle
-  const fullSubtitle = t.heroSubtitle;
+  const fullSubtitle = tr("heroSubtitle");
   const [subtitleText, setSubtitleText] = useState("");
 
   // Used for main login dropdown
@@ -51,6 +51,30 @@ export default function Home() {
   const isShortScreen = useMediaQuery("(max-height: 740px)");
   // Show cards on mobile too
   const showCards = true;
+
+  // Prevent scrollbars from appearing during reveal/card animations
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevBodyOverflowX = document.body.style.overflowX;
+    const prevBodyOverflowY = document.body.style.overflowY;
+
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    document.body.style.overflowX = "hidden";
+    document.body.style.overflowY = "hidden";
+    document.body.classList.add("dd-home-no-scroll");
+
+    return () => {
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+      document.body.style.overflowX = prevBodyOverflowX;
+      document.body.style.overflowY = prevBodyOverflowY;
+      document.body.classList.remove("dd-home-no-scroll");
+    };
+  }, []);
 
   const [cardSwapLayout, setCardSwapLayout] = useState(() => ({
     cardWidth: 500,
@@ -189,8 +213,6 @@ export default function Home() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       setIsEmployeeDomain(window.location.hostname.startsWith("employee."));
-      const lang = getCurrentLang();
-      setT(getTranslation(lang));
     }
   }, []);
 
@@ -255,7 +277,7 @@ export default function Home() {
       sx={{
         position: "relative",
         minHeight: "100vh",
-        width: "100vw",
+        width: "100%",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
@@ -348,7 +370,7 @@ export default function Home() {
                 fontSize: { xs: "2.5rem", sm: "3.75rem" }, // Smaller font on mobile
               }}
             >
-              {t.heroTitle}
+              {tr("heroTitle")}
             </Typography>
 
             <Typography
@@ -402,7 +424,7 @@ export default function Home() {
                   textTransform: "none",
                 }}
               >
-                {t.login}
+                {tr("login")}
               </Button>
             </Stack>
           </Box>
@@ -466,7 +488,7 @@ export default function Home() {
                     fontWeight={800}
                     sx={{ color: "#111827", lineHeight: 1.1 }}
                   >
-                    {t.cardRealTimeMeni}
+                    {tr("cardRealTimeMeni")}
                   </Typography>
                   <Box
                     sx={{
@@ -538,7 +560,7 @@ export default function Home() {
                     fontWeight={800}
                     sx={{ color: "#111827", lineHeight: 1.1 }}
                   >
-                    {t.cardOverview}
+                    {tr("cardOverview")}
                   </Typography>
                   <Box
                     sx={{
@@ -609,7 +631,7 @@ export default function Home() {
                     fontWeight={800}
                     sx={{ color: "#111827", lineHeight: 1.1 }}
                   >
-                    {t.cardNotifications}
+                    {tr("cardNotifications")}
                   </Typography>
                   <Box
                     sx={{
@@ -669,15 +691,13 @@ export default function Home() {
               sx={{
                 fontWeight: 600,
                 borderRadius: 999,
-                width: "100%",
-                maxWidth: 320,
-                px: 4,
-                minHeight: 50, // Slightly taller on mobile for ease of touch
+                width: "90%",
+                minHeight: 50,
                 color: "white",
                 textTransform: "none",
               }}
             >
-              {t.login}
+              {tr("login")}
             </Button>
           </Stack>
         </Box>

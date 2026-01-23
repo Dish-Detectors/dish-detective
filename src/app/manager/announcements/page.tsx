@@ -16,13 +16,7 @@ import {
 } from "@mui/material";
 import { uploadAttachment } from "./uploadAction";
 
-const formatTime = (date: Date) => {
-  return date.toLocaleTimeString("hr-HR", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
-};
+import { useI18n } from "@/components/I18nProvider";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import SendIcon from "@mui/icons-material/Send";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
@@ -96,8 +90,17 @@ const AudienceCard = ({
 );
 
 export default function AnnouncementChatPage() {
+  const { t, lang } = useI18n();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString(lang === "HR" ? "hr-HR" : "en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+  };
   const [selectedAudience, setSelectedAudience] = useState<
     "worker" | "student"
   >("worker");
@@ -148,7 +151,7 @@ export default function AnnouncementChatPage() {
       if (!uploadRes.success || !uploadRes.attachment) {
         setSnackbar({
           open: true,
-          message: "Neuspješno učitavanje datoteke",
+          message: t("fileUploadFailed"),
           severity: "error",
         });
         setIsUploading(false);
@@ -185,7 +188,7 @@ export default function AnnouncementChatPage() {
       console.error("Failed to send:", result.error);
       setSnackbar({
         open: true,
-        message: "Neuspješno slanje obavijesti",
+        message: t("announcementSendFailed"),
         severity: "error",
       });
     }
@@ -214,7 +217,7 @@ export default function AnnouncementChatPage() {
           fontWeight="bold"
           sx={{ color: "#212222", mb: 2 }}
         >
-          Obavijesti
+          {t("announcementsTitle")}
         </Typography>
         <Divider
           sx={{ borderBottomWidth: 1.5, borderColor: "rgba(0,0,0,0.1)" }}
@@ -235,15 +238,15 @@ export default function AnnouncementChatPage() {
         <Box sx={{ width: isMobile ? "100%" : "300px", flexShrink: 0 }}>
           <AudienceCard
             type="worker"
-            title="Radnici"
-            subtitle="Interna obavijest radnicima"
+            title={t("audienceWorkers")}
+            subtitle={t("audienceWorkersSubtitle")}
             selected={selectedAudience === "worker"}
             onClick={setSelectedAudience}
           />
           <AudienceCard
             type="student"
-            title="Studenti"
-            subtitle="Javna obavijest studentima"
+            title={t("audienceStudents")}
+            subtitle={t("audienceStudentsSubtitle")}
             selected={selectedAudience === "student"}
             onClick={setSelectedAudience}
           />
@@ -423,7 +426,7 @@ export default function AnnouncementChatPage() {
               </label>
               <InputBase
                 fullWidth
-                placeholder="Unesite poruku..."
+                placeholder={t("enterMessagePlaceholder")}
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
                 onKeyDown={handleKeyDown}

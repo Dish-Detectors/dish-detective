@@ -23,19 +23,19 @@ export async function createEmployeeAccount({
     // Verify the current user is an admin
     const { userId, sessionClaims } = await auth();
     if (!userId) {
-      return { success: false, error: "Unauthorized" };
+      return { success: false, errorKey: "unauthorized" };
     }
 
     if (sessionClaims?.metadata?.role !== "admin") {
       return {
         success: false,
-        error: "Only admins can create employee accounts",
+        errorKey: "onlyAdminsCanCreateEmployeeAccounts",
       };
     }
 
     // Validate role if provided
     if (role && role !== "manager" && role !== "worker") {
-      return { success: false, error: "Role must be either manager or worker" };
+      return { success: false, errorKey: "roleMustBeManagerOrWorker" };
     }
 
     // Create user in Clerk
@@ -81,7 +81,7 @@ export async function createEmployeeAccount({
       if (passwordError) {
         return {
           success: false,
-          error: "Lozinka mora imati minimalno 8 znakova",
+          errorKey: "passwordMinLength",
         };
       }
 
@@ -91,15 +91,14 @@ export async function createEmployeeAccount({
       );
 
       if (usernameError) {
-        return { success: false, error: "Korisničko ime već postoji" };
+        return { success: false, errorKey: "usernameAlreadyExists" };
       }
 
       // Generic Clerk error
       return {
         success: false,
-        error:
-          error.errors?.[0]?.longMessage ||
-          "Greška prilikom kreiranja računa u Clerk sustavu",
+        error: error.errors?.[0]?.longMessage,
+        errorKey: "clerkCreateAccountError",
       };
     }
 
@@ -108,6 +107,6 @@ export async function createEmployeeAccount({
       return { success: false, error: error.message };
     }
 
-    return { success: false, error: "Neuspješno kreiranje računa zaposlenika" };
+    return { success: false, errorKey: "createEmployeeAccountFailed" };
   }
 }

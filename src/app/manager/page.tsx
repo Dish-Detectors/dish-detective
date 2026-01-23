@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { getCurrentUserFirstName } from "@/app/admin/actions";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
 import { headerHeight } from "@/components/ManagerNavbar";
+import { useI18n } from "@/components/I18nProvider";
 
 interface ActionButtonProps {
   children: ReactNode;
@@ -131,6 +132,7 @@ export default function ManagerPage() {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const { t: tr } = useI18n();
   const [name, setName] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -178,7 +180,7 @@ export default function ManagerPage() {
           fontWeight={780}
           sx={{ color: "#212222", mb: 2 }}
         >
-          Dobrodošli{name ? `, ${name}` : ""}!
+          {tr("welcomeWithName", { name: name ? `, ${name}` : "" })}
         </Typography>
 
         <Divider sx={{ mb: 4, borderBottomWidth: 2 }} />
@@ -189,7 +191,7 @@ export default function ManagerPage() {
             icon={<MenuBookIcon sx={{ fontSize: 32, color: "text.primary" }} />}
             animationDelay="0.1s"
           >
-            Dnevni meni
+            {tr("dailyMenu")}
           </MobileActionCard>
           <MobileActionCard
             onClick={() => router.push("/manager/hours")}
@@ -198,7 +200,7 @@ export default function ManagerPage() {
             }
             animationDelay="0.3s"
           >
-            Radno vrijeme
+            {tr("workingHours")}
           </MobileActionCard>
 
           <MobileActionCard
@@ -206,7 +208,7 @@ export default function ManagerPage() {
             icon={<BarChartIcon sx={{ fontSize: 32, color: "text.primary" }} />}
             animationDelay="0.5s"
           >
-            Statistika
+            {tr("stats")}
           </MobileActionCard>
 
           <MobileActionCard
@@ -214,7 +216,7 @@ export default function ManagerPage() {
             icon={<CampaignIcon sx={{ fontSize: 32, color: "text.primary" }} />}
             animationDelay="0.7s"
           >
-            Obavijesti
+            {tr("announcements")}
           </MobileActionCard>
 
           <MobileActionCard
@@ -222,7 +224,7 @@ export default function ManagerPage() {
             icon={<BallotIcon sx={{ fontSize: 32, color: "text.primary" }} />}
             animationDelay="0.9s"
           >
-            Ankete
+            {tr("polls")}
           </MobileActionCard>
         </Box>
       </Box>
@@ -244,7 +246,7 @@ export default function ManagerPage() {
         fontWeight={780}
         sx={{ color: "#212222", mb: 4, ml: 0 }}
       >
-        Dobrodošli{name ? `, ${name}` : ""}!
+        {tr("welcomeWithName", { name: name ? `, ${name}` : "" })}
       </Typography>
 
       <Box sx={{ mt: -3 }}>
@@ -281,7 +283,7 @@ export default function ManagerPage() {
                   }}
                 />
               }
-              title="Dnevni meni"
+              title={tr("dailyMenu")}
               descriptions={[]}
               onClick={() => router.push("/manager/menu")}
               animationDelay="0.1s"
@@ -298,7 +300,7 @@ export default function ManagerPage() {
                   }}
                 />
               }
-              title="Radno vrijeme"
+              title={tr("workingHours")}
               descriptions={[]}
               onClick={() => router.push("/manager/hours")}
               animationDelay="0.3s"
@@ -315,7 +317,7 @@ export default function ManagerPage() {
                   }}
                 />
               }
-              title="Statistika"
+              title={tr("stats")}
               descriptions={[]}
               onClick={() => router.push("/manager/stats")}
               animationDelay="0.5s"
@@ -332,7 +334,7 @@ export default function ManagerPage() {
                   }}
                 />
               }
-              title="Obavijesti"
+              title={tr("announcements")}
               descriptions={[]}
               onClick={() => router.push("/manager/announcements")}
               animationDelay="0.7s"
@@ -349,7 +351,7 @@ export default function ManagerPage() {
                   }}
                 />
               }
-              title="Ankete"
+              title={tr("polls")}
               descriptions={[]}
               onClick={() => router.push("/manager/polls")}
               animationDelay="0.9s"

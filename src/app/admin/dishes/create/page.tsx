@@ -23,8 +23,10 @@ import { createDish } from "./actions";
 import { getAllAllergens } from "../actions";
 import AdminNavbar, { navWidth, headerHeight } from "@/components/AdminNavbar";
 import SuccessScreen from "@/components/SuccessScreen";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function Page() {
+  const { t } = useI18n();
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -86,8 +88,8 @@ export default function Page() {
 
     // Require image
     if (!imageFile) {
-      setImageError("Slika je obavezna");
-      setError("Molimo odaberite sliku jela");
+      setImageError(t("dishImageRequired"));
+      setError(t("pleaseSelectDishImage"));
       return;
     }
 
@@ -113,16 +115,16 @@ export default function Page() {
       const response = await createDish(formDataToSend);
 
       if (response.success) {
-        setSuccess("Jelo uspješno kreirano!");
+        setSuccess(t("dishCreatedSuccess"));
         setShowSuccessScreen(true);
         setTimeout(() => {
           router.push("/admin/dishes");
         }, 2000);
       } else {
-        setError(response.message || "Greška pri kreiranju jela");
+        setError(response.message || t("dishCreateError"));
       }
     } catch (err) {
-      setError("Došlo je do greške. Pokušajte ponovo.");
+      setError(t("genericTryAgainError"));
     } finally {
       setLoading(false);
     }
@@ -130,7 +132,7 @@ export default function Page() {
 
   // Show success screen after successful creation
   if (showSuccessScreen) {
-    return <SuccessScreen message="Jelo uspješno kreirano!" />;
+    return <SuccessScreen message={t("dishCreatedSuccess")} />;
   }
 
   // Mobile Layout (Matched to Edit Page)
@@ -164,7 +166,7 @@ export default function Page() {
                   color: "#212222",
                 }}
               >
-                Dodaj novo jelo
+                {t("addNewDishTitle")}
               </Typography>
 
               {error && (
@@ -240,7 +242,7 @@ export default function Page() {
                           startIcon={<CloudUploadIcon />}
                           sx={{ textTransform: "none" }}
                         >
-                          Odaberi sliku
+                          {t("chooseImageButton")}
                         </Button>
                       </label>
                       <Typography
@@ -251,7 +253,7 @@ export default function Page() {
                           color: imageError ? "error.main" : "text.secondary",
                         }}
                       >
-                        {imageError || "PNG, JPG do 5MB"}
+                        {imageError || t("imageFormatsHint")}
                       </Typography>
                     </Box>
                   )}
@@ -259,7 +261,7 @@ export default function Page() {
 
                 <TextField
                   fullWidth
-                  label="Naziv jela"
+                  label={t("dishNameLabel")}
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -276,7 +278,7 @@ export default function Page() {
 
                 <TextField
                   fullWidth
-                  label="Opis"
+                  label={t("dishDescriptionLabel")}
                   value={formData.description}
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
@@ -309,8 +311,8 @@ export default function Page() {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        label="Dodaj alergen"
-                        placeholder="Odaberi alergene"
+                        label={t("addAllergenLabel")}
+                        placeholder={t("selectAllergensPlaceholder")}
                         sx={{
                           bgcolor: "white",
                           "& .MuiOutlinedInput-root": {
@@ -372,10 +374,10 @@ export default function Page() {
               {loading ? (
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <CircularProgress size={24} color="inherit" />
-                  Kreiranje...
+                  {t("creating")}
                 </Box>
               ) : (
-                "Spremi promjene"
+                t("createDish")
               )}
             </Typography>
           </Box>
@@ -440,7 +442,7 @@ export default function Page() {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  placeholder="Naziv jela"
+                  placeholder={t("dishNamePlaceholder")}
                   fullWidth
                   required
                   sx={{
@@ -454,11 +456,11 @@ export default function Page() {
                 />
 
                 <Typography variant="h6" fontWeight="bold" gutterBottom>
-                  Opis
+                  {t("dishDescriptionLabel")}
                 </Typography>
                 <TextField
                   fullWidth
-                  placeholder="Unesite opis jela..."
+                  placeholder={t("dishDescriptionPlaceholder")}
                   value={formData.description}
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
@@ -600,13 +602,13 @@ export default function Page() {
                           variant="h6"
                           color={imageError ? "error.main" : "text.secondary"}
                         >
-                          Odaberi sliku
+                          {t("chooseImageButton")}
                         </Typography>
                         <Typography
                           variant="caption"
                           color={imageError ? "error.main" : "text.secondary"}
                         >
-                          PNG, JPG do 5MB
+                          {t("imageFormatsHint")}
                         </Typography>
                       </label>
                     </Box>
@@ -631,7 +633,7 @@ export default function Page() {
               gutterBottom
               sx={{ mt: -2 }}
             >
-              Alergeni
+              {t("allergensLabel")}
             </Typography>
             <Box sx={{ mb: 4 }}>
               <Autocomplete
@@ -648,7 +650,7 @@ export default function Page() {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    placeholder="Odaberi alergene"
+                    placeholder={t("selectAllergensPlaceholder")}
                     variant="outlined"
                     sx={{
                       "& .MuiOutlinedInput-root": {
@@ -705,7 +707,7 @@ export default function Page() {
                 {loading ? (
                   <CircularProgress size={24} color="inherit" />
                 ) : (
-                  "Kreiraj jelo"
+                  t("createDish")
                 )}
               </Button>
             </Box>

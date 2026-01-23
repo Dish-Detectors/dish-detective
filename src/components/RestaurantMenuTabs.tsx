@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Box, Tabs, Tab, Typography, Grid } from "@mui/material";
 import StudentDishCard from "@/components/StudentDishCard";
+import { useI18n } from "@/components/I18nProvider";
 
 interface DishData {
   id?: string; // menuItemId for offer, potentially undefined for others
@@ -24,6 +25,7 @@ interface RestaurantMenuTabsProps {
   otherDishes: DishData[];
   isOpen: boolean;
   restaurantId: string;
+  density?: "default" | "compact";
 }
 
 interface TabPanelProps {
@@ -54,8 +56,11 @@ export default function RestaurantMenuTabs({
   otherDishes,
   isOpen,
   restaurantId,
+  density = "default",
 }: RestaurantMenuTabsProps) {
+  const { t } = useI18n();
   const [value, setValue] = useState(isOpen ? 0 : 1);
+  const isCompact = density === "compact";
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -107,7 +112,7 @@ export default function RestaurantMenuTabs({
       );
     }
     return (
-      <Grid container spacing={3}>
+      <Grid container spacing={isCompact ? 2 : 3}>
         {dishes.map((item) => (
           <Grid
             size={{ xs: 12, sm: 6, md: 4 }}
@@ -128,6 +133,7 @@ export default function RestaurantMenuTabs({
               isInitiallySubscribed={item.isSubscribed}
               isOffer={isOffer}
               restaurantId={restaurantId}
+              density={density}
             />
           </Grid>
         ))}
@@ -147,12 +153,12 @@ export default function RestaurantMenuTabs({
           textColor="primary"
         >
           <Tab
-            label="Trenutna ponuda"
+            label={t("tabCurrentOffer")}
             disabled={!isOpen}
             sx={{ textTransform: "none", fontSize: "1.1rem", fontWeight: 600 }}
           />
           <Tab
-            label="Sva jela"
+            label={t("tabAllDishes")}
             sx={{ textTransform: "none", fontSize: "1.1rem", fontWeight: 600 }}
           />
         </Tabs>
@@ -173,21 +179,17 @@ export default function RestaurantMenuTabs({
             color="error.contrastText"
             sx={{ fontWeight: 600 }}
           >
-            RESTOREAN JE TRENUTNO ZATVOREN - Van radnog vremena
+            {t("restaurantClosedBanner")}
           </Typography>
         </Box>
       )}
 
       <CustomTabPanel value={value} index={0}>
-        {renderDishGrid(
-          offer,
-          "Trenutno nema dostupnih jela u ovom restoranu.",
-          true,
-        )}
+        {renderDishGrid(offer, t("noAvailableDishesInRestaurant"), true)}
       </CustomTabPanel>
 
       <CustomTabPanel value={value} index={1}>
-        {renderDishGrid(otherDishes, "Nema ostalih jela.", false)}
+        {renderDishGrid(otherDishes, t("noOtherDishes"), false)}
       </CustomTabPanel>
     </Box>
   );

@@ -25,6 +25,7 @@ import { createEmployeeAccount } from "./actions";
 import { uploadProfileImage } from "../upload-image";
 import SuccessScreen from "@/components/SuccessScreen";
 import AdminNavbar, { navWidth, headerHeight } from "@/components/AdminNavbar";
+import { useI18n } from "@/components/I18nProvider";
 
 type Restaurant = {
   _id: string;
@@ -32,11 +33,12 @@ type Restaurant = {
 };
 
 export default function EmployeeCreatePage() {
+  const { t } = useI18n();
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  // ...existing code...
+
   const [loading, setLoading] = useState(false);
   const [loadingRestaurants, setLoadingRestaurants] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,18 +70,36 @@ export default function EmployeeCreatePage() {
     confirmPassword: "",
     role: undefined as "worker" | "manager" | undefined,
   });
-  // ...
-  // ...
 
-  const handlePasswordChange = (value: string) => {
-    setFormData({ ...formData, password: value });
-    if (value.length > 0 && value.length < 8) {
-      setPasswordError("Minimalno 8 znakova");
+  const validatePassword = (password: string): string => {
+    if (password.length < 8) {
+      return t("passwordMinLength");
+    }
+    return "";
+  };
+
+  const validateConfirmPassword = (confirm: string, pass: string): string => {
+    if (confirm !== pass) {
+      return t("passwordsMustMatch");
+    }
+    return "";
+  };
+
+  const handlePasswordChange = (password: string) => {
+    setFormData({ ...formData, password });
+    if (password) {
+      setPasswordError(validatePassword(password));
+      // Re-validate confirm password if it exists
+      if (formData.confirmPassword) {
+        setConfirmPasswordError(
+          validateConfirmPassword(formData.confirmPassword, password),
+        );
+      }
     } else {
       setPasswordError("");
     }
 
-    if (formData.confirmPassword && value !== formData.confirmPassword) {
+    if (formData.confirmPassword && password !== formData.confirmPassword) {
       setConfirmPasswordError("Lozinke se moraju podudarati");
     } else if (formData.confirmPassword) {
       setConfirmPasswordError("");
@@ -95,8 +115,36 @@ export default function EmployeeCreatePage() {
     }
   };
 
+  // Load restaurants on mount
+  useEffect(() => {
+    async function loadRestaurants() {
+      try {
+        const result = await getAllRestaurants();
+        if (result.success && result.data) {
+          setRestaurants(result.data);
+        } else {
+          setError(t("failedToLoadRestaurants"));
+        }
+      } catch (err) {
+        setError(t("failedToLoadRestaurants"));
+      } finally {
+        setLoadingRestaurants(false);
+      }
+    }
+    loadRestaurants();
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (
+      passwordError ||
+      confirmPasswordError ||
+      formData.password !== formData.confirmPassword
+    ) {
+      setError(t("checkPasswords"));
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setSuccess(null);
@@ -127,14 +175,28 @@ export default function EmployeeCreatePage() {
         role: formData.role,
       });
 
-      if (result.success) {
-        setSuccess("Zaposlenik uspješno kreiran");
+      if (result.success && result.user) {
+        // Upload image if selected
+        if (imageFile) {
+          const formData = new FormData();
+          formData.append("file", imageFile);
+          formData.append("userId", result.user.id);
+
+          await uploadProfileImage(formData);
+          // We don't block success on image upload failure, but we could log it
+        }
+
+        setSuccess(t("accountCreatedSuccess"));
         setShowSuccessScreen(true);
       } else {
-        setError(result.error || "Došlo je do greške");
+        setError(
+          ("errorKey" in result && result.errorKey && t(result.errorKey)) ||
+          result.error ||
+          t("accountCreateError"),
+        );
       }
     } catch (err) {
-      setError("Došlo je do greške prilikom kreiranja računa.");
+      setError(t("accountCreateGenericError"));
     } finally {
       setLoading(false);
     }
@@ -145,7 +207,276 @@ export default function EmployeeCreatePage() {
       router.push("/admin/accounts");
     }, 2000);
 
-    return <SuccessScreen message="Račun uspješno kreiran!" />;
+    return <SuccessScreen message={t("accountCreatedSuccess")} />;
+  }
+
+  // Mobile Layout
+  if (isMobile) {
+    return (
+      <>
+        <AdminNavbar isMobile={isMobile} />
+        <Box
+          sx={{
+            minHeight: "100vh",
+            bgcolor: "#f5f5f5",
+            display: "flex",
+            flexDirection: "column",
+            pb: "134px", // Space for button (70px) + navbar (64px)
+          }}
+        >
+          <Box sx={{ p: 3, flexGrow: 1 }}>
+            {/* Image Upload (Mobile) */}
+            <Box sx={{ display: "flex", justifyContent: "center", mb: 4 }}>
+              <Badge
+                overlap="circular"
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                badgeContent={
+                  <Box
+                    component="label"
+                    sx={{
+                      bgcolor: "primary.main",
+                      color: "white",
+                      width: 32,
+                      height: 32,
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      border: "2px solid white",
+                    }}
+                  >
+                    <EditIcon sx={{ fontSize: 18 }} />
+                    <input
+                      type="file"
+                      hidden
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
+                  </Box>
+                }
+              >
+                {imagePreview ? (
+                  <Avatar
+                    src={imagePreview}
+                    sx={{
+                      width: 100,
+                      height: 100,
+                      border: "4px solid white",
+                      boxShadow: 1,
+                    }}
+                  />
+                ) : (
+                  <Box
+                    sx={{
+                      width: 100,
+                      height: 100,
+                      borderRadius: "50%",
+                      bgcolor:
+                        formData.role === "manager" ? "#64b5f6" : "#ba68c8",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      border: "4px solid white",
+                      boxShadow: 1,
+                    }}
+                  >
+                    {formData.role === "manager" ? (
+                      <AssignmentIndIcon
+                        sx={{ fontSize: 60, color: "white" }}
+                      />
+                    ) : (
+                      <PersonIcon sx={{ fontSize: 60, color: "white" }} />
+                    )}
+                  </Box>
+                )}
+              </Badge>
+            </Box>
+
+            {/* Editable Header for Name & Last Name (Mobile) */}
+            <Box
+              sx={{ mb: 4, display: "flex", flexDirection: "column", gap: 0 }}
+            >
+              <InputBase
+                placeholder={t("firstNamePlaceholder")}
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                required
+                sx={{
+                  fontSize: "2rem",
+                  fontWeight: 800,
+                  color: "#212222",
+                  borderBottom: "2px solid transparent",
+                  "&:hover": { borderBottom: "2px solid #e0e0e0" },
+                  "&.Mui-focused": { borderBottom: "2px solid #1976d2" },
+                }}
+              />
+              <InputBase
+                placeholder={t("lastNamePlaceholder")}
+                value={formData.lastName}
+                onChange={(e) =>
+                  setFormData({ ...formData, lastName: e.target.value })
+                }
+                required
+                sx={{
+                  fontSize: "2rem",
+                  fontWeight: 800,
+                  color: "#212222",
+                  borderBottom: "2px solid transparent",
+                  "&:hover": { borderBottom: "2px solid #e0e0e0" },
+                  "&.Mui-focused": { borderBottom: "2px solid #1976d2" },
+                }}
+              />
+            </Box>
+
+            {error && (
+              <Alert severity="error" sx={{ mb: 3 }}>
+                {error}
+              </Alert>
+            )}
+
+            {success && (
+              <Alert severity="success" sx={{ mb: 3 }}>
+                {success}
+              </Alert>
+            )}
+
+            <Box component="form" onSubmit={handleSubmit}>
+              <TextField
+                fullWidth
+                label={t("usernameLabel")}
+                value={formData.username}
+                onChange={(e) =>
+                  setFormData({ ...formData, username: e.target.value })
+                }
+                required
+                sx={{
+                  mb: 3,
+                  bgcolor: "white",
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 2,
+                  },
+                }}
+              />
+
+              <TextField
+                fullWidth
+                label={t("passwordLabel")}
+                type="password"
+                value={formData.password}
+                onChange={(e) => handlePasswordChange(e.target.value)}
+                required
+                error={!!passwordError && formData.password.length > 0}
+                helperText={
+                  passwordError && formData.password.length > 0
+                    ? passwordError
+                    : t("min8CharsHint")
+                }
+                sx={{
+                  mb: 3,
+                  bgcolor: "white",
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 2,
+                  },
+                }}
+              />
+
+              <TextField
+                fullWidth
+                label={t("confirmPasswordLabel")}
+                type="password"
+                value={formData.confirmPassword}
+                onChange={(e) => handleConfirmPasswordChange(e.target.value)}
+                required
+                error={
+                  !!confirmPasswordError && formData.confirmPassword.length > 0
+                }
+                helperText={
+                  confirmPasswordError && formData.confirmPassword.length > 0
+                    ? confirmPasswordError
+                    : t("passwordsMustMatch")
+                }
+                sx={{
+                  mb: 3,
+                  bgcolor: "white",
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 2,
+                  },
+                }}
+              />
+            </Box>
+          </Box>
+
+          {/* Fixed Button Area at Bottom */}
+          <Box
+            onClick={
+              loading ||
+                loadingRestaurants ||
+                !!passwordError ||
+                !!confirmPasswordError
+                ? undefined
+                : handleSubmit
+            }
+            sx={{
+              position: "fixed",
+              bottom: "64px",
+              left: 0,
+              right: 0,
+              height: "70px",
+              bgcolor:
+                loading ||
+                  loadingRestaurants ||
+                  !!passwordError ||
+                  !!confirmPasswordError
+                  ? "grey.400"
+                  : "#57aaf4",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor:
+                loading ||
+                  loadingRestaurants ||
+                  !!passwordError ||
+                  !!confirmPasswordError
+                  ? "not-allowed"
+                  : "pointer",
+              transition: "all 0.2s ease-in-out",
+              zIndex: 1000,
+              boxShadow: "0 -2px 8px rgba(0,0,0,0.15)",
+              "&:active": {
+                bgcolor:
+                  loading ||
+                    loadingRestaurants ||
+                    !!passwordError ||
+                    !!confirmPasswordError
+                    ? "grey.400"
+                    : "#3d8fd9",
+              },
+            }}
+          >
+            <Typography
+              sx={{
+                color: "white",
+                fontSize: "1.1rem",
+                fontWeight: 600,
+                textTransform: "none",
+              }}
+            >
+              {loading ? (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <CircularProgress size={24} color="inherit" />
+                  {t("creating")}
+                </Box>
+              ) : (
+                t("createAccount")
+              )}
+            </Typography>
+          </Box>
+        </Box>
+      </>
+    );
   }
 
   // Desktop Layout
@@ -157,7 +488,7 @@ export default function EmployeeCreatePage() {
           height: `calc(100vh - ${headerHeight}px)`,
           bgcolor: "#f5f5f5",
           pt: `${headerHeight}px`,
-          pb: 3,
+          pb: 8,
           pl: `${navWidth}px`,
           overflowY: "auto",
         }}
@@ -220,7 +551,7 @@ export default function EmployeeCreatePage() {
           {/* Editable Header for Name & Last Name */}
           <Box sx={{ mb: 4, display: "flex", flexDirection: "column", gap: 0 }}>
             <InputBase
-              placeholder="Ime"
+              placeholder={t("firstNamePlaceholder")}
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
@@ -248,7 +579,7 @@ export default function EmployeeCreatePage() {
               }}
             />
             <InputBase
-              placeholder="Prezime"
+              placeholder={t("lastNamePlaceholder")}
               value={formData.lastName}
               onChange={(e) =>
                 setFormData({ ...formData, lastName: e.target.value })
@@ -292,7 +623,7 @@ export default function EmployeeCreatePage() {
           <Box component="form" onSubmit={handleSubmit}>
             <TextField
               fullWidth
-              label="Korisničko ime"
+              label={t("usernameLabel")}
               value={formData.username}
               onChange={(e) =>
                 setFormData({ ...formData, username: e.target.value })
@@ -308,7 +639,7 @@ export default function EmployeeCreatePage() {
 
             <TextField
               fullWidth
-              label="Lozinka"
+              label={t("passwordLabel")}
               type="password"
               value={formData.password}
               onChange={(e) => handlePasswordChange(e.target.value)}
@@ -317,7 +648,7 @@ export default function EmployeeCreatePage() {
               helperText={
                 passwordError && formData.password.length > 0
                   ? passwordError
-                  : "Minimalno 8 znakova"
+                  : t("min8CharsHint")
               }
               sx={{
                 mb: 3,
@@ -329,7 +660,7 @@ export default function EmployeeCreatePage() {
 
             <TextField
               fullWidth
-              label="Potvrdi lozinku"
+              label={t("confirmPasswordLabel")}
               type="password"
               value={formData.confirmPassword}
               onChange={(e) => handleConfirmPasswordChange(e.target.value)}
@@ -340,7 +671,7 @@ export default function EmployeeCreatePage() {
               helperText={
                 confirmPasswordError && formData.confirmPassword.length > 0
                   ? confirmPasswordError
-                  : "Lozinke se moraju podudarati"
+                  : t("passwordsMustMatch")
               }
               sx={{
                 mb: 3,
@@ -383,10 +714,10 @@ export default function EmployeeCreatePage() {
               {loading ? (
                 <>
                   <CircularProgress size={24} sx={{ mr: 1 }} color="inherit" />
-                  Kreiranje...
+                  {t("creating")}
                 </>
               ) : (
-                "Kreiraj račun"
+                t("createAccount")
               )}
             </Button>
           </Box>

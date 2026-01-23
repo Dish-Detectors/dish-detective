@@ -4,6 +4,10 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 export interface INotification extends Document {
   title: string;
   description: string;
+  titleKey?: string;
+  titleParams?: Record<string, string | number>;
+  descriptionKey?: string;
+  descriptionParams?: Record<string, string | number>;
   imageUrl?: string;
   postedBy: string; // clerkId
   targetUserId?: string; // Specific recipient (student)
@@ -27,13 +31,27 @@ const notifSchema = new Schema<INotification>(
       type: String,
       required: [true, "Title is required"],
       trim: true,
-      default: "Obavijest",
+      default: "Notification",
+    },
+    titleKey: {
+      type: String,
+      trim: true,
+    },
+    titleParams: {
+      type: Schema.Types.Mixed,
     },
     description: {
       type: String,
       // required: [true, "Description is required"], // Removed requirement to allow attachment-only messages
       trim: true,
       default: "",
+    },
+    descriptionKey: {
+      type: String,
+      trim: true,
+    },
+    descriptionParams: {
+      type: Schema.Types.Mixed,
     },
     imageUrl: {
       type: String,

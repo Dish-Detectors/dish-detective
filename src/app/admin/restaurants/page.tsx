@@ -8,6 +8,7 @@ import {
   Typography,
   IconButton,
   InputAdornment,
+  Divider,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -20,8 +21,10 @@ import AddIcon from "@mui/icons-material/Add";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
 import RestaurantCard from "@/components/RestaurantCard";
 import { getAllRestaurants, deleteRestaurant } from "./actions";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function RestaurantsPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const [restaurants, setRestaurants] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,11 +82,11 @@ export default function RestaurantsPage() {
         setDeleteDialogOpen(false);
         setRestaurantToDelete(null);
       } else {
-        alert("Failed to delete: " + response.message);
+        alert(response.message || t("deleteFailed"));
       }
     } catch (err) {
       console.error(err);
-      alert("An error occurred while deleting.");
+      alert(t("deleteFailed"));
     }
     setDeleting(false);
   };
@@ -125,63 +128,106 @@ export default function RestaurantsPage() {
         px: { xs: 3, sm: 5 },
         py: { xs: 3, sm: 5 },
         pt: 0,
-        pb: { xs: 12, sm: 10 },
+        pb: 0,
         overflow: "hidden",
       }}
     >
-      <Typography
-        variant="h4"
-        sx={{ fontWeight: 780, mb: 4, color: "#212222", flexShrink: 0 }}
-      >
-        Upravljaj restoranima
-      </Typography>
-
       <Box
         sx={{
-          display: "flex",
-          gap: 2,
-          mb: 4,
-          maxWidth: { xs: "100%", sm: 600 },
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", sm: "1fr auto 1fr" },
+          alignItems: "center",
+          columnGap: 3,
+          rowGap: 2,
+          mb: 2,
           flexShrink: 0,
         }}
       >
-        <TextField
-          fullWidth
-          placeholder="Pretraži restorane..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ color: "#999" }} />
-                </InputAdornment>
-              ),
-            },
-          }}
+        <Typography
+          variant="h4"
           sx={{
-            bgcolor: "white",
-            borderRadius: 10,
-            "& .MuiOutlinedInput-root": {
-              borderRadius: 10,
-              "& fieldset": { borderColor: "#e0e0e0" },
-            },
-          }}
-        />
-        <IconButton
-          onClick={handleAddNew}
-          sx={{
-            bgcolor: "white",
-            border: "1px solid #e0e0e0",
-            width: 56,
-            height: 56,
-            borderRadius: "50%",
-            "&:hover": { bgcolor: "#e0e0e0" },
+            fontWeight: 780,
+            color: "#212222",
+            flexShrink: 0,
+            lineHeight: 1.2,
+            justifySelf: "start",
           }}
         >
-          <AddIcon />
-        </IconButton>
+          {t("manageRestaurantsTitle")}
+        </Typography>
+
+        <Divider
+          sx={{
+            display: { xs: "block", sm: "none" },
+            mb: 1,
+            borderBottomWidth: 2,
+          }}
+        />
+
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            width: { xs: "100%", sm: "auto" },
+            justifySelf: { xs: "stretch", sm: "center" },
+          }}
+        >
+          <TextField
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={t("searchRestaurantsPlaceholder")}
+            size="small"
+            sx={{
+              width: { xs: "100%", sm: 340, md: 440 },
+              maxWidth: "100%",
+              bgcolor: "white",
+              borderRadius: 999,
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 999,
+                "& fieldset": {
+                  borderColor: "#e0e0e0",
+                },
+                "&:hover fieldset": {
+                  borderColor: "primary.main",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "primary.main",
+                },
+              },
+            }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: "#999" }} />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+
+          <IconButton
+            onClick={handleAddNew}
+            sx={{
+              bgcolor: "white",
+              border: "1px solid #e0e0e0",
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
+              flexShrink: 0,
+              "&:hover": { bgcolor: "#e0e0e0" },
+            }}
+            aria-label={t("create")}
+          >
+            <AddIcon />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ display: { xs: "none", sm: "block" } }} />
       </Box>
+
+      <Divider sx={{ display: { xs: "none", sm: "block" }, mb: 4 }} />
 
       <Box sx={{ flex: 1, overflowY: "auto", pr: 1 }}>
         {filteredRestaurants.length === 0 ? (
@@ -195,9 +241,7 @@ export default function RestaurantsPage() {
             }}
           >
             <Typography variant="body1" color="text.secondary">
-              {searchQuery
-                ? "Nema rezultata pretrage"
-                : "Nema unesenih restorana"}
+              {searchQuery ? t("noSearchResults") : t("noRestaurants")}
             </Typography>
           </Box>
         ) : (
@@ -245,18 +289,17 @@ export default function RestaurantsPage() {
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
       >
-        <DialogTitle>Potvrda brisanja</DialogTitle>
+        <DialogTitle>{t("confirmRemovalTitle")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Jeste li sigurni da želite obrisati restoran <b>{restaurantName}</b>
-            ? Ova radnja se ne može poništiti.
+            {t("confirmDeleteRestaurantBody", { name: restaurantName })}
             <br />
-            Molimo upišite <b>{restaurantName}</b> za potvrdu.
+            {t("typeRestaurantNameToConfirm", { name: restaurantName })}
           </DialogContentText>
           <TextField
             autoFocus
             margin="dense"
-            label="Ime restorana"
+            label={t("restaurantNameLabel")}
             fullWidth
             variant="standard"
             value={confirmationName}
@@ -268,7 +311,7 @@ export default function RestaurantsPage() {
             onClick={() => setDeleteDialogOpen(false)}
             disabled={deleting}
           >
-            Odustani
+            {t("cancel")}
           </Button>
           <Button
             onClick={confirmDelete}
@@ -276,7 +319,7 @@ export default function RestaurantsPage() {
             variant="contained"
             disabled={deleting || confirmationName !== restaurantName}
           >
-            {deleting ? "Brisanje..." : "Obriši"}
+            {deleting ? t("deleting") : t("delete")}
           </Button>
         </DialogActions>
       </Dialog>
