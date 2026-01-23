@@ -122,11 +122,11 @@ export async function getAnnouncements(type: "worker" | "student") {
           file:
             notif.attachment && notif.attachment.url
               ? {
-                name: notif.attachment.name,
-                date: new Date(notif.createdAt).toLocaleDateString(), // Use creation date as file date
-                size: notif.attachment.size,
-                url: notif.attachment.url,
-              }
+                  name: notif.attachment.name,
+                  date: new Date(notif.createdAt).toLocaleDateString(), // Use creation date as file date
+                  size: notif.attachment.size,
+                  url: notif.attachment.url,
+                }
               : undefined,
         };
       }),

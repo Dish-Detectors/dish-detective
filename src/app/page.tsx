@@ -455,8 +455,6 @@ export default function Home() {
               staggerFadeInEachMs={120}
               staggerFadeInDurationSec={0.55}
             >
-
-
               <Card
                 style={{
                   background:
@@ -671,7 +669,6 @@ export default function Home() {
               </Card>
             </CardSwap>
           </Box>
-
 
           {/* Mobile Button - Shown ONLY on mobile, after cards */}
           <Stack
