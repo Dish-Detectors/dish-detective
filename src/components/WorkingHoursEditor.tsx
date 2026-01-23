@@ -16,6 +16,7 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import TimePicker24 from "./TimePicker24";
 import { IShift, IWorkingDay } from "@/models/Restaurant";
 
 const DAYS = ["NED", "PON", "UTO", "SRI", "ČET", "PET", "SUB"];
@@ -193,25 +194,12 @@ export default function WorkingHoursEditor({
                     minWidth: 0,
                   }}
                 >
-                  <TextField
+                  <TimePicker24
                     label="Početak"
-                    type="time"
-                    size="small"
                     value={shift.start}
-                    onChange={(e) =>
-                      handleShiftChange(index, "start", e.target.value)
+                    onChange={(val) =>
+                      handleShiftChange(index, "start", val)
                     }
-                    slotProps={{
-                      inputLabel: { shrink: true },
-                      htmlInput: {
-                        max: shift.end,
-                      },
-                    }}
-                    sx={{
-                      bgcolor: "white",
-                      "& .MuiOutlinedInput-root": { borderRadius: 2 },
-                      width: { xs: "100%", sm: 140 },
-                    }}
                   />
                   <Typography
                     color="text.secondary"
@@ -219,25 +207,12 @@ export default function WorkingHoursEditor({
                   >
                     do
                   </Typography>
-                  <TextField
+                  <TimePicker24
                     label="Kraj"
-                    type="time"
-                    size="small"
                     value={shift.end}
-                    onChange={(e) =>
-                      handleShiftChange(index, "end", e.target.value)
+                    onChange={(val) =>
+                      handleShiftChange(index, "end", val)
                     }
-                    slotProps={{
-                      inputLabel: { shrink: true },
-                      htmlInput: {
-                        min: shift.start,
-                      },
-                    }}
-                    sx={{
-                      bgcolor: "white",
-                      "& .MuiOutlinedInput-root": { borderRadius: 2 },
-                      width: { xs: "100%", sm: 140 },
-                    }}
                   />
                 </Box>
                 <IconButton
