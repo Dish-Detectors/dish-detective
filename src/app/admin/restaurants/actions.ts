@@ -34,6 +34,7 @@ export async function deleteRestaurant(
           publicMetadata: {
             restaurantId: null,
             role: null,
+            isEmployee: true,
           },
         }),
       ),
@@ -219,6 +220,7 @@ export async function assignEmployee(
       publicMetadata: {
         restaurantId,
         role,
+        isEmployee: true,
       },
     });
 
@@ -257,6 +259,7 @@ export async function removeEmployee(userId: string, restaurantId: string) {
       publicMetadata: {
         restaurantId: null,
         role: null,
+        isEmployee: true, // Ensure they remain flagged as an employee even if role is removed
       },
     });
 

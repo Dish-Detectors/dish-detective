@@ -45,10 +45,7 @@ export async function getAllEmployees(): Promise<ActionResponse> {
     });
 
     const employees = clerkUsersResponse.data.filter(
-      (user) =>
-        user.publicMetadata.role === "manager" ||
-        user.publicMetadata.role === "worker" ||
-        user.publicMetadata.role === null,
+      (user) => user.publicMetadata.isEmployee === true,
     );
 
     if (employees.length === 0) {

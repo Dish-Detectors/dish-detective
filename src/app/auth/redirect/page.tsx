@@ -16,17 +16,21 @@ export default async function RedirectAfterSignIn() {
     | null
     | undefined;
 
-  // Check for explicitly unassigned employee
-  if (role === null && restaurantId === null) {
+  const isEmployee = user.publicMetadata?.isEmployee === true;
+
+  // Check for explicitly unassigned employee (isEmployee=true but no role/rest)
+  // Or if role is missing/null/undefined BUT they are an employee
+  if (isEmployee && !role && !restaurantId) {
     redirect("/unassigned");
   }
 
-  // If role is missing (undefined), default to student
-  if (role === undefined) {
+  // If role is missing and NOT an employee -> Default to Student
+  if (role === undefined && !isEmployee) {
     try {
       await client.users.updateUserMetadata(userId, {
         publicMetadata: {
           role: "student",
+          isEmployee: false, // Explicitly mark as not employee
         },
       });
       role = "student";

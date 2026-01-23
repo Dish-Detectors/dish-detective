@@ -44,30 +44,28 @@ export async function updateEmployeeAccount({
     if (username !== undefined) clerkUpdateData.username = username;
     if (password !== undefined) clerkUpdateData.password = password;
 
-    // Update user in Clerk if there are any profile updates
+    // Prepare metadata if needed
+    if (role !== undefined || restaurantId !== undefined) {
+      const publicMetadata: any = { isEmployee: true };
+      if (role !== undefined) publicMetadata.role = role;
+      if (restaurantId !== undefined)
+        publicMetadata.restaurantId = restaurantId;
+
+      // Add metadata to update object
+      clerkUpdateData.publicMetadata = publicMetadata;
+    }
+
+    // Perform single update if there is data
     if (Object.keys(clerkUpdateData).length > 0) {
       try {
         await client.users.updateUser(userId, clerkUpdateData);
       } catch (clerkError: any) {
         console.error("Clerk update error:", clerkError);
-        // ... handle Clerk errors (password, username exists, etc.)
         return {
           success: false,
           errorKey: "clerkUpdateUserError",
         };
       }
-    }
-
-    // Update metadata in Clerk if role or restaurantId changed
-    if (role !== undefined || restaurantId !== undefined) {
-      const publicMetadata: any = {};
-      if (role !== undefined) publicMetadata.role = role;
-      if (restaurantId !== undefined)
-        publicMetadata.restaurantId = restaurantId;
-
-      await client.users.updateUserMetadata(userId, {
-        publicMetadata,
-      });
     }
 
     return {
