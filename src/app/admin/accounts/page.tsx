@@ -273,6 +273,8 @@ export default function WorkerManagerAccountsPage() {
               borderRadius: 3,
               textAlign: "center",
               maxWidth: { xs: "100%", sm: 600 },
+              mx: "auto",
+              mt: 4,
             }}
           >
             <Typography variant="body1" color="text.secondary">
