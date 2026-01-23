@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import React, { useState, useEffect } from "react";
-import { UserButton, useUser } from "@clerk/nextjs"; // Import useUser
+import { UserButton, useUser } from "@clerk/nextjs";
 import { getRestaurantName } from "@/app/admin/actions";
 import {
   Box,
@@ -14,15 +14,18 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  IconButton,
 } from "@mui/material";
+import { useColorMode } from "@/components/ThemeRegistry";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
 
 export default function Header() {
   const pathname = usePathname();
-  const { user } = useUser(); // Get the user data from Clerk
-
+  const { user } = useUser();
+  const { toggleColorMode, mode } = useColorMode();
   const isHomepage = pathname === "/";
   const isLoginRoute = pathname.startsWith("/login");
-
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -100,7 +103,6 @@ export default function Header() {
   }, [userRole]);
 
   if (isHomepage) {
-    // ... (Homepage header remains unchanged)
     return (
       <AppBar
         position="absolute"
@@ -160,7 +162,7 @@ export default function Header() {
             </Typography>
           </Box>
 
-          <Box sx={{ display: "flex", gap: { xs: 2, md: 3 } }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1, md: 2 } }}>
             <Button
               sx={{
                 display: { xs: "flex", sm: "none" },
@@ -186,9 +188,26 @@ export default function Header() {
     );
   }
 
-  // Non-homepage header (blue header)
+  // Non-homepage header
+  // Only show dark mode toggle if user is NOT an employee/manager (so students or public on sub-pages)
+  // Actually, standard behavior: if subdomain is employee, we forced light mode in ThemeRegistry.
+  // We can just hide the button if role is not student, or rely on subdomain check.
+  // User said "dark mode is not feature for employees".
+  // Let's assume on main domain (Student), we show it.
+  const showDarkModeToggle =
+    userRole === "student" || (!userRole && !isLoginRoute);
+
   return (
-    <AppBar position="static" sx={{ bgcolor: "#56aaf4" }}>
+    <AppBar
+      position="static"
+      sx={{
+        bgcolor: mode === "dark" ? "background.paper" : "primary.main",
+        backgroundImage: "none", // Remove default gradient if any
+        transition: "background-color 0.3s ease",
+        position: "relative", // Ensure z-index applies
+        zIndex: (theme) => theme.zIndex.drawer + 2, // Ensure header is above sidebar
+      }}
+    >
       <Toolbar
         sx={{
           justifyContent: "space-between",
@@ -227,7 +246,7 @@ export default function Header() {
           </Typography>
         </Box>
 
-        <Box sx={{ display: "flex", gap: { xs: 2, md: 3 } }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 2, md: 3 } }}>
           <Typography
             variant="body1"
             sx={{
@@ -243,6 +262,12 @@ export default function Header() {
           >
             {restaurantName}
           </Typography>
+
+          {showDarkModeToggle && (
+            <IconButton onClick={toggleColorMode} sx={{ color: "white" }}>
+              {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
+            </IconButton>
+          )}
 
           <Button
             sx={{

@@ -171,7 +171,7 @@ export default async function RestaurantOfferPage({
           p: { xs: 3, md: 4 },
           mb: 5,
           borderRadius: 4,
-          bgcolor: "white",
+          bgcolor: "background.paper", // Changed from "white"
           border: "1px solid",
           borderColor: "divider",
         }}
@@ -232,7 +232,7 @@ export default async function RestaurantOfferPage({
           <Grid size={{ xs: 12, md: 5 }}>
             <Box
               sx={{
-                bgcolor: "grey.50",
+                bgcolor: "background.default", // Changed from "grey.50"
                 p: 3,
                 borderRadius: 3,
                 border: "1px solid",
@@ -306,8 +306,8 @@ export default async function RestaurantOfferPage({
             allergens: dish.allergens?.map((a: any) => a.name) || [],
             lastServed: lastServedMap.has(dish._id.toString())
               ? lastServedMap
-                  .get(dish._id.toString())!
-                  .toLocaleDateString("hr-HR")
+                .get(dish._id.toString())!
+                .toLocaleDateString("hr-HR")
               : "Nikada do sada",
             rating: ratingInfo.avg,
             ratingCount: ratingInfo.count,

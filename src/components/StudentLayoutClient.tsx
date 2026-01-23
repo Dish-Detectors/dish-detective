@@ -30,7 +30,7 @@ export default function StudentLayoutClient({
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          bgcolor: "#f5f5f5",
+          bgcolor: "background.default",
         }}
       >
         <PancakeStackLoader />
@@ -48,7 +48,8 @@ export default function StudentLayoutClient({
           overflowY: "auto",
           ml: isMobile ? 0 : `${navWidth}px`,
           pb: isMobile ? "96px" : 4,
-          bgcolor: "#f5f5f5", // Added background for consistency with Admin
+          bgcolor: "background.default", // Use theme background
+          transition: "background-color 0.3s ease",
         }}
       >
         {children}

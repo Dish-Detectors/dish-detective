@@ -207,7 +207,7 @@ export default function StudentDishCard({
             alignItems: "center",
             gap: 1,
             color: "text.secondary",
-            bgcolor: "grey.100",
+            bgcolor: "action.hover", // Changed from grey.100
             py: 0.8,
             px: 1.5,
             borderRadius: 1.5,
@@ -228,9 +228,9 @@ export default function StudentDishCard({
             mt: 2.5,
             p: 2,
             borderRadius: 3,
-            bgcolor: "grey.50",
+            bgcolor: "background.default", // Changed from grey.50 for better theme support
             border: "1px solid",
-            borderColor: "grey.200",
+            borderColor: "divider", // Changed from grey.200
             display: "flex",
             flexDirection: "column",
             gap: 2,

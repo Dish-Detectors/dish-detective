@@ -447,8 +447,19 @@ export default function NotificationCenter({
       targetUrl = `/student/restaurants/${notif.restaurantId}`;
     }
 
-    // Mark as read if unread
-    if (!notif.read) {
+    // Mark as read if unread OR delete if it's a "consumable" notification like restaurant offer
+    if (notif.restaurantId) {
+      // Auto-delete restaurant notifications as they are one-time "alerts"
+      try {
+        await deleteNotification(notif._id);
+        setNotifications((prev) =>
+          prev.filter((n) => (n as any)._id !== notif._id),
+        );
+        if (onRead) onRead();
+      } catch (error) {
+        console.error("Failed to delete restaurant notification on click", error);
+      }
+    } else if (!notif.read) {
       try {
         await markNotificationAsRead(notif._id);
         setNotifications((prev) =>
