@@ -228,3 +228,7 @@
   overflow-y: auto;
   overflow-x: hidden;
 }
+
+body.dd-home-no-scroll .dd-app-main {
+  overflow: hidden;
+}

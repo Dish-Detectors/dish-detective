@@ -63,12 +63,14 @@ export default function Home() {
     document.body.style.overflow = "hidden";
     document.body.style.overflowX = "hidden";
     document.body.style.overflowY = "hidden";
+    document.body.classList.add("dd-home-no-scroll");
 
     return () => {
       document.documentElement.style.overflow = prevHtmlOverflow;
       document.body.style.overflow = prevBodyOverflow;
       document.body.style.overflowX = prevBodyOverflowX;
       document.body.style.overflowY = prevBodyOverflowY;
+      document.body.classList.remove("dd-home-no-scroll");
     };
   }, []);
 
