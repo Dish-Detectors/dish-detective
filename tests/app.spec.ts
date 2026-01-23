@@ -61,8 +61,6 @@ test('wrong login for worker', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Lozinka' }).fill('test');
   await page.getByRole('button', { name: 'Prijavi se' }).click();
   await expect(page.getByText('Neispravno korisničko ime ili')).toBeVisible();
-  await page.getByRole('button', { name: 'Open user menu' }).click();
-  await page.getByRole('menuitem', { name: 'Sign out' }).click();
 }); 
 
 test('manual redirect test', async ({ page }) => {
