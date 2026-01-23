@@ -26,7 +26,6 @@ import { uploadProfileImage } from "../upload-image";
 import SuccessScreen from "@/components/SuccessScreen";
 import AdminNavbar, { navWidth, headerHeight } from "@/components/AdminNavbar";
 
-
 type Restaurant = {
   _id: string;
   name: string;
@@ -72,8 +71,6 @@ export default function EmployeeCreatePage() {
   // ...
   // ...
 
-
-
   const handlePasswordChange = (value: string) => {
     setFormData({ ...formData, password: value });
     if (value.length > 0 && value.length < 8) {
@@ -104,7 +101,12 @@ export default function EmployeeCreatePage() {
     setError(null);
     setSuccess(null);
 
-    if (!formData.name || !formData.lastName || !formData.username || !formData.password) {
+    if (
+      !formData.name ||
+      !formData.lastName ||
+      !formData.username ||
+      !formData.password
+    ) {
       setError("Molimo ispunite sva polja");
       setLoading(false);
       return;
@@ -138,18 +140,12 @@ export default function EmployeeCreatePage() {
     }
   };
 
-
-
   if (showSuccessScreen) {
     setTimeout(() => {
       router.push("/admin/accounts");
     }, 2000);
 
-    return (
-      <SuccessScreen
-        message="Račun uspješno kreiran!"
-      />
-    );
+    return <SuccessScreen message="Račun uspješno kreiran!" />;
   }
 
   // Desktop Layout

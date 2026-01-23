@@ -62,7 +62,12 @@ export default function RestaurantCard({
           height="180"
           image={imageUrl || "/placeholder-restaurant.jpg"}
           alt={name}
-          sx={{ bgcolor: "#f0f0f0", objectFit: "cover" }}
+          sx={{
+            height: 180,
+            width: "100%",
+            bgcolor: "#f0f0f0",
+            objectFit: "cover",
+          }}
         />
       </Box>
 

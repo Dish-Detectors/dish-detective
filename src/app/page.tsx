@@ -93,14 +93,17 @@ export default function Home() {
           cardDistance,
           verticalDistance,
         });
-
       } else {
         // Desktop sizing logic
         // Scale mostly with width, but cap by height so it doesn't get cramped on short screens.
         const cardWidth = clamp(500, Math.round(vw * 0.32), 740);
         const idealCardHeight = cardWidth * (340 / 520);
         const maxCardHeight = Math.min(540, Math.round(vh * 0.58));
-        const cardHeight = clamp(327, Math.round(idealCardHeight), maxCardHeight);
+        const cardHeight = clamp(
+          327,
+          Math.round(idealCardHeight),
+          maxCardHeight,
+        );
 
         // Keep roughly the same extra breathing room as before: +60w / +120h.
         const wrapperWidth = cardWidth + 60;
@@ -247,7 +250,6 @@ export default function Home() {
     );
   }
 
-
   return (
     <Box
       sx={{
@@ -371,7 +373,14 @@ export default function Home() {
             </Typography>
 
             {/* Desktop Button - Hidden on Mobile */}
-            <Stack spacing={2} sx={{ width: "100%", alignItems: "flex-start", display: { xs: "none", lg: "flex" } }}>
+            <Stack
+              spacing={2}
+              sx={{
+                width: "100%",
+                alignItems: "flex-start",
+                display: { xs: "none", lg: "flex" },
+              }}
+            >
               <Button
                 variant="contained"
                 color="primary"
@@ -639,7 +648,14 @@ export default function Home() {
           </Box>
 
           {/* Mobile Button - Shown ONLY on mobile, after cards */}
-          <Stack spacing={2} sx={{ width: "100%", alignItems: "center", display: { xs: "flex", lg: "none" } }}>
+          <Stack
+            spacing={2}
+            sx={{
+              width: "100%",
+              alignItems: "center",
+              display: { xs: "flex", lg: "none" },
+            }}
+          >
             <Button
               variant="contained"
               color="primary"

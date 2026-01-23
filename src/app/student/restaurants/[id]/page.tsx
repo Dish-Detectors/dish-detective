@@ -191,7 +191,14 @@ export default async function RestaurantOfferPage({
         />
         <Box sx={{ p: { xs: 3, md: 4 } }}>
           <Grid container spacing={4} alignItems="stretch">
-            <Grid size={{ xs: 12, md: 7 }} sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+            <Grid
+              size={{ xs: 12, md: 7 }}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}
+            >
               <Box>
                 <Box
                   sx={{
@@ -206,7 +213,9 @@ export default async function RestaurantOfferPage({
                     {restaurant.name}
                   </Typography>
                   <Chip
-                    label={isOpen ? "OTVORENO" : "ZATVORENO - Van radnog vremena"}
+                    label={
+                      isOpen ? "OTVORENO" : "ZATVORENO - Van radnog vremena"
+                    }
                     color={isOpen ? "success" : "error"}
                     sx={{ fontWeight: 700, borderRadius: 2 }}
                   />
@@ -289,7 +298,9 @@ export default async function RestaurantOfferPage({
                             : "text.primary"
                         }
                       >
-                        {wh.shifts.map((s) => `${s.start} - ${s.end}`).join(", ")}
+                        {wh.shifts
+                          .map((s) => `${s.start} - ${s.end}`)
+                          .join(", ")}
                       </Typography>
                     </Box>
                   ))}
@@ -318,8 +329,8 @@ export default async function RestaurantOfferPage({
             allergens: dish.allergens?.map((a: any) => a.name) || [],
             lastServed: lastServedMap.has(dish._id.toString())
               ? lastServedMap
-                .get(dish._id.toString())!
-                .toLocaleDateString("hr-HR")
+                  .get(dish._id.toString())!
+                  .toLocaleDateString("hr-HR")
               : "Nikada do sada",
             rating: ratingInfo.avg,
             ratingCount: ratingInfo.count,
@@ -330,6 +341,6 @@ export default async function RestaurantOfferPage({
         isOpen={isOpen}
         restaurantId={id}
       />
-    </Container >
+    </Container>
   );
 }

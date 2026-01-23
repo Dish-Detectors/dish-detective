@@ -470,9 +470,9 @@ export default function EditWorkerManagerAccountPage({
                       transition: "all 0.2s",
                       "&:hover": formData.restaurantId
                         ? {
-                          bgcolor: "rgba(0, 0, 0, 0.05)",
-                          borderColor: "primary.main",
-                        }
+                            bgcolor: "rgba(0, 0, 0, 0.05)",
+                            borderColor: "primary.main",
+                          }
                         : {},
                     }}
                   >
@@ -559,10 +559,10 @@ export default function EditWorkerManagerAccountPage({
               height: "70px",
               bgcolor:
                 loading ||
-                  !formData.name.trim() ||
-                  !formData.lastName.trim() ||
-                  !formData.username.trim() ||
-                  formData.username.length < 4
+                !formData.name.trim() ||
+                !formData.lastName.trim() ||
+                !formData.username.trim() ||
+                formData.username.length < 4
                   ? "grey.400"
                   : "primary.main",
               display: "flex",
@@ -570,20 +570,20 @@ export default function EditWorkerManagerAccountPage({
               justifyContent: "center",
               cursor:
                 loading ||
-                  !formData.name.trim() ||
-                  !formData.lastName.trim() ||
-                  !formData.username.trim() ||
-                  formData.username.length < 4
+                !formData.name.trim() ||
+                !formData.lastName.trim() ||
+                !formData.username.trim() ||
+                formData.username.length < 4
                   ? "not-allowed"
                   : "pointer",
               transition: "all 0.2s ease-in-out",
               "&:active": {
                 bgcolor:
                   loading ||
-                    !formData.name.trim() ||
-                    !formData.lastName.trim() ||
-                    !formData.username.trim() ||
-                    formData.username.length < 4
+                  !formData.name.trim() ||
+                  !formData.lastName.trim() ||
+                  !formData.username.trim() ||
+                  formData.username.length < 4
                     ? "grey.400"
                     : "primary.dark",
               },
@@ -830,9 +830,9 @@ export default function EditWorkerManagerAccountPage({
                   transition: "all 0.2s",
                   "&:hover": formData.restaurantId
                     ? {
-                      bgcolor: "rgba(0, 0, 0, 0.05)",
-                      borderColor: "primary.main",
-                    }
+                        bgcolor: "rgba(0, 0, 0, 0.05)",
+                        borderColor: "primary.main",
+                      }
                     : {},
                 }}
               >

@@ -160,7 +160,13 @@ export default function Header() {
             </Typography>
           </Box>
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1, md: 2 } }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: { xs: 1, md: 2 },
+            }}
+          >
             {/* Translate button removed as per user request */}
           </Box>
         </Toolbar>
@@ -226,7 +232,9 @@ export default function Header() {
           </Typography>
         </Box>
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 2, md: 3 } }}>
+        <Box
+          sx={{ display: "flex", alignItems: "center", gap: { xs: 2, md: 3 } }}
+        >
           <Typography
             variant="body1"
             sx={{

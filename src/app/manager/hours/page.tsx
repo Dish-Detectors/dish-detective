@@ -318,9 +318,7 @@ export default function WorkingHoursPage() {
                       <TimePicker24
                         label="Kraj"
                         value={shift.end}
-                        onChange={(val) =>
-                          handleShiftChange(index, "end", val)
-                        }
+                        onChange={(val) => handleShiftChange(index, "end", val)}
                       />
                     </Box>
                     <IconButton
