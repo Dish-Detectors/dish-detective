@@ -78,8 +78,6 @@ export default function HomeRevealAnimation({
       });
 
     const startReveal = async () => {
-      // In dev on first load, the reveal can start before images are cached;
-      // if they load late, they can miss the visible part of the animation.
       // Preload briefly so the utensil animation always has pixels to render.
       try {
         const fallback = new Promise<void>((r) => window.setTimeout(r, 900));
@@ -105,18 +103,35 @@ export default function HomeRevealAnimation({
         window.dispatchEvent(new Event(REVEAL_START_EVENT));
       }
 
-      // For reduced motion, skip animation and ask for language immediately.
+      // Automatically choose language
+      let lang: "HR" | "EN" = "HR";
+      try {
+        const cookies = document.cookie.split("; ");
+        const langCookie = cookies
+          .find((c) => c.startsWith("dd_lang="))
+          ?.split("=")[1];
+        if (langCookie === "EN" || langCookie === "HR") {
+          lang = langCookie;
+        } else {
+          // Fallback to navigator
+          lang = navigator.language.startsWith("hr") ? "HR" : "EN";
+        }
+      } catch {
+        // Fallback
+      }
+
+      // For reduced motion, skip animation and finish immediately.
       if (prefersReducedMotion) {
-        setPaused(true);
-        setShowLanguageChoice(true);
+        chooseLanguage(lang);
         return;
       }
 
       // Pause shortly after the fly-in reaches center (≈42% of 1650ms).
+      // But instead of showing choice, we just show the welcome message and continue soon.
       const pauseMs = 700;
       pauseTimerRef.current = window.setTimeout(() => {
         setPaused(true);
-        setShowLanguageChoice(true);
+        chooseLanguage(lang);
       }, pauseMs);
     };
 
@@ -238,45 +253,7 @@ export default function HomeRevealAnimation({
         draggable={false}
       />
 
-      {showLanguageChoice ? (
-        <div
-          className="ddLang ddLang--choice"
-          role="group"
-          aria-label="Choose language"
-        >
-          <button
-            type="button"
-            className="ddLang__btn"
-            onClick={() => chooseLanguage("HR")}
-            aria-label="Hrvatski"
-          >
-            <img
-              className="ddLang__flag"
-              src="/HR.svg"
-              alt=""
-              aria-hidden="true"
-              draggable={false}
-            />
-            HR
-          </button>
-          <div className="ddLang__sep" aria-hidden="true" />
-          <button
-            type="button"
-            className="ddLang__btn"
-            onClick={() => chooseLanguage("EN")}
-            aria-label="English"
-          >
-            <img
-              className="ddLang__flag"
-              src="/GB.svg"
-              alt=""
-              aria-hidden="true"
-              draggable={false}
-            />
-            EN
-          </button>
-        </div>
-      ) : welcomeText ? (
+      {welcomeText ? (
         <div className="ddLang ddLang--msg" aria-live="polite">
           <div
             className={

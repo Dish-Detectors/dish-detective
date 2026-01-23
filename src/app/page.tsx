@@ -22,14 +22,18 @@ import HomeRevealGate from "@/components/HomeRevealGate";
 import CardSwap, { Card } from "@/components/CardSwap";
 import Aurora from "@/components/Aurora";
 import { getUserRole } from "./actions";
+import { getTranslation, getCurrentLang } from "@/utils/i18n";
 
 export default function Home() {
   const router = useRouter();
   const { isLoaded, isSignedIn, user } = useUser();
   const [checkingRole, setCheckingRole] = useState(true);
 
+  const [isEmployeeDomain, setIsEmployeeDomain] = useState(false);
+
+  const [t, setT] = useState(getTranslation("HR"));
   // Typewriter effect for subtitle
-  const fullSubtitle = "Real-time jelovnik u restoranima";
+  const fullSubtitle = t.heroSubtitle;
   const [subtitleText, setSubtitleText] = useState("");
 
   // Used for main login dropdown
@@ -154,11 +158,11 @@ export default function Home() {
     };
   }, [fullSubtitle, homeRevealDone]);
 
-  const [isEmployeeDomain, setIsEmployeeDomain] = useState(false);
-
   useEffect(() => {
     if (typeof window !== "undefined") {
       setIsEmployeeDomain(window.location.hostname.startsWith("employee."));
+      const lang = getCurrentLang();
+      setT(getTranslation(lang));
     }
   }, []);
 
@@ -315,7 +319,7 @@ export default function Home() {
               fontSize: { xs: "6vh" },
             }}
           >
-            Poboljšaj svoje iskustvo u menzi
+            {t.heroTitle}
           </Typography>
 
           <Typography
@@ -357,7 +361,7 @@ export default function Home() {
               textTransform: "none",
             }}
           >
-            Prijava
+            {t.login}
           </Button>
         </Box>
       </Box>
@@ -438,7 +442,7 @@ export default function Home() {
                 letterSpacing: -1,
               }}
             >
-              Poboljšaj svoje iskustvo u menzi
+              {t.heroTitle}
             </Typography>
 
             <Typography
@@ -480,7 +484,7 @@ export default function Home() {
                   textTransform: "none",
                 }}
               >
-                Prijava
+                {t.login}
               </Button>
             </Stack>
           </Box>
@@ -545,7 +549,7 @@ export default function Home() {
                     fontWeight={800}
                     sx={{ color: "#111827", lineHeight: 1.1 }}
                   >
-                    Real-time meni
+                    {t.cardRealTimeMeni}
                   </Typography>
                   <Box
                     sx={{
@@ -617,7 +621,7 @@ export default function Home() {
                     fontWeight={800}
                     sx={{ color: "#111827", lineHeight: 1.1 }}
                   >
-                    Jednostavan pregled menzi
+                    {t.cardOverview}
                   </Typography>
                   <Box
                     sx={{
@@ -688,7 +692,7 @@ export default function Home() {
                     fontWeight={800}
                     sx={{ color: "#111827", lineHeight: 1.1 }}
                   >
-                    Obavijesti u stvarnom vremenu
+                    {t.cardNotifications}
                   </Typography>
                   <Box
                     sx={{
