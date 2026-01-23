@@ -4,6 +4,8 @@ import { ClerkProvider } from "@clerk/nextjs";
 import ThemeRegistry from "@/components/ThemeRegistry";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { I18nProvider } from "@/components/I18nProvider";
+import { getServerLang } from "@/utils/i18nServer";
 
 export const metadata: Metadata = {
   title: "Dish Detective",
@@ -14,14 +16,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Next 15/16: headers()/cookies() are async, so language lookup is async too.
+  // Layouts can be async server components.
+  const lang = await getServerLang();
+  const htmlLang = lang === "HR" ? "hr" : "en";
+
   return (
     <ClerkProvider>
-      <html lang="hr" suppressHydrationWarning>
+      <html lang={htmlLang} suppressHydrationWarning>
         <head>
           <script
             dangerouslySetInnerHTML={{
@@ -43,9 +50,11 @@ export default function RootLayout({
         </head>
         <body suppressHydrationWarning={true}>
           <ThemeRegistry>
-            <Header />
-            {children}
-            <Footer />
+            <I18nProvider initialLang={lang}>
+              <Header />
+              {children}
+              <Footer />
+            </I18nProvider>
           </ThemeRegistry>
         </body>
       </html>

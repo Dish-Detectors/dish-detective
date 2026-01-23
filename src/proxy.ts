@@ -1,6 +1,8 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
+const LANG_COOKIE = "dd_lang";
+
 const isPublicRoute = createRouteMatcher([
   "/",
   "/login/student(.*)",
@@ -45,20 +47,22 @@ export default clerkMiddleware(async (auth, req) => {
   const host = req.headers.get("host") || "";
   const langHeader = req.headers.get("accept-language") || "";
   const detectedLang = langHeader.toLowerCase().startsWith("hr") ? "HR" : "EN";
+  const existingLang = req.cookies.get(LANG_COOKIE)?.value;
+  const langToSet = existingLang === "HR" || existingLang === "EN" ? null : detectedLang;
 
   const isEmployeeSubdomain = host.startsWith("employee.");
   const url = req.nextUrl.clone();
 
   const response = await handleRedirects(isEmployeeSubdomain, url);
   if (response) {
-    // Also set the language cookie on redirect
-    response.cookies.set("dd_lang", detectedLang, { path: "/" });
+    // Also set the language cookie on redirect (only if missing)
+    if (langToSet) response.cookies.set(LANG_COOKIE, langToSet, { path: "/" });
     return response;
   }
 
   if (isPublicRoute(req)) {
     const res = NextResponse.next();
-    res.cookies.set("dd_lang", detectedLang, { path: "/" });
+    if (langToSet) res.cookies.set(LANG_COOKIE, langToSet, { path: "/" });
     return res;
   }
 
@@ -91,6 +95,11 @@ export default clerkMiddleware(async (auth, req) => {
   ) {
     return NextResponse.redirect(new URL(currentRolePath, req.url));
   }
+
+  // Normal pass-through; still ensure language cookie exists.
+  const res = NextResponse.next();
+  if (langToSet) res.cookies.set(LANG_COOKIE, langToSet, { path: "/" });
+  return res;
 });
 
 export const config = {
