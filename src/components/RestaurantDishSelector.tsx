@@ -18,6 +18,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import CheckIcon from "@mui/icons-material/Check";
 import { getAllDishes } from "@/app/admin/restaurants/edit/actions";
+import { useI18n } from "@/components/I18nProvider";
 
 interface Dish {
   _id: string;
@@ -35,6 +36,7 @@ export default function RestaurantDishSelector({
   initialSelectedIds,
   onChange,
 }: RestaurantDishSelectorProps) {
+  const { t } = useI18n();
   const [allDishes, setAllDishes] = useState<Dish[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(
     new Set(initialSelectedIds),
@@ -86,7 +88,7 @@ export default function RestaurantDishSelector({
     <Box>
       <TextField
         fullWidth
-        placeholder="Pretraži jela prema nazivu..."
+        placeholder={t("searchDishesByNamePlaceholder")}
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         sx={{ mb: 3 }}
@@ -162,7 +164,7 @@ export default function RestaurantDishSelector({
         color="text.secondary"
         sx={{ mt: 2, display: "block" }}
       >
-        Odabrano: {selectedIds.size} jela
+        {t("selectedDishesCount", { count: selectedIds.size })}
       </Typography>
     </Box>
   );
