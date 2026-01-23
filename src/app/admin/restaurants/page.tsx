@@ -20,8 +20,10 @@ import AddIcon from "@mui/icons-material/Add";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
 import RestaurantCard from "@/components/RestaurantCard";
 import { getAllRestaurants, deleteRestaurant } from "./actions";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function RestaurantsPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const [restaurants, setRestaurants] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,11 +81,11 @@ export default function RestaurantsPage() {
         setDeleteDialogOpen(false);
         setRestaurantToDelete(null);
       } else {
-        alert("Failed to delete: " + response.message);
+        alert(response.message || t("deleteFailed"));
       }
     } catch (err) {
       console.error(err);
-      alert("An error occurred while deleting.");
+      alert(t("deleteFailed"));
     }
     setDeleting(false);
   };
@@ -133,7 +135,7 @@ export default function RestaurantsPage() {
         variant="h4"
         sx={{ fontWeight: 780, mb: 4, color: "#212222", flexShrink: 0 }}
       >
-        Upravljaj restoranima
+        {t("manageRestaurantsTitle")}
       </Typography>
 
       <Box
@@ -147,7 +149,7 @@ export default function RestaurantsPage() {
       >
         <TextField
           fullWidth
-          placeholder="Pretraži restorane..."
+          placeholder={t("searchRestaurantsPlaceholder")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           slotProps={{
@@ -178,6 +180,7 @@ export default function RestaurantsPage() {
             borderRadius: "50%",
             "&:hover": { bgcolor: "#e0e0e0" },
           }}
+          aria-label={t("create")}
         >
           <AddIcon />
         </IconButton>
@@ -196,8 +199,8 @@ export default function RestaurantsPage() {
           >
             <Typography variant="body1" color="text.secondary">
               {searchQuery
-                ? "Nema rezultata pretrage"
-                : "Nema unesenih restorana"}
+                ? t("noSearchResults")
+                : t("noRestaurants")}
             </Typography>
           </Box>
         ) : (
@@ -245,18 +248,17 @@ export default function RestaurantsPage() {
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
       >
-        <DialogTitle>Potvrda brisanja</DialogTitle>
+        <DialogTitle>{t("confirmRemovalTitle")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Jeste li sigurni da želite obrisati restoran <b>{restaurantName}</b>
-            ? Ova radnja se ne može poništiti.
+            {t("confirmDeleteRestaurantBody", { name: restaurantName })}
             <br />
-            Molimo upišite <b>{restaurantName}</b> za potvrdu.
+            {t("typeRestaurantNameToConfirm", { name: restaurantName })}
           </DialogContentText>
           <TextField
             autoFocus
             margin="dense"
-            label="Ime restorana"
+            label={t("restaurantNameLabel")}
             fullWidth
             variant="standard"
             value={confirmationName}
@@ -268,7 +270,7 @@ export default function RestaurantsPage() {
             onClick={() => setDeleteDialogOpen(false)}
             disabled={deleting}
           >
-            Odustani
+            {t("cancel")}
           </Button>
           <Button
             onClick={confirmDelete}
@@ -276,7 +278,7 @@ export default function RestaurantsPage() {
             variant="contained"
             disabled={deleting || confirmationName !== restaurantName}
           >
-            {deleting ? "Brisanje..." : "Obriši"}
+            {deleting ? t("deleting") : t("delete")}
           </Button>
         </DialogActions>
       </Dialog>

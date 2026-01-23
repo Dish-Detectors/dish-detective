@@ -69,7 +69,7 @@ describe("Edit Account Server Actions", () => {
       const result = await getEmployeeAccount(testEmployeeId);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Unauthorized");
+      expect(result.errorKey).toBe("unauthorized");
     });
   });
 
@@ -120,7 +120,7 @@ describe("Edit Account Server Actions", () => {
       const result = await updateEmployeeAccount(updateData);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Only admins can update employee accounts");
+      expect(result.errorKey).toBe("onlyAdminsCanUpdateEmployeeAccounts");
     });
 
     it("should handle Clerk update errors", async () => {
@@ -136,7 +136,7 @@ describe("Edit Account Server Actions", () => {
       const result = await updateEmployeeAccount(updateData);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Greška prilikom ažuriranja Clerk korisnika");
+      expect(result.errorKey).toBe("clerkUpdateUserError");
     });
   });
 });

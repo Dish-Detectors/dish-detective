@@ -23,6 +23,7 @@ import EmployeeCard from "@/components/EmployeeCard";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
 import { navWidth } from "@/components/AdminNavbar";
 import { getAllEmployees, deleteEmployee } from "./actions";
+import { useI18n } from "@/components/I18nProvider";
 
 type EmployeeData = {
   id: string;
@@ -35,6 +36,7 @@ type EmployeeData = {
 };
 
 export default function WorkerManagerAccountsPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -104,11 +106,15 @@ export default function WorkerManagerAccountsPage() {
           filteredEmployees.filter((emp) => emp.id !== employeeToDelete),
         );
       } else {
-        alert(result.error || "Greška prilikom brisanja");
+        const message =
+          ("errorKey" in result && result.errorKey && t(result.errorKey))
+          || result.error
+          || t("deleteFailed");
+        alert(message);
       }
     } catch (error) {
       console.error("Error deleting employee:", error);
-      alert("Greška prilikom brisanja");
+      alert(t("deleteFailed"));
     } finally {
       setDeleting(false);
       setDeleteDialogOpen(false);
@@ -164,7 +170,7 @@ export default function WorkerManagerAccountsPage() {
           flexShrink: 0,
         }}
       >
-        Upravljaj računima
+        {t("manageAccountsTitle")}
       </Typography>
 
       <Box
@@ -178,7 +184,7 @@ export default function WorkerManagerAccountsPage() {
       >
         <TextField
           fullWidth
-          placeholder="Search"
+          placeholder={t("search")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           slotProps={{
@@ -214,7 +220,7 @@ export default function WorkerManagerAccountsPage() {
               bgcolor: "#e0e0e0",
             },
           }}
-          aria-label="add employee"
+          aria-label={t("addEmployeeAria")}
         >
           <AddIcon />
         </IconButton>
@@ -238,7 +244,7 @@ export default function WorkerManagerAccountsPage() {
             }}
           >
             <Typography variant="body1" color="text.secondary">
-              {searchQuery ? "Nema rezultata pretrage" : "Nema zaposlenika"}
+              {searchQuery ? t("noSearchResults") : t("noEmployees")}
             </Typography>
           </Box>
         ) : (
@@ -290,16 +296,17 @@ export default function WorkerManagerAccountsPage() {
         onClose={cancelDelete}
         aria-labelledby="delete-dialog-title"
       >
-        <DialogTitle id="delete-dialog-title">Potvrda brisanja</DialogTitle>
+        <DialogTitle id="delete-dialog-title">
+          {t("confirmRemovalTitle")}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Jeste li sigurni da želite obrisati ovaj račun? Ova radnja se ne
-            može poništiti.
+            {t("confirmDeleteAccountBody")}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={cancelDelete} disabled={deleting}>
-            Odustani
+            {t("cancel")}
           </Button>
           <Button
             onClick={confirmDelete}
@@ -307,7 +314,7 @@ export default function WorkerManagerAccountsPage() {
             variant="contained"
             disabled={deleting}
           >
-            {deleting ? "Brisanje..." : "Obriši"}
+            {deleting ? t("deleting") : t("delete")}
           </Button>
         </DialogActions>
       </Dialog>

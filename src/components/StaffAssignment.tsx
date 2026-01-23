@@ -29,6 +29,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import PersonIcon from "@mui/icons-material/Person";
 import BadgeIcon from "@mui/icons-material/Badge";
+import { useI18n } from "@/components/I18nProvider";
 import {
   getRestaurantStaff,
   searchAvailableUsers,
@@ -57,6 +58,7 @@ export default function StaffAssignment({
   value,
   onChange,
 }: StaffAssignmentProps) {
+  const { t } = useI18n();
   // If restaurantId is present, we ignore value/onChange and manage state internally via server fetch
   // If restaurantId is missing (create mode), we use value/onChange (controlled) or internal state (uncontrolled)
   const [internalStaff, setInternalStaff] = useState<StaffMember[]>([]);
@@ -153,7 +155,7 @@ export default function StaffAssignment({
 
       // Check for duplicates
       if (staff.some((s) => s.id === newMember.id)) {
-        setError("Korisnik je već dodan.");
+        setError(t("userAlreadyAdded"));
         return;
       }
 
@@ -211,7 +213,7 @@ export default function StaffAssignment({
         }}
       >
         <Typography variant="h6" fontWeight={600}>
-          Zaposlenici
+          {t("staffTitle")}
         </Typography>
         <Button
           startIcon={<PersonAddIcon />}
@@ -219,7 +221,7 @@ export default function StaffAssignment({
           size="small"
           onClick={() => setOpenAddDialog(true)}
         >
-          Dodaj
+          {t("add")}
         </Button>
       </Box>
 
@@ -235,7 +237,7 @@ export default function StaffAssignment({
         </Box>
       ) : staff.length === 0 ? (
         <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>
-          Nema dodijeljenih zaposlenika.
+          {t("noAssignedStaff")}
         </Typography>
       ) : (
         <List dense sx={{ bgcolor: "background.paper", borderRadius: 2 }}>
@@ -247,7 +249,7 @@ export default function StaffAssignment({
                 color="primary"
                 sx={{ px: 2, pt: 1 }}
               >
-                Voditelji
+                {t("managersGroup")}
               </Typography>
               {managers.map((member) => (
                 <ListItem
@@ -286,7 +288,7 @@ export default function StaffAssignment({
                 color="secondary"
                 sx={{ px: 2, pt: managers.length > 0 ? 2 : 1 }}
               >
-                Radnici
+                {t("workersGroup")}
               </Typography>
               {workers.map((member) => (
                 <ListItem
@@ -325,7 +327,7 @@ export default function StaffAssignment({
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle>Dodaj zaposlenika</DialogTitle>
+        <DialogTitle>{t("addStaffTitle")}</DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3, pt: 1 }}>
             <Autocomplete
@@ -338,8 +340,8 @@ export default function StaffAssignment({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Pretraži korisnike"
-                  placeholder="Ime, prezime ili username..."
+                  label={t("searchUsersLabel")}
+                  placeholder={t("searchUsersPlaceholder")}
                   fullWidth
                   InputProps={{
                     ...params.InputProps,
@@ -355,7 +357,7 @@ export default function StaffAssignment({
                 />
               )}
               noOptionsText={
-                searching ? "Učitavanje..." : "Nema dostupnih korisnika"
+                searching ? t("loading") : t("noAvailableUsers")
               }
             />
 
@@ -365,7 +367,7 @@ export default function StaffAssignment({
                 color="text.secondary"
                 sx={{ mb: 1, ml: 1 }}
               >
-                Pozicija
+                {t("positionLabel")}
               </Typography>
               <ToggleButtonGroup
                 color="primary"
@@ -377,40 +379,40 @@ export default function StaffAssignment({
                 fullWidth
                 sx={{ bgcolor: "white" }}
               >
-                <ToggleButton value="worker">Radnik</ToggleButton>
-                <ToggleButton value="manager">Voditelj</ToggleButton>
+                <ToggleButton value="worker">{t("roleWorker")}</ToggleButton>
+                <ToggleButton value="manager">{t("roleManager")}</ToggleButton>
               </ToggleButtonGroup>
             </Box>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenAddDialog(false)}>Odustani</Button>
+          <Button onClick={() => setOpenAddDialog(false)}>{t("cancel")}</Button>
           <Button
             onClick={handleAdd}
             variant="contained"
             disabled={!selectedUser || actionLoading}
           >
-            {actionLoading ? "Dodavanje..." : "Dodaj"}
+            {actionLoading ? t("adding") : t("add")}
           </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={!!userToDelete} onClose={() => setUserToDelete(null)}>
-        <DialogTitle>Potvrda brisanja</DialogTitle>
+        <DialogTitle>{t("confirmRemovalTitle")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Jeste li sigurni da želite ukloniti ovog zaposlenika?
+            {t("confirmRemoveEmployee")}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setUserToDelete(null)}>Odustani</Button>
+          <Button onClick={() => setUserToDelete(null)}>{t("cancel")}</Button>
           <Button
             onClick={confirmRemove}
             color="error"
             variant="contained"
             autoFocus
           >
-            Obriši
+            {t("delete")}
           </Button>
         </DialogActions>
       </Dialog>

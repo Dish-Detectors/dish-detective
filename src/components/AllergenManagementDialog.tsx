@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import { useI18n } from "@/components/I18nProvider";
 import {
   getAllAllergens,
   createAllergen,
@@ -39,6 +40,7 @@ export default function AllergenManagementDialog({
   open,
   onClose,
 }: AllergenManagementDialogProps) {
+  const { t } = useI18n();
   const [allergens, setAllergens] = useState<Allergen[]>([]);
   const [newAllergen, setNewAllergen] = useState("");
   const [loading, setLoading] = useState(false);
@@ -50,7 +52,7 @@ export default function AllergenManagementDialog({
     if (res.success && res.data) {
       setAllergens(res.data);
     } else {
-      setError("Failed to load allergens");
+      setError(t("failedToLoadAllergens"));
     }
     setLoading(false);
   };
@@ -71,24 +73,24 @@ export default function AllergenManagementDialog({
       setNewAllergen("");
       fetchAllergens();
     } else {
-      setError(res.message || "Unknown error occurred");
+      setError(res.message || t("unknownError"));
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Jeste li sigurni da želite obrisati ovaj alergen?")) return;
+    if (!confirm(t("confirmDeleteAllergen"))) return;
     const res = await deleteAllergen(id);
     if (res.success) {
       fetchAllergens();
     } else {
-      setError(res.message || "Unknown error occurred");
+      setError(res.message || t("unknownError"));
     }
   };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogTitle sx={{ fontWeight: "bold" }}>
-        Upravljanje alergenima
+        {t("manageAllergensTitle")}
       </DialogTitle>
       <DialogContent>
         {error && (
@@ -101,7 +103,7 @@ export default function AllergenManagementDialog({
           <TextField
             fullWidth
             size="small"
-            label="Novi alergen"
+            label={t("newAllergenLabel")}
             value={newAllergen}
             onChange={(e) => setNewAllergen(e.target.value)}
             onKeyPress={(e) => {
@@ -138,7 +140,7 @@ export default function AllergenManagementDialog({
                 textAlign="center"
                 sx={{ py: 2 }}
               >
-                Nema definiranih alergena.
+                {t("noAllergensDefined")}
               </Typography>
             ) : (
               allergens.map((allergen) => (
@@ -170,7 +172,7 @@ export default function AllergenManagementDialog({
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 3 }}>
         <Button onClick={onClose} variant="outlined" fullWidth>
-          Zatvori
+          {t("close")}
         </Button>
       </DialogActions>
     </Dialog>

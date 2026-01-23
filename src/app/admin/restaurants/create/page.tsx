@@ -25,8 +25,10 @@ import { createRestaurant } from "./actions";
 import { uploadAttachment } from "@/app/manager/announcements/uploadAction"; // Reusing generic upload
 import { IWorkingDay, IShift } from "@/models/Restaurant";
 import StaffAssignment, { StaffMember } from "@/components/StaffAssignment";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function CreateRestaurantPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -74,16 +76,16 @@ export default function CreateRestaurantPage() {
 
     // Validation
     if (!imageFile) {
-      setImageError("Slika je obavezna");
-      setError("Molimo odaberite sliku restorana");
+      setImageError(t("restaurantImageRequired"));
+      setError(t("pleaseSelectRestaurantImage"));
       return;
     }
     if (!formData.name || !formData.address) {
-      setError("Naziv i adresa su obavezni");
+      setError(t("nameAndAddressRequired"));
       return;
     }
     if (!location) {
-      setError("Molimo označite lokaciju restorana na karti");
+      setError(t("selectRestaurantLocationOnMap"));
       return;
     }
 
@@ -130,14 +132,14 @@ export default function CreateRestaurantPage() {
         throw new Error(res.message);
       }
 
-      setSuccess("Restoran uspješno kreiran!");
+      setSuccess(t("restaurantCreatedSuccess"));
       setShowSuccessScreen(true);
       setTimeout(() => {
         router.push("/admin/restaurants");
       }, 2000);
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Došlo je do greške. Pokušajte ponovo.");
+      setError(err.message || t("genericTryAgainError"));
     } finally {
       setLoading(false);
     }
@@ -202,7 +204,7 @@ export default function CreateRestaurantPage() {
               startIcon={<CloudUploadIcon />}
               sx={{ textTransform: "none" }}
             >
-              Odaberi sliku *
+              {t("chooseImage")}
             </Button>
           </label>
           <Typography
@@ -210,7 +212,7 @@ export default function CreateRestaurantPage() {
             display="block"
             sx={{ mt: 1, color: imageError ? "error.main" : "text.secondary" }}
           >
-            {imageError || "PNG, JPG do 5MB"}
+            {imageError || t("imageFormatsHint")}
           </Typography>
         </Box>
       )}
@@ -219,12 +221,12 @@ export default function CreateRestaurantPage() {
 
   // Reusable Form Content
   const renderFormContent = () => (
-    <Box component="form" onSubmit={handleSubmit}>
+    <Box component="form" onSubmit={handleSubmit} noValidate>
       {renderImageUpload()}
 
       <TextField
         fullWidth
-        label="Naziv restorana"
+        label={t("restaurantNameLabel")}
         value={formData.name}
         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
         required
@@ -242,7 +244,7 @@ export default function CreateRestaurantPage() {
 
       <Box sx={{ mb: 4 }}>
         <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5 }}>
-          Lokacija
+          {t("location")}
         </Typography>
         <MapLocationPicker
           initialAddress={formData.address}
@@ -255,7 +257,7 @@ export default function CreateRestaurantPage() {
 
       <Box sx={{ mb: 3 }}>
         <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5 }}>
-          Radno vrijeme
+          {t("workingHours")}
         </Typography>
         <WorkingHoursEditor onChange={setWorkingHoursRaw} />
       </Box>
@@ -263,7 +265,7 @@ export default function CreateRestaurantPage() {
   );
 
   if (showSuccessScreen) {
-    return <SuccessScreen message="Restoran uspješno kreiran!" />;
+    return <SuccessScreen message={t("restaurantCreatedSuccess")} />;
   }
 
   // Mobile Layout
@@ -283,7 +285,7 @@ export default function CreateRestaurantPage() {
             variant="h4"
             sx={{ fontWeight: 780, mb: 4, color: "#212222" }}
           >
-            Unesite podatke
+            {t("enterDetailsTitle")}
           </Typography>
 
           {error && (
@@ -331,10 +333,10 @@ export default function CreateRestaurantPage() {
             {loading ? (
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <CircularProgress size={24} color="inherit" />
-                Spremanje...
+                {t("saving")}
               </Box>
             ) : (
-              "Spremi"
+              t("save")
             )}
           </Typography>
         </Box>
@@ -374,7 +376,7 @@ export default function CreateRestaurantPage() {
             component="input"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            placeholder="Naziv restorana"
+            placeholder={t("restaurantNameLabel")}
             sx={{
               fontSize: "2.125rem", // h4 size
               fontWeight: 780,
@@ -410,12 +412,12 @@ export default function CreateRestaurantPage() {
               {/* Left Column: Image, Location */}
               <Box>
                 <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-                  Osnovne informacije
+                  {t("basicInfoTitle")}
                 </Typography>
                 {renderImageUpload()}
 
                 <Typography variant="h6" sx={{ mb: 1, fontWeight: 600, mt: 3 }}>
-                  Lokacija
+                  {t("location")}
                 </Typography>
                 <Box sx={{ mb: 2 }}>
                   <MapLocationPicker
@@ -436,7 +438,7 @@ export default function CreateRestaurantPage() {
                 </Box>
 
                 <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-                  Radno vrijeme
+                  {t("workingHours")}
                 </Typography>
                 <Box sx={{ mb: 2 }}>
                   <WorkingHoursEditor onChange={setWorkingHoursRaw} />
@@ -466,10 +468,10 @@ export default function CreateRestaurantPage() {
               {loading ? (
                 <>
                   <CircularProgress size={24} sx={{ mr: 1 }} color="inherit" />
-                  Spremanje...
+                  {t("saving")}
                 </>
               ) : (
-                "Spremi"
+                t("save")
               )}
             </Button>
           </Box>

@@ -26,12 +26,14 @@ import { uploadAttachment } from "@/app/manager/announcements/uploadAction";
 import { IWorkingDay, IShift } from "@/models/Restaurant";
 import StaffAssignment from "@/components/StaffAssignment";
 import RestaurantDishSelector from "@/components/RestaurantDishSelector";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function EditRestaurantPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const { t } = useI18n();
   const { id } = use(params);
   const router = useRouter();
   const theme = useTheme();
@@ -92,10 +94,10 @@ export default function EditRestaurantPage({
             setAvailableDishes(rest.availableDishes);
           }
         } else {
-          setError("Restoran nije pronađen.");
+          setError(t("restaurantNotFound"));
         }
       } catch (e) {
-        setError("Neuspješno učitavanje podataka.");
+        setError(t("failedToLoadData"));
       } finally {
         setFetchingData(false);
       }
@@ -126,16 +128,16 @@ export default function EditRestaurantPage({
     if (e) e.preventDefault();
 
     if (!imagePreview) {
-      setImageError("Slika je obavezna");
-      setError("Molimo odaberite sliku restorana");
+      setImageError(t("restaurantImageRequired"));
+      setError(t("pleaseSelectRestaurantImage"));
       return;
     }
     if (!formData.name || !formData.address) {
-      setError("Naziv i adresa su obavezni");
+      setError(t("nameAndAddressRequired"));
       return;
     }
     if (!location) {
-      setError("Molimo označite lokaciju restorana na karti");
+      setError(t("selectRestaurantLocationOnMap"));
       return;
     }
 
@@ -184,14 +186,14 @@ export default function EditRestaurantPage({
         throw new Error(res.message);
       }
 
-      setSuccess("Podaci uspješno ažurirani!");
+      setSuccess(t("dataUpdatedSuccess"));
       setShowSuccessScreen(true);
       setTimeout(() => {
         router.push("/admin/restaurants");
       }, 2000);
     } catch (err: any) {
       console.error(err);
-      setError("Došlo je do greške. Pokušajte ponovo.");
+      setError(t("genericTryAgainError"));
     } finally {
       setSaving(false);
     }
@@ -307,10 +309,10 @@ export default function EditRestaurantPage({
               sx={{ fontSize: 48, color: "text.secondary", mb: 2 }}
             />
             <Typography variant="h6" color="text.secondary">
-              Odaberi sliku
+              {t("chooseImageButton")}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {imageError || "PNG, JPG do 5MB"}
+              {imageError || t("imageFormatsHint")}
             </Typography>
           </label>
         </Box>
@@ -324,7 +326,7 @@ export default function EditRestaurantPage({
 
       <TextField
         fullWidth
-        label="Naziv restorana"
+        label={t("restaurantNameLabel")}
         value={formData.name}
         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
         required
@@ -342,7 +344,7 @@ export default function EditRestaurantPage({
 
       <Box sx={{ mb: 4 }}>
         <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5 }}>
-          Lokacija
+          {t("location")}
         </Typography>
         <MapLocationPicker
           initialLocation={location || undefined}
@@ -356,7 +358,7 @@ export default function EditRestaurantPage({
 
       <Box sx={{ mb: 3 }}>
         <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5 }}>
-          Radno vrijeme
+          {t("workingHours")}
         </Typography>
         <WorkingHoursEditor
           initialData={initialHours}
@@ -367,7 +369,7 @@ export default function EditRestaurantPage({
   );
 
   if (showSuccessScreen) {
-    return <SuccessScreen message="Podaci uspješno ažurirani!" />;
+    return <SuccessScreen message={t("dataUpdatedSuccess")} />;
   }
 
   if (fetchingData) {
@@ -403,7 +405,7 @@ export default function EditRestaurantPage({
             variant="h4"
             sx={{ fontWeight: 780, mb: 4, color: "#212222" }}
           >
-            Uredi podatke
+            {t("editDataTitle")}
           </Typography>
 
           {error && (
@@ -450,10 +452,10 @@ export default function EditRestaurantPage({
             {saving ? (
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <CircularProgress size={24} color="inherit" />
-                Spremanje...
+                {t("saving")}
               </Box>
             ) : (
-              "Spremi promjene"
+              t("saveChanges")
             )}
           </Typography>
         </Box>
@@ -534,7 +536,7 @@ export default function EditRestaurantPage({
               {/* Top Left: Basic Info & Image */}
               <Box>
                 <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-                  Osnovne informacije
+                  {t("basicInfoTitle")}
                 </Typography>
                 {renderImageUpload()}
               </Box>
@@ -547,7 +549,7 @@ export default function EditRestaurantPage({
               {/* Bottom Left: Location */}
               <Box>
                 <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-                  Lokacija
+                  {t("location")}
                 </Typography>
                 <MapLocationPicker
                   initialLocation={location || undefined}
@@ -562,7 +564,7 @@ export default function EditRestaurantPage({
               {/* Bottom Right: Working Hours */}
               <Box>
                 <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-                  Radno vrijeme
+                  {t("workingHours")}
                 </Typography>
                 <WorkingHoursEditor
                   initialData={initialHours}
@@ -573,12 +575,10 @@ export default function EditRestaurantPage({
 
             <Box sx={{ mt: 4 }}>
               <Typography variant="h6" sx={{ mb: 1.5, fontWeight: 600 }}>
-                Dostupna jela
+                {t("availableDishes")}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                Odaberite sva jela koja ovaj restoran može ponuditi. Ova lista
-                će se koristiti za filtriranje "Sva jela" na studentskoj
-                stranici.
+                {t("selectRestaurantDishesHelp")}
               </Typography>
               <RestaurantDishSelector
                 initialSelectedIds={availableDishes}
@@ -608,10 +608,10 @@ export default function EditRestaurantPage({
               {saving ? (
                 <>
                   <CircularProgress size={24} sx={{ mr: 1 }} color="inherit" />
-                  Spremanje...
+                  {t("saving")}
                 </>
               ) : (
-                "Spremi"
+                t("save")
               )}
             </Button>
           </Box>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, use } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Box,
@@ -14,42 +14,41 @@ import {
   DialogContentText,
   DialogActions,
   Button,
-  useMediaQuery,
-  useTheme,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
+
 import DishCard from "@/components/DishCard";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
-import { navWidth } from "@/components/AdminNavbar";
-import { getAllDishes, deleteDish } from "./actions";
 import AllergenManagementDialog from "@/components/AllergenManagementDialog";
+import { useI18n } from "@/components/I18nProvider";
 
-interface Dish {
+import { deleteDish, getAllDishes } from "./actions";
+
+type Dish = {
   _id: string;
   name: string;
   description: string;
-
   imageUrl: string;
-  allergens: string[];
-  createdAt: string;
-  updatedAt: string;
-}
+  allergens: (string | { name: string })[];
+};
 
 export default function Page() {
+  const { t } = useI18n();
   const router = useRouter();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [allergenDialogOpen, setAllergenDialogOpen] = useState(false);
   const [dishToDelete, setDishToDelete] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  const [allergenDialogOpen, setAllergenDialogOpen] = useState(false);
+
   useEffect(() => {
-    loadDishes();
+    void loadDishes();
   }, []);
 
   const loadDishes = async () => {
@@ -64,34 +63,12 @@ export default function Page() {
     setLoading(false);
   };
 
-  const handleAddNew = () => {
-    router.push("/admin/dishes/create");
-  };
-
-  const handleEdit = (id: string) => {
-    router.push(`/admin/dishes/edit/${id}`);
-  };
+  const handleAddNew = () => router.push("/admin/dishes/create");
+  const handleEdit = (id: string) => router.push(`/admin/dishes/edit/${id}`);
 
   const handleDelete = (id: string) => {
     setDishToDelete(id);
     setDeleteDialogOpen(true);
-  };
-
-  const confirmDelete = async () => {
-    if (!dishToDelete) return;
-
-    setDeleting(true);
-    const response = await deleteDish(dishToDelete);
-
-    if (response.success) {
-      setDishes(dishes.filter((dish) => dish._id !== dishToDelete));
-      setDeleteDialogOpen(false);
-      setDishToDelete(null);
-    } else {
-      console.error("Failed to delete dish:", response.message);
-      alert("Failed to delete dish");
-    }
-    setDeleting(false);
   };
 
   const cancelDelete = () => {
@@ -99,12 +76,32 @@ export default function Page() {
     setDishToDelete(null);
   };
 
+  const confirmDelete = async () => {
+    if (!dishToDelete) return;
+    setDeleting(true);
+
+    const response = await deleteDish(dishToDelete);
+
+    if (response.success) {
+      setDishes((prev) => prev.filter((dish) => dish._id !== dishToDelete));
+      cancelDelete();
+    } else {
+      console.error("Failed to delete dish:", response.message);
+      alert(t("deleteFailed"));
+    }
+
+    setDeleting(false);
+  };
+
   const filteredDishes = dishes.filter((dish) => {
     const query = searchQuery.toLowerCase();
     return (
       dish.name.toLowerCase().includes(query) ||
       dish.description.toLowerCase().includes(query) ||
-      dish.allergens.some((allergen) => allergen.toLowerCase().includes(query))
+      dish.allergens.some((allergen) => {
+        const label = typeof allergen === "string" ? allergen : allergen.name;
+        return label.toLowerCase().includes(query);
+      })
     );
   });
 
@@ -140,14 +137,9 @@ export default function Page() {
     >
       <Typography
         variant="h4"
-        sx={{
-          fontWeight: 780,
-          mb: 4,
-          color: "#212222",
-          flexShrink: 0,
-        }}
+        sx={{ fontWeight: 780, mb: 4, color: "#212222", flexShrink: 0 }}
       >
-        Upravljaj jelima
+        {t("manageDishesTitle")}
       </Typography>
 
       <Box
@@ -161,7 +153,7 @@ export default function Page() {
       >
         <TextField
           fullWidth
-          placeholder="Search"
+          placeholder={t("search")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           slotProps={{
@@ -197,7 +189,7 @@ export default function Page() {
               bgcolor: "#e0e0e0",
             },
           }}
-          aria-label="add dish"
+          aria-label={t("create")}
         >
           <AddIcon />
         </IconButton>
@@ -220,17 +212,11 @@ export default function Page() {
             },
           }}
         >
-          Upravljaj alergenima
+          {t("manageAllergensButton")}
         </Button>
       </Box>
 
-      <Box
-        sx={{
-          flex: 1,
-          overflowY: "auto",
-          pr: 1,
-        }}
-      >
+      <Box sx={{ flex: 1, overflowY: "auto", pr: 1 }}>
         {filteredDishes.length === 0 ? (
           <Box
             sx={{
@@ -242,7 +228,7 @@ export default function Page() {
             }}
           >
             <Typography variant="body1" color="text.secondary">
-              {searchQuery ? "Nema rezultata pretrage" : "Nema jela"}
+              {searchQuery ? t("noSearchResults") : t("noDishes")}
             </Typography>
           </Box>
         ) : (
@@ -286,21 +272,14 @@ export default function Page() {
         )}
       </Box>
 
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={cancelDelete}
-        aria-labelledby="delete-dialog-title"
-      >
-        <DialogTitle id="delete-dialog-title">Potvrda brisanja</DialogTitle>
+      <Dialog open={deleteDialogOpen} onClose={cancelDelete}>
+        <DialogTitle>{t("confirmRemovalTitle")}</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Jeste li sigurni da želite obrisati ovo jelo? Ova radnja se ne može
-            poništiti.
-          </DialogContentText>
+          <DialogContentText>{t("confirmDeleteDishBody")}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={cancelDelete} disabled={deleting}>
-            Odustani
+            {t("cancel")}
           </Button>
           <Button
             onClick={confirmDelete}
@@ -308,10 +287,11 @@ export default function Page() {
             variant="contained"
             disabled={deleting}
           >
-            {deleting ? "Brisanje..." : "Obriši"}
+            {deleting ? t("deleting") : t("delete")}
           </Button>
         </DialogActions>
       </Dialog>
+
       <AllergenManagementDialog
         open={allergenDialogOpen}
         onClose={() => setAllergenDialogOpen(false)}
