@@ -141,24 +141,13 @@ export default function EmployeeCreatePage() {
 
 
   if (showSuccessScreen) {
+    setTimeout(() => {
+      router.push("/admin/accounts");
+    }, 2000);
+
     return (
       <SuccessScreen
         message="Račun uspješno kreiran!"
-        onContinue={() => {
-          setShowSuccessScreen(false);
-          setFormData({
-            name: "",
-            lastName: "",
-            username: "",
-            password: "",
-            confirmPassword: "",
-            role: undefined,
-          });
-          setImageFile(null);
-          setImagePreview(null);
-          setSuccess(null);
-        }}
-        continueText="Kreiraj novi račun"
       />
     );
   }
