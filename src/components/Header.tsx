@@ -139,11 +139,10 @@ export default function Header() {
               gap: 1,
               textDecoration: "none",
               color: "white",
-              ...(isMobile && { color: "black" }),
             }}
           >
             <Image
-              src={isMobile ? "/logoDark.png" : "/logoWhite.png"}
+              src="/logoWhite.png"
               alt="Dish Detective Logo"
               width={32}
               height={32}
@@ -154,7 +153,6 @@ export default function Header() {
                 fontWeight: "bold",
                 "&:hover": {
                   color: "grey.200",
-                  ...(isMobile && { color: "grey.700" }),
                 },
               }}
             >
@@ -163,25 +161,7 @@ export default function Header() {
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1, md: 2 } }}>
-            <Button
-              sx={{
-                display: { xs: "flex", sm: "none" },
-                minWidth: 0,
-                padding: 0,
-                bgcolor: "transparent",
-                "&:hover": {
-                  bgcolor: "transparent",
-                },
-              }}
-              disableRipple
-            >
-              <Image
-                src="/translate.png"
-                alt="Translate"
-                width={32}
-                height={32}
-              />
-            </Button>
+            {/* Translate button removed as per user request */}
           </Box>
         </Toolbar>
       </AppBar>

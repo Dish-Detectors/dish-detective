@@ -48,7 +48,8 @@ export default function Home() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isShortScreen = useMediaQuery("(max-height: 740px)");
-  const showDesktopCards = useMediaQuery("(min-width: 1400px)");
+  // Show cards on mobile too
+  const showCards = true;
 
   const [cardSwapLayout, setCardSwapLayout] = useState(() => ({
     cardWidth: 500,
@@ -62,7 +63,7 @@ export default function Home() {
   const cardSwapImageSizes = `${cardSwapLayout.cardWidth}px`;
 
   useEffect(() => {
-    if (!showDesktopCards) return;
+    if (!showCards) return;
 
     const clamp = (min: number, value: number, max: number) =>
       Math.max(min, Math.min(max, value));
@@ -72,27 +73,50 @@ export default function Home() {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
 
-      // Scale mostly with width, but cap by height so it doesn't get cramped on short screens.
-      const cardWidth = clamp(500, Math.round(vw * 0.32), 740);
-      const idealCardHeight = cardWidth * (340 / 520);
-      const maxCardHeight = Math.min(540, Math.round(vh * 0.58));
-      const cardHeight = clamp(327, Math.round(idealCardHeight), maxCardHeight);
+      if (vw < 900) {
+        // Mobile sizing logic
+        const cardWidth = clamp(280, Math.round(vw * 0.85), 450);
+        const cardHeight = Math.round(cardWidth * (340 / 520));
 
-      // Keep roughly the same extra breathing room as before: +60w / +120h.
-      const wrapperWidth = cardWidth + 60;
-      const wrapperHeight = cardHeight + 120;
+        const wrapperWidth = cardWidth + 40;
+        const wrapperHeight = cardHeight + 80;
 
-      const cardDistance = clamp(52, Math.round(cardWidth * 0.12), 86);
-      const verticalDistance = clamp(62, Math.round(cardHeight * 0.22), 104);
+        const cardDistance = clamp(30, Math.round(cardWidth * 0.08), 50);
+        const verticalDistance = clamp(40, Math.round(cardHeight * 0.15), 60);
 
-      setCardSwapLayout({
-        cardWidth,
-        cardHeight,
-        wrapperWidth,
-        wrapperHeight,
-        cardDistance,
-        verticalDistance,
-      });
+        setCardSwapLayout({
+          cardWidth,
+          cardHeight,
+          wrapperWidth,
+          wrapperHeight,
+          cardDistance,
+          verticalDistance,
+        });
+
+      } else {
+        // Desktop sizing logic
+        // Scale mostly with width, but cap by height so it doesn't get cramped on short screens.
+        const cardWidth = clamp(500, Math.round(vw * 0.32), 740);
+        const idealCardHeight = cardWidth * (340 / 520);
+        const maxCardHeight = Math.min(540, Math.round(vh * 0.58));
+        const cardHeight = clamp(327, Math.round(idealCardHeight), maxCardHeight);
+
+        // Keep roughly the same extra breathing room as before: +60w / +120h.
+        const wrapperWidth = cardWidth + 60;
+        const wrapperHeight = cardHeight + 120;
+
+        const cardDistance = clamp(52, Math.round(cardWidth * 0.12), 86);
+        const verticalDistance = clamp(62, Math.round(cardHeight * 0.22), 104);
+
+        setCardSwapLayout({
+          cardWidth,
+          cardHeight,
+          wrapperWidth,
+          wrapperHeight,
+          cardDistance,
+          verticalDistance,
+        });
+      }
     };
 
     const onResize = () => {
@@ -106,7 +130,7 @@ export default function Home() {
       window.removeEventListener("resize", onResize);
       cancelAnimationFrame(rafId);
     };
-  }, [showDesktopCards]);
+  }, [showCards]);
 
   const typingFinished = subtitleText.length >= fullSubtitle.length;
 
@@ -222,153 +246,7 @@ export default function Home() {
     );
   }
 
-  if (isMobile) {
-    return (
-      <Box
-        sx={{
-          position: "relative",
-          minHeight: "100vh",
-          width: "100vw",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          overflowY: "auto",
-          WebkitOverflowScrolling: "touch",
-          bgcolor: "black",
-        }}
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            zIndex: 0,
-            overflow: "hidden",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Box sx={{ width: "200%", height: "200%", position: "relative" }}>
-            <Aurora
-              colorStops={["#0c7fdb", "#57aaf5", "#f8a44b"]}
-              amplitude={1.0}
-              blend={0.75}
-            />
-          </Box>
-        </Box>
-        <Box
-          sx={{
-            backgroundColor: "rgba(255, 255, 255, 0.8)",
-            borderRadius: 4,
-            padding: 4,
-            maxWidth: "90%",
-            boxShadow: 3,
-            mt: 2,
-            mb: 2,
-            zIndex: 1,
-            "@media (max-height: 740px)": {
-              mt: 5,
-            },
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              mb: 3,
-            }}
-          >
-            <Box
-              component="img"
-              src="logoDark.png"
-              alt="Dish Detective Logo"
-              sx={{
-                width: "18vh",
-                height: "18vh",
-                mb: 1,
-                "@media (min-height: 900px)": {
-                  width: "20vh",
-                  height: "20vh",
-                },
-              }}
-            />
-            <Typography
-              variant="h5"
-              sx={{
-                color: "#000000d4",
-                fontWeight: 750,
-                textAlign: "center",
-              }}
-            >
-              Dish Detective
-            </Typography>
-          </Box>
-          <Typography
-            variant="h3"
-            fontWeight={800}
-            sx={{
-              color: "#000000d4",
-              mb: 2,
-              textAlign: "center",
-              letterSpacing: -1,
-              fontSize: { xs: "6vh" },
-            }}
-          >
-            {t.heroTitle}
-          </Typography>
 
-          <Typography
-            variant="h6"
-            fontWeight={600}
-            sx={{
-              mb: 3,
-              color: "#3c403d",
-              textAlign: "center",
-              fontSize: { xs: "1.1rem" },
-            }}
-          >
-            <span className="ddTypewriterText">{subtitleText}</span>
-            <span
-              className={
-                typingFinished
-                  ? "ddTypewriterCaret ddTypewriterCaret--idle"
-                  : "ddTypewriterCaret"
-              }
-              aria-hidden="true"
-            />
-          </Typography>
-
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              if (isEmployeeDomain) {
-                router.push("/login/employee");
-              } else {
-                router.push("/login/student");
-              }
-            }}
-            fullWidth
-            sx={{
-              fontWeight: 600,
-              borderRadius: 999,
-              minHeight: 50,
-              textTransform: "none",
-            }}
-          >
-            {t.login}
-          </Button>
-        </Box>
-      </Box>
-    );
-  }
-
-  // Desktop layout
   return (
     <Box
       sx={{
@@ -379,8 +257,9 @@ export default function Home() {
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "flex-start",
-        paddingLeft: 10,
+        paddingLeft: { xs: 0, lg: 10 },
         bgcolor: "black",
+        overflowX: "hidden", // Prevent horizontal scroll
       }}
     >
       <Box
@@ -397,7 +276,15 @@ export default function Home() {
           alignItems: "center",
         }}
       >
-        <Box sx={{ width: "100%", height: "100%", position: "relative" }}>
+        <Box
+          sx={{
+            width: { xs: "250%", md: "100%" },
+            height: "100%",
+            position: "relative",
+            left: { xs: "50%", md: 0 },
+            transform: { xs: "translateX(-50%)", md: "none" },
+          }}
+        >
           <Aurora
             colorStops={["#0c7fdb", "#57aaf5", "#f8a44b"]}
             amplitude={1.0}
@@ -423,14 +310,28 @@ export default function Home() {
           sx={{
             zIndex: 1,
             width: "100%",
+            height: "100%",
             display: "flex",
+            flexDirection: { xs: "column", lg: "row" },
             alignItems: "center",
-            justifyContent: "space-between",
-            gap: 8,
-            pr: "clamp(70px, 2vw, 180px)",
+            justifyContent: { xs: "center", lg: "space-between" },
+            gap: { xs: 5, lg: 8 },
+            pr: { xs: 0, lg: "clamp(70px, 2vw, 180px)" },
+            pt: { xs: 10, lg: 0 },
+            pb: { xs: 4, lg: 0 },
           }}
         >
-          <Box sx={{ maxWidth: 600 }}>
+          <Box
+            sx={{
+              maxWidth: 600,
+              width: "100%",
+              px: { xs: 4, lg: 0 },
+              display: "flex",
+              flexDirection: "column",
+              alignItems: { xs: "center", lg: "flex-start" },
+              textAlign: { xs: "center", lg: "left" },
+            }}
+          >
             <Typography
               variant="h2"
               fontWeight={800}
@@ -440,6 +341,7 @@ export default function Home() {
                 lineHeight: 1.2,
                 wordBreak: "break-word",
                 letterSpacing: -1,
+                fontSize: { xs: "3rem", sm: "3.75rem" },
               }}
             >
               {t.heroTitle}
@@ -451,6 +353,8 @@ export default function Home() {
                 mb: 3,
                 color: "lightgrey",
                 letterSpacing: 1.2,
+                fontSize: { xs: "1.25rem", sm: "1.5rem" },
+                minHeight: { xs: "3rem", sm: "auto" },
               }}
             >
               <span className="ddTypewriterText">{subtitleText}</span>
@@ -464,7 +368,8 @@ export default function Home() {
               />
             </Typography>
 
-            <Stack spacing={2}>
+            {/* Desktop Button - Hidden on Mobile */}
+            <Stack spacing={2} sx={{ width: "100%", alignItems: "flex-start", display: { xs: "none", lg: "flex" } }}>
               <Button
                 variant="contained"
                 color="primary"
@@ -478,7 +383,9 @@ export default function Home() {
                 sx={{
                   fontWeight: 600,
                   borderRadius: 999,
-                  width: "25%",
+                  width: { xs: "100%", sm: "auto", lg: "25%" },
+                  minWidth: { sm: 200 },
+                  px: { sm: 4 },
                   minHeight: 45,
                   color: "white",
                   textTransform: "none",
@@ -495,10 +402,9 @@ export default function Home() {
               width: cardSwapLayout.wrapperWidth,
               height: cardSwapLayout.wrapperHeight,
               flex: "0 0 auto",
-              display: "none",
-              "@media (min-width: 1400px)": {
-                display: "block",
-              },
+              display: "block",
+              mx: "auto",
+              mt: { xs: 4, lg: 0 },
             }}
             aria-hidden="true"
           >
@@ -729,6 +635,33 @@ export default function Home() {
               </Card>
             </CardSwap>
           </Box>
+
+          {/* Mobile Button - Shown ONLY on mobile, after cards */}
+          <Stack spacing={2} sx={{ width: "100%", alignItems: "center", display: { xs: "flex", lg: "none" } }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                if (isEmployeeDomain) {
+                  router.push("/login/employee");
+                } else {
+                  router.push("/login/student");
+                }
+              }}
+              sx={{
+                fontWeight: 600,
+                borderRadius: 999,
+                width: "100%",
+                maxWidth: 320,
+                px: 4,
+                minHeight: 50, // Slightly taller on mobile for ease of touch
+                color: "white",
+                textTransform: "none",
+              }}
+            >
+              {t.login}
+            </Button>
+          </Stack>
         </Box>
       </HomeRevealGate>
     </Box>
