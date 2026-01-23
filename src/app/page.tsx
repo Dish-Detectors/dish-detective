@@ -22,18 +22,18 @@ import HomeRevealGate from "@/components/HomeRevealGate";
 import CardSwap, { Card } from "@/components/CardSwap";
 import Aurora from "@/components/Aurora";
 import { getUserRole } from "./actions";
-import { getTranslation, getCurrentLang } from "@/utils/i18n";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function Home() {
   const router = useRouter();
   const { isLoaded, isSignedIn, user } = useUser();
   const [checkingRole, setCheckingRole] = useState(true);
+  const { t: tr } = useI18n();
 
   const [isEmployeeDomain, setIsEmployeeDomain] = useState(false);
 
-  const [t, setT] = useState(getTranslation("HR"));
   // Typewriter effect for subtitle
-  const fullSubtitle = t.heroSubtitle;
+  const fullSubtitle = tr("heroSubtitle");
   const [subtitleText, setSubtitleText] = useState("");
 
   // Used for main login dropdown
@@ -183,8 +183,6 @@ export default function Home() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       setIsEmployeeDomain(window.location.hostname.startsWith("employee."));
-      const lang = getCurrentLang();
-      setT(getTranslation(lang));
     }
   }, []);
 
@@ -341,7 +339,7 @@ export default function Home() {
               fontSize: { xs: "6vh" },
             }}
           >
-            {t.heroTitle}
+            {tr("heroTitle")}
           </Typography>
 
           <Typography
@@ -383,7 +381,7 @@ export default function Home() {
               textTransform: "none",
             }}
           >
-            {t.login}
+            {tr("login")}
           </Button>
         </Box>
       </Box>
@@ -464,7 +462,7 @@ export default function Home() {
                 letterSpacing: -1,
               }}
             >
-              {t.heroTitle}
+              {tr("heroTitle")}
             </Typography>
 
             <Typography
@@ -506,7 +504,7 @@ export default function Home() {
                   textTransform: "none",
                 }}
               >
-                {t.login}
+                {tr("login")}
               </Button>
             </Stack>
           </Box>
@@ -571,7 +569,7 @@ export default function Home() {
                     fontWeight={800}
                     sx={{ color: "#111827", lineHeight: 1.1 }}
                   >
-                    {t.cardRealTimeMeni}
+                    {tr("cardRealTimeMeni")}
                   </Typography>
                   <Box
                     sx={{
@@ -643,7 +641,7 @@ export default function Home() {
                     fontWeight={800}
                     sx={{ color: "#111827", lineHeight: 1.1 }}
                   >
-                    {t.cardOverview}
+                    {tr("cardOverview")}
                   </Typography>
                   <Box
                     sx={{
@@ -714,7 +712,7 @@ export default function Home() {
                     fontWeight={800}
                     sx={{ color: "#111827", lineHeight: 1.1 }}
                   >
-                    {t.cardNotifications}
+                    {tr("cardNotifications")}
                   </Typography>
                   <Box
                     sx={{

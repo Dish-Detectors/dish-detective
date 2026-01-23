@@ -22,11 +22,13 @@ import {
 } from "./actions";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
 import { FormControlLabel, Switch } from "@mui/material";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function Page() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const router = useRouter();
+  const { t: tr } = useI18n();
 
   const [menzaId, setMenzaId] = useState<string | null>(null);
   const [dishes, setDishes] = useState<WorkerMenuItem[]>([]);
@@ -83,7 +85,7 @@ export default function Page() {
             flexShrink: 0,
           }}
         >
-          Ponuda dana
+          {tr("todayOfferTitle")}
         </Typography>
 
         <Divider sx={{ mb: 4 }} />
@@ -124,7 +126,7 @@ export default function Page() {
               >
                 <RestaurantMenuIcon sx={{ fontSize: 64, opacity: 0.5 }} />
                 <Typography variant="h6" fontWeight="medium">
-                  Trenutno nema aktivnog menija ili je restoran zatvoren.
+                  {tr("noActiveMenuOrClosed")}
                 </Typography>
               </Box>
             ) : (
@@ -193,7 +195,11 @@ export default function Page() {
                               color="primary"
                             />
                           }
-                          label={dish.available ? "Dostupno" : "Nedostupno"}
+                          label={
+                            dish.available
+                              ? tr("available")
+                              : tr("unavailable")
+                          }
                           sx={{
                             m: 0,
                             "& .MuiTypography-root": {

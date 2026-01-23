@@ -12,10 +12,12 @@ import {
   CircularProgress,
 } from "@mui/material";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function Page() {
   const { signIn, setActive, isLoaded } = useSignIn();
   const router = useRouter();
+  const { t: tr } = useI18n();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -52,7 +54,7 @@ export default function Page() {
         await setActive({ session: result.createdSessionId });
         router.push("/auth/redirect");
       } else {
-        setError("Neuspješna prijava. Provjerite korisničko ime i lozinku.");
+        setError(tr("loginFailedCheckCredentials"));
       }
     } catch (err: any) {
       console.error("Login error:", err);
@@ -69,7 +71,7 @@ export default function Page() {
         return;
       }
 
-      setError("Neispravno korisničko ime ili lozinka");
+      setError(tr("invalidUsernameOrPassword"));
     } finally {
       setLoading(false);
     }
@@ -123,7 +125,7 @@ export default function Page() {
             textAlign: "center",
           }}
         >
-          Zaposlenik login
+          {tr("employeeLoginTitle")}
         </Typography>
 
         {error && (
@@ -135,7 +137,7 @@ export default function Page() {
         <Box component="form" onSubmit={handleSubmit}>
           <TextField
             fullWidth
-            label="Korisničko ime"
+            label={tr("username")}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
@@ -145,7 +147,7 @@ export default function Page() {
 
           <TextField
             fullWidth
-            label="Lozinka"
+            label={tr("password")}
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -174,10 +176,10 @@ export default function Page() {
             {loading ? (
               <>
                 <CircularProgress size={24} sx={{ mr: 1 }} color="inherit" />
-                Prijava...
+                {tr("signingIn")}
               </>
             ) : (
-              "Prijavi se"
+              tr("signIn")
             )}
           </Button>
         </Box>
