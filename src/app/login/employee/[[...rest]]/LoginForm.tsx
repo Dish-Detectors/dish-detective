@@ -46,7 +46,7 @@ export default function LoginForm() {
 
     try {
       const result = await signIn.create({
-        identifier: username,
+        identifier: username.trim(),
         password,
       });
 

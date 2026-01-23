@@ -41,7 +41,7 @@ export async function createEmployeeAccount({
     // Create user in Clerk
     const client = await clerkClient();
     const clerkUser = await client.users.createUser({
-      username,
+      username: username.trim(),
       password,
       firstName: name,
       lastName: lastName,
