@@ -207,7 +207,7 @@ export default function AnnouncementChatPage() {
         minHeight: "100vh",
         bgcolor: "#f5f5f5",
         pt: 4,
-        pb: isMobile ? "80px" : 4,
+        pb: 2
       }}
     >
       {/* Header */}

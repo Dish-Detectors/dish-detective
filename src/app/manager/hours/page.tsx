@@ -199,7 +199,7 @@ export default function WorkingHoursPage() {
         px: { xs: 3, sm: 5 },
         py: { xs: 3, sm: 5 },
         pt: 0,
-        pb: { xs: "100px", sm: 6 },
+        pb: 0,
         overflow: "hidden",
       }}
     >

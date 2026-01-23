@@ -106,7 +106,7 @@ export default function PollsListingPage() {
           maxWidth: 800,
           mx: "auto",
           pr: { xs: 0, sm: 1 },
-          pb: { xs: "100px", sm: 4 },
+          pb: { xs: 2, sm: 4 },
           scrollbarGutter: "stable",
         }}
       >

@@ -112,7 +112,7 @@ export default function ManagerStatsPage() {
         px: { xs: 3, sm: 5 },
         py: { xs: 3, sm: 5 },
         pt: 0,
-        pb: { xs: "140px", sm: 8 },
+        pb: 0,
         overflow: "hidden",
       }}
     >
