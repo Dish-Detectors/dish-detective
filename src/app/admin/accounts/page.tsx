@@ -108,7 +108,6 @@ export default function WorkerManagerAccountsPage() {
         );
       } else {
         const message =
-          ("errorKey" in result && result.errorKey && t(result.errorKey)) ||
           result.error ||
           t("deleteFailed");
         alert(message);

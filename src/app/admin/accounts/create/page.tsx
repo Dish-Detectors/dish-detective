@@ -191,7 +191,7 @@ export default function EmployeeCreatePage() {
       } else {
         setError(
           ("errorKey" in result && result.errorKey && t(result.errorKey)) ||
-          result.error ||
+          ("error" in result && result.error) ||
           t("accountCreateError"),
         );
       }
