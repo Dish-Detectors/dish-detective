@@ -158,7 +158,7 @@ export default function WorkerManagerAccountsPage() {
         px: { xs: 3, sm: 5 },
         py: { xs: 3, sm: 5 },
         pt: 0,
-        pb: { xs: "130px", sm: 10 }, // Extra padding for mobile navbar and desktop spacing
+        pb: 0,
         overflow: "hidden",
       }}
     >

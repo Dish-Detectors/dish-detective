@@ -132,7 +132,7 @@ export default function Page() {
         px: { xs: 3, sm: 5 },
         py: { xs: 3, sm: 5 },
         pt: 0,
-        pb: { xs: "100px", sm: 10 },
+        pb: 0,
         overflow: "hidden",
       }}
     >
