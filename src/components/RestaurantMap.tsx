@@ -6,12 +6,12 @@ import {
   AdvancedMarker,
   Pin,
   InfoWindow,
+  useMapsLibrary,
 } from "@vis.gl/react-google-maps";
 import { IRestaurant } from "@/models/Restaurant";
-import { Box, Typography, Button, IconButton, useTheme } from "@mui/material";
+import { Box, Typography, Button, useTheme } from "@mui/material";
 import { useState, useEffect } from "react";
 import NavigationIcon from "@mui/icons-material/Navigation";
-import CloseIcon from "@mui/icons-material/Close";
 
 interface RestaurantMapProps {
   restaurants: IRestaurant[];
@@ -100,17 +100,55 @@ const DARK_MAP_STYLES = [
   },
 ];
 
-export default function RestaurantMap({ restaurants }: RestaurantMapProps) {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+function RestaurantMapContent({ restaurants }: { restaurants: IRestaurant[] }) {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
+  const geocodingLib = useMapsLibrary("geocoding");
+  const [geocoder, setGeocoder] = useState<google.maps.Geocoder | null>(null);
+
+  const [markers, setMarkers] = useState<
+    Record<string, { lat: number; lng: number }>
+  >({});
 
   const [userLocation, setUserLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
+
   const [selectedRestaurant, setSelectedRestaurant] =
     useState<IRestaurant | null>(null);
+
+  useEffect(() => {
+    if (geocodingLib) {
+      setGeocoder(new geocodingLib.Geocoder());
+    }
+  }, [geocodingLib]);
+
+  useEffect(() => {
+    if (!geocoder || restaurants.length === 0) return;
+
+    restaurants.forEach((restaurant) => {
+      // If we already have a marker for this restaurant, skip
+      if (markers[restaurant._id as string]) return;
+
+      geocoder.geocode(
+        { address: `${restaurant.address}, Zagreb` }, // Append Zagreb for better results locally
+        (results, status) => {
+          if (status === "OK" && results && results[0]) {
+            const loc = results[0].geometry.location;
+            setMarkers((prev) => ({
+              ...prev,
+              [restaurant._id as string]: { lat: loc.lat(), lng: loc.lng() },
+            }));
+          } else {
+            console.warn(
+              `Geocode failed for ${restaurant.name}: ${status}`,
+            );
+          }
+        },
+      );
+    });
+  }, [geocoder, restaurants, markers]);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -127,6 +165,138 @@ export default function RestaurantMap({ restaurants }: RestaurantMapProps) {
       );
     }
   }, []);
+
+  return (
+    <>
+      {isDarkMode && (
+        <style>{`
+            .gm-style-iw {
+              background-color: #1e293b !important;
+              color: #e2e8f0 !important;
+            }
+            .gm-style-iw-c {
+              background-color: #1e293b !important;
+              padding: 0 !important;
+            }
+            .gm-style-iw-d {
+              background-color: #1e293b !important;
+              color: #e2e8f0 !important;
+              overflow: hidden !important;
+            }
+            .gm-style-iw-tc::after {
+              background: #1e293b !important;
+            }
+            .gm-ui-hover-effect {
+              filter: invert(1) !important;
+            }
+            .gm-style-iw-ch {
+                padding-top: 10px !important;
+                padding-left: 10px !important;
+            }
+          `}</style>
+      )}
+      <Map
+        defaultCenter={ZAGREB_CENTER}
+        defaultZoom={13}
+        mapId="DEMO_MAP_ID"
+        disableDefaultUI={true}
+        onClick={() => setSelectedRestaurant(null)}
+        colorScheme={isDarkMode ? "DARK" : "LIGHT"}
+        styles={isDarkMode ? DARK_MAP_STYLES : []}
+      >
+        {/* User Location Marker */}
+        {userLocation && (
+          <AdvancedMarker position={userLocation}>
+            <div
+              style={{
+                width: "16px",
+                height: "16px",
+                backgroundColor: "#4285F4",
+                border: "2px solid white",
+                borderRadius: "50%",
+                boxShadow: "0 0 0 2px #4285F4",
+              }}
+            />
+          </AdvancedMarker>
+        )}
+
+        {restaurants.map((restaurant) => {
+          const position = markers[restaurant._id as string];
+          if (!position) return null;
+
+          return (
+            <AdvancedMarker
+              key={restaurant._id as string}
+              position={position}
+              onClick={() => setSelectedRestaurant(restaurant)}
+            >
+              <Pin
+                background={"#E53935"}
+                glyphColor={"#000"}
+                borderColor={"#000"}
+              />
+            </AdvancedMarker>
+          );
+        })}
+
+        {selectedRestaurant && markers[selectedRestaurant._id as string] && (
+          <InfoWindow
+            position={markers[selectedRestaurant._id as string]}
+            onCloseClick={() => setSelectedRestaurant(null)}
+            headerContent={
+              <Typography
+                variant="subtitle1"
+                fontWeight="bold"
+                color="text.primary"
+              >
+                {selectedRestaurant.name}
+              </Typography>
+            }
+          >
+            <Box sx={{ width: 200, p: 1 }}>
+              {selectedRestaurant.imageUrl && (
+                <img
+                  src={selectedRestaurant.imageUrl}
+                  alt={selectedRestaurant.name}
+                  style={{
+                    width: "100%",
+                    height: "100px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                    marginBottom: "8px",
+                  }}
+                />
+              )}
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 2 }}
+              >
+                {selectedRestaurant.address}
+              </Typography>
+              <Button
+                variant="contained"
+                size="small"
+                fullWidth
+                startIcon={<NavigationIcon />}
+                href={`https://www.google.com/maps/dir/?api=1&destination=${markers[selectedRestaurant._id as string]?.lat
+                  },${markers[selectedRestaurant._id as string]?.lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ textTransform: "none" }}
+              >
+                Navigiraj
+              </Button>
+            </Box>
+          </InfoWindow>
+        )}
+      </Map>
+    </>
+  );
+}
+
+export default function RestaurantMap({ restaurants }: RestaurantMapProps) {
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
   if (!apiKey) {
     return (
@@ -155,129 +325,7 @@ export default function RestaurantMap({ restaurants }: RestaurantMapProps) {
       }}
     >
       <APIProvider apiKey={apiKey}>
-        {isDarkMode && (
-          <style>{`
-            .gm-style-iw {
-              background-color: #1e293b !important;
-              color: #e2e8f0 !important;
-            }
-            .gm-style-iw-c {
-              background-color: #1e293b !important;
-              padding: 0 !important;
-            }
-            .gm-style-iw-d {
-              background-color: #1e293b !important;
-              color: #e2e8f0 !important;
-              overflow: hidden !important;
-            }
-            .gm-style-iw-tc::after {
-              background: #1e293b !important;
-            }
-            .gm-ui-hover-effect {
-              filter: invert(1) !important;
-            }
-            .gm-style-iw-ch {
-                padding-top: 10px !important;
-                padding-left: 10px !important;
-            }
-          `}</style>
-        )}
-        <Map
-          defaultCenter={ZAGREB_CENTER}
-          defaultZoom={13}
-          mapId="DEMO_MAP_ID" // Required for AdvancedMarker
-          disableDefaultUI={true}
-          onClick={() => setSelectedRestaurant(null)}
-          colorScheme={isDarkMode ? "DARK" : "LIGHT"}
-          styles={isDarkMode ? DARK_MAP_STYLES : []}
-        >
-          {/* User Location Marker */}
-          {userLocation && (
-            <AdvancedMarker position={userLocation}>
-              <div
-                style={{
-                  width: "16px",
-                  height: "16px",
-                  backgroundColor: "#4285F4",
-                  border: "2px solid white",
-                  borderRadius: "50%",
-                  boxShadow: "0 0 0 2px #4285F4",
-                }}
-              />
-            </AdvancedMarker>
-          )}
-
-          {restaurants.map((restaurant) => (
-            <AdvancedMarker
-              key={restaurant._id as string}
-              position={{
-                lat: restaurant.location.coordinates[1],
-                lng: restaurant.location.coordinates[0],
-              }}
-              onClick={() => setSelectedRestaurant(restaurant)}
-            >
-              <Pin
-                background={"#E53935"}
-                glyphColor={"#000"}
-                borderColor={"#000"}
-              />
-            </AdvancedMarker>
-          ))}
-
-          {selectedRestaurant && (
-            <InfoWindow
-              position={{
-                lat: selectedRestaurant.location.coordinates[1],
-                lng: selectedRestaurant.location.coordinates[0],
-              }}
-              onCloseClick={() => setSelectedRestaurant(null)}
-              headerContent={
-                <Typography
-                  variant="subtitle1"
-                  fontWeight="bold"
-                  color="text.primary"
-                >
-                  {selectedRestaurant.name}
-                </Typography>
-              }
-            >
-              <Box sx={{ width: 200, p: 1 }}>
-                {selectedRestaurant.imageUrl && (
-                  <img
-                    src={selectedRestaurant.imageUrl}
-                    alt={selectedRestaurant.name}
-                    style={{
-                      width: "100%",
-                      height: "100px",
-                      objectFit: "cover",
-                      borderRadius: "8px",
-                      marginBottom: "8px",
-                    }}
-                  />
-                )}
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mb: 2 }}
-                >
-                  {selectedRestaurant.address}
-                </Typography>
-                <Button
-                  variant="contained"
-                  size="small"
-                  fullWidth
-                  startIcon={<NavigationIcon />}
-                  href={`https://www.google.com/maps/dir/?api=1&destination=${selectedRestaurant.location.coordinates[1]},${selectedRestaurant.location.coordinates[0]}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{ textTransform: "none" }}
-                >
-                  Navigiraj
-                </Button>
-              </Box>
-            </InfoWindow>
-          )}
-        </Map>
+        <RestaurantMapContent restaurants={restaurants} />
       </APIProvider>
     </Box>
   );

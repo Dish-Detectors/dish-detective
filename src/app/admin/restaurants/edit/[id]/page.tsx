@@ -48,9 +48,6 @@ export default function EditRestaurantPage({
 
   const [workingHoursRaw, setWorkingHoursRaw] = useState<WorkingHoursData>({});
   const [initialHours, setInitialHours] = useState<IWorkingDay[]>([]);
-  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
-    null,
-  );
   const [availableDishes, setAvailableDishes] = useState<string[]>([]);
 
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -79,13 +76,6 @@ export default function EditRestaurantPage({
 
           if (rest.imageUrl) {
             setImagePreview(rest.imageUrl);
-          }
-
-          if (rest.location && rest.location.coordinates) {
-            setLocation({
-              lng: rest.location.coordinates[0],
-              lat: rest.location.coordinates[1],
-            });
           }
 
           if (rest.workingHours) {
@@ -137,10 +127,6 @@ export default function EditRestaurantPage({
       setError(t("nameAndAddressRequired"));
       return;
     }
-    if (!location) {
-      setError(t("selectRestaurantLocationOnMap"));
-      return;
-    }
 
     setSaving(true);
     setError(null);
@@ -189,10 +175,6 @@ export default function EditRestaurantPage({
         address: formData.address,
         imageUrl: imageUrl,
         workingHours: formattedHours,
-        location: {
-          type: "Point",
-          coordinates: [location.lng, location.lat],
-        },
         availableDishes: availableDishes,
       });
 
@@ -361,10 +343,8 @@ export default function EditRestaurantPage({
           {t("location")}
         </Typography>
         <MapLocationPicker
-          initialLocation={location || undefined}
           initialAddress={formData.address}
           onLocationChange={(loc, addr) => {
-            setLocation(loc);
             setFormData((prev) => ({ ...prev, address: addr }));
           }}
         />
@@ -568,10 +548,8 @@ export default function EditRestaurantPage({
                   {t("location")}
                 </Typography>
                 <MapLocationPicker
-                  initialLocation={location || undefined}
                   initialAddress={formData.address}
                   onLocationChange={(loc, addr) => {
-                    setLocation(loc);
                     setFormData((prev) => ({ ...prev, address: addr }));
                   }}
                 />

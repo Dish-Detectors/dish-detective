@@ -8,11 +8,17 @@ import { useI18n } from "@/components/I18nProvider";
 interface SuccessScreenProps {
   message: string;
   showLoader?: boolean;
+  onContinue?: () => void;
+  continueText?: string;
+  title?: string;
 }
 
 export default function SuccessScreen({
   message,
   showLoader = true,
+  onContinue,
+  continueText,
+  title,
 }: SuccessScreenProps) {
   const { t } = useI18n();
 
@@ -87,16 +93,42 @@ export default function SuccessScreen({
           {message}
         </Typography>
 
-        {/* Redirect Notice */}
-        <Typography
-          variant="body1"
-          sx={{
-            color: "text.secondary",
-            textAlign: "center",
-          }}
-        >
-          {t("redirecting")}
-        </Typography>
+        {/* Redirect Notice or Continue Button */}
+        {onContinue ? (
+          <Box
+            component="button"
+            onClick={onContinue}
+            sx={{
+              mt: 2,
+              px: 4,
+              py: 1.5,
+              bgcolor: "#4caf50",
+              color: "white",
+              border: "none",
+              borderRadius: 2,
+              fontSize: "1.1rem",
+              fontWeight: 600,
+              cursor: "pointer",
+              transition: "transform 0.2s",
+              "&:hover": {
+                bgcolor: "#43a047",
+                transform: "scale(1.05)",
+              },
+            }}
+          >
+            {continueText || "Nastavi"}
+          </Box>
+        ) : (
+          <Typography
+            variant="body1"
+            sx={{
+              color: "text.secondary",
+              textAlign: "center",
+            }}
+          >
+            {t("redirecting")}
+          </Typography>
+        )}
       </Box>
     </Box>
   );

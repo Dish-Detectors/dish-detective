@@ -107,11 +107,7 @@ export default function WorkerManagerAccountsPage() {
           filteredEmployees.filter((emp) => emp.id !== employeeToDelete),
         );
       } else {
-        const errorKey = (result as { errorKey?: unknown }).errorKey;
-        const message =
-          (typeof errorKey === "string" ? t(errorKey) : "") ||
-          result.error ||
-          t("deleteFailed");
+        const message = result.error || t("deleteFailed");
         alert(message);
       }
     } catch (error) {
@@ -280,6 +276,8 @@ export default function WorkerManagerAccountsPage() {
               borderRadius: 3,
               textAlign: "center",
               maxWidth: { xs: "100%", sm: 600 },
+              mx: "auto",
+              mt: 4,
             }}
           >
             <Typography variant="body1" color="text.secondary">

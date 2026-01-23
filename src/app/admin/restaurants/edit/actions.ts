@@ -1,9 +1,6 @@
 "use server";
 
-import Restaurant, {
-  Location,
-  IWorkingDay,
-} from "../../../../models/Restaurant";
+import Restaurant, { IWorkingDay } from "../../../../models/Restaurant";
 import dbConnect from "../../../../utils/dbConnect";
 import { Types } from "mongoose";
 import Dish from "../../../../models/Dish";
@@ -14,7 +11,6 @@ type RestaurantInput = {
   imageUrl: string;
   workingHours: IWorkingDay[];
   availableDishes: string[];
-  location: Location;
   initialStaff?: {
     id: string;
     role: "manager" | "worker";
@@ -63,7 +59,6 @@ export async function updateRestaurant(
       updateData.imageUrl = input.imageUrl.trim();
     if (input.availableDishes !== undefined)
       updateData.availableDishes = input.availableDishes;
-    if (input.location !== undefined) updateData.location = input.location;
 
     const updatedRest = await Restaurant.findByIdAndUpdate(restId, updateData, {
       new: true,

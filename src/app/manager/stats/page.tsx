@@ -17,7 +17,10 @@ import SortIcon from "@mui/icons-material/Sort";
 import DishCard from "@/components/DishCard";
 import StatDishCard from "@/components/StatDishCard";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
-import { getAllDishes, getManagerRestaurant } from "@/app/manager/menu/actions";
+import {
+  getRestaurantAvailableDishes,
+  getManagerRestaurant,
+} from "@/app/manager/menu/actions";
 import {
   getSubscriptionCountsForMenuItems,
   getManagerSubscriptionCounts,
@@ -64,7 +67,7 @@ export default function ManagerStatsPage() {
       }
 
       const [dishesResult, counts] = await Promise.all([
-        getAllDishes(),
+        getRestaurantAvailableDishes(id),
         getManagerSubscriptionCounts(id),
       ]);
 

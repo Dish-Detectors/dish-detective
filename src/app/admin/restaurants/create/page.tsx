@@ -40,9 +40,6 @@ export default function CreateRestaurantPage() {
 
   const [workingHoursRaw, setWorkingHoursRaw] = useState<WorkingHoursData>({});
   const [staff, setStaff] = useState<StaffMember[]>([]);
-  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
-    null,
-  );
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -83,10 +80,6 @@ export default function CreateRestaurantPage() {
     }
     if (!formData.name || !formData.address) {
       setError(t("nameAndAddressRequired"));
-      return;
-    }
-    if (!location) {
-      setError(t("selectRestaurantLocationOnMap"));
       return;
     }
 
@@ -135,10 +128,6 @@ export default function CreateRestaurantPage() {
         address: formData.address,
         imageUrl: imageUrl,
         workingHours: formattedHours,
-        location: {
-          type: "Point",
-          coordinates: [location.lng, location.lat], // GeoJSON is [lng, lat]
-        },
         initialStaff: staff.map((s) => ({ id: s.id, role: s.role })),
       });
 
@@ -263,7 +252,6 @@ export default function CreateRestaurantPage() {
         <MapLocationPicker
           initialAddress={formData.address}
           onLocationChange={(loc, addr) => {
-            setLocation(loc);
             setFormData((prev) => ({ ...prev, address: addr }));
           }}
         />
@@ -452,7 +440,6 @@ export default function CreateRestaurantPage() {
                   <MapLocationPicker
                     initialAddress={formData.address}
                     onLocationChange={(loc, addr) => {
-                      setLocation(loc);
                       setFormData((prev) => ({ ...prev, address: addr }));
                     }}
                   />

@@ -1,9 +1,6 @@
 "use server";
 
-import Restaurant, {
-  Location,
-  IWorkingDay,
-} from "../../../../models/Restaurant";
+import Restaurant, { IWorkingDay } from "../../../../models/Restaurant";
 import dbConnect from "../../../../utils/dbConnect";
 import { Types } from "mongoose";
 import { assignEmployee } from "../actions";
@@ -22,7 +19,6 @@ type RestaurantInput = {
   manager?: string;
   imageUrl: string;
   workingHours: IWorkingDay[];
-  location: Location;
   initialStaff?: {
     id: string;
     role: "manager" | "worker";
@@ -46,7 +42,6 @@ export async function createRestaurant(
       name: input.name.trim(),
       address: input.address.trim(),
       manager: input.manager?.trim(),
-      location: input.location,
       imageUrl: input.imageUrl.trim(),
       workingHours: input.workingHours || [],
     });

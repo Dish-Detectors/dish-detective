@@ -47,8 +47,6 @@ export default function PollPage() {
       const res = await getPoll(pollId);
       if ("errorKey" in res && res.errorKey) {
         setError(t(res.errorKey));
-      } else if ("error" in res && res.error) {
-        setError(res.error);
       } else if (res.poll) {
         setPoll(res.poll);
         const name = res.restaurantName || "";
@@ -92,9 +90,6 @@ export default function PollPage() {
 
     if ("errorKey" in res && res.errorKey) {
       setError(t(res.errorKey));
-      setSubmitting(false);
-    } else if ("error" in res && res.error) {
-      setError(res.error);
       setSubmitting(false);
     } else {
       setSubmitted(true);

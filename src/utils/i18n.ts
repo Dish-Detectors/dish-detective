@@ -1,5 +1,3 @@
-"use client";
-
 import {
   DEFAULT_LANG,
   isSupportedLang,
@@ -22,12 +20,15 @@ export function getCurrentLang(): SupportedLang {
     return langCookie;
   }
 
-  return navigator.language.toLowerCase().startsWith("hr") ? "HR" : "EN";
+  // Fallback to browser lang
+  if (navigator.language.toUpperCase().startsWith("HR")) {
+    return "HR";
+  }
+  return "EN"; // Default fallback
 }
 
 export function setCurrentLang(lang: SupportedLang) {
-  if (typeof document === "undefined") return;
-  document.cookie = `${LANG_COOKIE}=${lang}; path=/; samesite=lax`;
+  document.cookie = `${LANG_COOKIE}=${lang}; path=/; max-age=31536000; SameSite=Lax`;
 }
 
 export function t(key: string, vars?: Record<string, string | number>) {

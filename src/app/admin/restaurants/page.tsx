@@ -241,6 +241,8 @@ export default function RestaurantsPage() {
               borderRadius: 3,
               textAlign: "center",
               maxWidth: 600,
+              mx: "auto",
+              mt: 4,
             }}
           >
             <Typography variant="body1" color="text.secondary">

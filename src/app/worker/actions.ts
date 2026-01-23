@@ -50,7 +50,6 @@ export async function fetchTodaysOfferForMenza(
 
   const menuItems = await MenuItem.find({
     _id: { $in: menu.items },
-    available: true,
   }).lean();
 
   const dishIds = menuItems.map((item) => item.dishId);
