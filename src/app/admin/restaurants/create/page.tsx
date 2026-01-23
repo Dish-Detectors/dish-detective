@@ -48,6 +48,7 @@ export default function CreateRestaurantPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
+  const [hoursError, setHoursError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [showSuccessScreen, setShowSuccessScreen] = useState(false);
 
@@ -89,6 +90,8 @@ export default function CreateRestaurantPage() {
 
     setLoading(true);
     setError(null);
+    setImageError(null);
+    setHoursError(null);
     setSuccess(null);
 
     try {
@@ -106,12 +109,23 @@ export default function CreateRestaurantPage() {
       Object.entries(workingHoursRaw).forEach(([dayStr, shifts]) => {
         const dayNum = parseInt(dayStr);
         if (shifts.length > 0) {
-          formattedHours.push({
-            day: dayNum,
-            shifts: shifts.filter((s: IShift) => s.start && s.end), // Filter partials
-          });
+          const validShifts = shifts.filter((s: IShift) => s.start && s.end);
+          if (validShifts.length > 0) {
+            formattedHours.push({
+              day: dayNum,
+              shifts: validShifts,
+            });
+          }
         }
       });
+
+      if (formattedHours.length === 0) {
+        setHoursError("Radno vrijeme je obavezno");
+        setError("Molimo definirajte radno vrijeme");
+        setLoading(false);
+        return;
+      }
+      setHoursError(null);
 
       // 3. Create Restaurant
       const res = await createRestaurant({
@@ -257,7 +271,7 @@ export default function CreateRestaurantPage() {
         <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5 }}>
           Radno vrijeme
         </Typography>
-        <WorkingHoursEditor onChange={setWorkingHoursRaw} />
+        <WorkingHoursEditor onChange={setWorkingHoursRaw} error={hoursError} />
       </Box>
     </Box>
   );
@@ -439,7 +453,10 @@ export default function CreateRestaurantPage() {
                   Radno vrijeme
                 </Typography>
                 <Box sx={{ mb: 2 }}>
-                  <WorkingHoursEditor onChange={setWorkingHoursRaw} />
+                  <WorkingHoursEditor
+                    onChange={setWorkingHoursRaw}
+                    error={hoursError}
+                  />
                 </Box>
               </Box>
             </Box>

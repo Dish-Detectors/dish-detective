@@ -36,11 +36,13 @@ export interface WorkingHoursData {
 interface WorkingHoursEditorProps {
   initialData?: IWorkingDay[];
   onChange: (data: WorkingHoursData) => void;
+  error?: string | null;
 }
 
 export default function WorkingHoursEditor({
   initialData,
   onChange,
+  error,
 }: WorkingHoursEditorProps) {
   const [selectedDay, setSelectedDay] = useState<number>(1); // Monday default
   const [workingHours, setWorkingHours] = useState<WorkingHoursData>({});
@@ -143,7 +145,9 @@ export default function WorkingHoursEditor({
           p: 4,
           borderRadius: 4,
           bgcolor: "white",
-          border: "1px solid #e0e0e0",
+          border: "1px solid",
+          borderColor: error ? "error.main" : "#e0e0e0",
+          boxShadow: error ? "0 0 0 1px #d32f2f" : "none",
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
@@ -271,6 +275,15 @@ export default function WorkingHoursEditor({
           Dodaj smjenu
         </Button>
       </Paper>
+      {error && (
+        <Typography
+          variant="caption"
+          color="error"
+          sx={{ mt: 1, display: "block", ml: 2 }}
+        >
+          {error}
+        </Typography>
+      )}
     </Box>
   );
 }
