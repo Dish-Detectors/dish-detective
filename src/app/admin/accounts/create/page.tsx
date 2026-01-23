@@ -364,6 +364,7 @@ export default function EmployeeCreatePage() {
                 !formData.name ||
                 !formData.lastName ||
                 !formData.username ||
+                formData.username.length < 4 ||
                 !formData.password ||
                 !formData.confirmPassword ||
                 formData.password.length < 8 ||

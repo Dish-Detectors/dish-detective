@@ -42,9 +42,34 @@ export async function getManagerRestaurant() {
   }
 }
 
-export async function getAllDishes() {
+export async function getRestaurantAvailableDishes(restaurantId: string) {
+  const { userId, sessionClaims } = await auth();
+  if (!userId || sessionClaims?.metadata?.role !== "manager") {
+    // Optionally also check if restaurantId matches the manager's assigned restaurant
+    // But for now, just checking role is basic protection,
+    // assuming the UI passes the correct ID from the authenticated session context ideally.
+    // Better: Fetch manager's restaurant ID and ignore the passed param if we want strict security,
+    // or just validte it.
+    // Let's implement strict validation.
+    return [];
+  }
+
   await dbConnect();
-  const dishes = await Dish.find({}).lean();
+  const client = await clerkClient();
+  const user = await client.users.getUser(userId);
+  const userRestaurantId = user.publicMetadata?.restaurantId as string;
+
+  if (userRestaurantId !== restaurantId) {
+    return [];
+  }
+
+  const restaurant = await Restaurant.findById(restaurantId).lean();
+  if (!restaurant || !restaurant.availableDishes) return [];
+
+  const dishes = await Dish.find({
+    _id: { $in: restaurant.availableDishes },
+  }).lean();
+
   return JSON.parse(JSON.stringify(dishes));
 }
 
@@ -86,7 +111,7 @@ export async function addDishToMenu(restaurantId: string, dishId: string) {
 
   const newMenuItem = await MenuItem.create({
     dishId,
-    available: true,
+    available: false,
     lastServed: new Date(),
   });
 

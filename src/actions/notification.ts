@@ -152,14 +152,17 @@ export async function sendDishNotification(
         availableFrom: availableFrom,
         url: `/student/restaurants/${(restaurant as any)._id.toString()}`,
       },
-      topic: `dish_notify_${(dish as any)._id.toString()}`,
+      topic: `dish_notify_${(dish as any)._id.toString()}_${(restaurant as any)._id.toString()}`,
     };
 
     const response = await messaging.send(message);
     console.log("Successfully sent message:", response);
 
-    // Find all subscribers (by dishId)
-    const subscribers = await Subscription.find({ dishId: (dish as any)._id });
+    // Find all subscribers (by dishId AND restaurantId)
+    const subscribers = await Subscription.find({
+      dishId: (dish as any)._id,
+      restaurantId: (restaurant as any)._id,
+    });
 
     // Save to database for each subscribed student
     const notificationPromises = subscribers.map((sub) =>
@@ -258,28 +261,39 @@ export async function unsubscribeTokenFromTopic(token: string, topic: string) {
   }
 }
 
-export async function toggleSubscription(dishId: string) {
+export async function toggleSubscription(
+  dishId: string,
+  restaurantId: string,
+) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
   await dbConnect();
 
-  const existing = await Subscription.findOne({ userId, dishId });
+  const existing = await Subscription.findOne({
+    userId,
+    dishId,
+    restaurantId,
+  });
   if (existing) {
     await Subscription.findByIdAndDelete(existing._id);
     return { success: true, subscribed: false };
   } else {
-    await Subscription.create({ userId, dishId });
+    await Subscription.create({ userId, dishId, restaurantId });
     return { success: true, subscribed: true };
   }
 }
 
-export async function getUserSubscriptions() {
+export async function getUserSubscriptions(restaurantId?: string) {
   const { userId } = await auth();
   if (!userId) return [];
 
   await dbConnect();
-  const subs = await Subscription.find({ userId });
+  const query: any = { userId };
+  if (restaurantId) {
+    query.restaurantId = restaurantId;
+  }
+  const subs = await Subscription.find(query);
   return subs.map((sub) => sub.dishId.toString());
 }
 
@@ -294,7 +308,10 @@ export async function syncDeviceSubscriptions(token: string) {
 
     // Subscribe token to all topics the user has in DB
     const syncPromises = subs.map((sub) =>
-      messaging.subscribeToTopic(token, `dish_notify_${sub.dishId}`),
+      messaging.subscribeToTopic(
+        token,
+        `dish_notify_${sub.dishId}_${sub.restaurantId}`,
+      ),
     );
 
     // Also subscribe to general public announcements

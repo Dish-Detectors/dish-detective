@@ -14,7 +14,7 @@ import DishCard from "@/components/DishCard";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
 import {
   getManagerRestaurant,
-  getAllDishes,
+  getRestaurantAvailableDishes,
   getTodayMenu,
   addDishToMenu,
   removeDishFromMenu,
@@ -53,7 +53,7 @@ export default function DailyMenuPage() {
       if (restaurantRes.success && restaurantRes.data) {
         setRestaurantId(restaurantRes.data._id);
         const [dishes, menu] = await Promise.all([
-          getAllDishes(),
+          getRestaurantAvailableDishes(restaurantRes.data._id),
           getTodayMenu(restaurantRes.data._id),
         ]);
         setAllDishes(dishes as Dish[]);

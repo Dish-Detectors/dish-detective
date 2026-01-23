@@ -49,7 +49,7 @@ export default async function RestaurantOfferPage({
   ).lean()) as unknown as IRestaurant;
 
   const offer = await getRestaurantOffer(id);
-  const subscriptions = await getUserSubscriptions();
+  const subscriptions = await getUserSubscriptions(id);
 
   // Fetch history for accurate "Last served"
   const restaurantMenus = await Menu.find({ restaurantId: id })

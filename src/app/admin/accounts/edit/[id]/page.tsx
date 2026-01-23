@@ -557,14 +557,35 @@ export default function EditWorkerManagerAccountPage({
               left: 0,
               right: 0,
               height: "70px",
-              bgcolor: loading ? "grey.400" : "primary.main",
+              bgcolor:
+                loading ||
+                  !formData.name.trim() ||
+                  !formData.lastName.trim() ||
+                  !formData.username.trim() ||
+                  formData.username.length < 4
+                  ? "grey.400"
+                  : "primary.main",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              cursor: loading ? "not-allowed" : "pointer",
+              cursor:
+                loading ||
+                  !formData.name.trim() ||
+                  !formData.lastName.trim() ||
+                  !formData.username.trim() ||
+                  formData.username.length < 4
+                  ? "not-allowed"
+                  : "pointer",
               transition: "all 0.2s ease-in-out",
               "&:active": {
-                bgcolor: loading ? "grey.400" : "primary.dark",
+                bgcolor:
+                  loading ||
+                    !formData.name.trim() ||
+                    !formData.lastName.trim() ||
+                    !formData.username.trim() ||
+                    formData.username.length < 4
+                    ? "grey.400"
+                    : "primary.dark",
               },
             }}
           >
@@ -885,7 +906,13 @@ export default function EditWorkerManagerAccountPage({
               fullWidth
               variant="contained"
               size="large"
-              disabled={loading}
+              disabled={
+                loading ||
+                !formData.name.trim() ||
+                !formData.lastName.trim() ||
+                !formData.username.trim() ||
+                formData.username.length < 4
+              }
               sx={{
                 py: 1.5,
                 textTransform: "none",
@@ -959,9 +986,9 @@ export default function EditWorkerManagerAccountPage({
             variant="contained"
             disabled={
               loading ||
-              !!passwordError ||
-              !!confirmPasswordError ||
-              !passwords.newPassword
+              !passwords.newPassword ||
+              passwords.newPassword.length < 8 ||
+              passwords.newPassword !== passwords.confirmPassword
             }
             sx={{ textTransform: "none", boxShadow: 0, borderRadius: 2 }}
           >

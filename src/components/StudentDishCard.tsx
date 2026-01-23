@@ -73,17 +73,17 @@ export default function StudentDishCard({
 
     try {
       if (isSubscribed) {
-        success = await unsubscribeFromDishTopic(dishId);
+        success = await unsubscribeFromDishTopic(dishId, restaurantId);
         if (success) {
-          const res = await toggleSubscription(dishId);
+          const res = await toggleSubscription(dishId, restaurantId);
           if (res.success) {
             setIsSubscribed(false);
           }
         }
       } else {
-        success = await subscribeToDishTopic(dishId);
+        success = await subscribeToDishTopic(dishId, restaurantId);
         if (success) {
-          const res = await toggleSubscription(dishId);
+          const res = await toggleSubscription(dishId, restaurantId);
           if (res.success) {
             setIsSubscribed(true);
           }
