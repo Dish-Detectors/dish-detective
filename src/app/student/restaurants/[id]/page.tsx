@@ -336,6 +336,7 @@ export default async function RestaurantOfferPage({
         })}
         isOpen={isOpen}
         restaurantId={id}
+        density="compact"
       />
     </Container >
   );
