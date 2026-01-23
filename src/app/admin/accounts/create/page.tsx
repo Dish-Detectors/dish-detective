@@ -69,210 +69,45 @@ export default function EmployeeCreatePage() {
     username: "",
     password: "",
     confirmPassword: "",
-    role: "worker" as "worker" | "manager",
+    role: undefined as "worker" | "manager" | undefined,
   });
+  // ...
+  // ...
+  <Box
+    sx={{
+      width: 100,
+      height: 100,
+      borderRadius: "50%",
+      bgcolor:
+        formData.role === "manager"
+          ? "#64b5f6"
+          : formData.role === "worker"
+            ? "#ba68c8"
+            : "#9e9e9e", // Grey for no role
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      border: "4px solid white",
+      boxShadow: 1,
+    }}
+  >
+    {formData.role === "manager" ? (
+      <AssignmentIndIcon
+        sx={{ fontSize: 60, color: "white" }}
+      />
+    ) : formData.role === "worker" ? (
+      <PersonIcon sx={{ fontSize: 60, color: "white" }} />
+    ) : (
+      <PersonIcon sx={{ fontSize: 60, color: "white" }} />
+    )}
+  </Box>                )
+}
+              </Badge >
+            </Box >
 
-  const validatePassword = (password: string): string => {
-    if (password.length < 8) {
-      return "Lozinka mora imati minimalno 8 znakova";
-    }
-    return "";
-  };
-
-  const validateConfirmPassword = (confirm: string, pass: string): string => {
-    if (confirm !== pass) {
-      return "Lozinke se moraju podudarati";
-    }
-    return "";
-  };
-
-  const handlePasswordChange = (password: string) => {
-    setFormData({ ...formData, password });
-    if (password) {
-      setPasswordError(validatePassword(password));
-      // Re-validate confirm password if it exists
-      if (formData.confirmPassword) {
-        setConfirmPasswordError(
-          validateConfirmPassword(formData.confirmPassword, password),
-        );
-      }
-    } else {
-      setPasswordError("");
-    }
-  };
-
-  const handleConfirmPasswordChange = (confirmPassword: string) => {
-    setFormData({ ...formData, confirmPassword });
-    if (confirmPassword) {
-      setConfirmPasswordError(
-        validateConfirmPassword(confirmPassword, formData.password),
-      );
-    } else {
-      setConfirmPasswordError("");
-    }
-  };
-
-  // Load restaurants on mount
-  useEffect(() => {
-    async function loadRestaurants() {
-      try {
-        const result = await getAllRestaurants();
-        if (result.success && result.data) {
-          setRestaurants(result.data);
-        } else {
-          setError("Failed to load restaurants");
-        }
-      } catch (err) {
-        setError("Failed to load restaurants");
-      } finally {
-        setLoadingRestaurants(false);
-      }
-    }
-    loadRestaurants();
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (
-      passwordError ||
-      confirmPasswordError ||
-      formData.password !== formData.confirmPassword
-    ) {
-      setError("Molimo provjerite lozinke");
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
-
-    try {
-      const result = await createEmployeeAccount({
-        name: formData.name,
-        lastName: formData.lastName,
-        username: formData.username,
-        password: formData.password,
-        role: formData.role,
-      });
-
-      if (result.success && result.user) {
-        // Upload image if selected
-        if (imageFile) {
-          const formData = new FormData();
-          formData.append("file", imageFile);
-          formData.append("userId", result.user.id);
-
-          await uploadProfileImage(formData);
-          // We don't block success on image upload failure, but we could log it
-        }
-
-        setSuccess("Račun uspješno kreiran!");
-        setShowSuccessScreen(true);
-        // Redirect after showing success screen
-        setTimeout(() => {
-          router.push("/admin/accounts");
-        }, 2000);
-      } else {
-        setError(result.error || "Neuspješno kreiranje računa");
-      }
-    } catch (err) {
-      setError("Došlo je do greške prilikom kreiranja računa");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Show success screen after successful creation
-  if (showSuccessScreen) {
-    return <SuccessScreen message="Račun uspješno kreiran!" />;
-  }
-
-  // Mobile Layout
-  if (isMobile) {
-    return (
-      <>
-        <AdminNavbar isMobile={isMobile} />
-        <Box
-          sx={{
-            minHeight: "100vh",
-            bgcolor: "#f5f5f5",
-            display: "flex",
-            flexDirection: "column",
-            pb: "134px", // Space for button (70px) + navbar (64px)
-          }}
-        >
-          <Box sx={{ p: 3, flexGrow: 1 }}>
-            {/* Image Upload (Mobile) */}
-            <Box sx={{ display: "flex", justifyContent: "center", mb: 4 }}>
-              <Badge
-                overlap="circular"
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                badgeContent={
-                  <Box
-                    component="label"
-                    sx={{
-                      bgcolor: "primary.main",
-                      color: "white",
-                      width: 32,
-                      height: 32,
-                      borderRadius: "50%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      cursor: "pointer",
-                      border: "2px solid white",
-                    }}
-                  >
-                    <EditIcon sx={{ fontSize: 18 }} />
-                    <input
-                      type="file"
-                      hidden
-                      accept="image/*"
-                      onChange={handleImageChange}
-                    />
-                  </Box>
-                }
-              >
-                {imagePreview ? (
-                  <Avatar
-                    src={imagePreview}
-                    sx={{
-                      width: 100,
-                      height: 100,
-                      border: "4px solid white",
-                      boxShadow: 1,
-                    }}
-                  />
-                ) : (
-                  <Box
-                    sx={{
-                      width: 100,
-                      height: 100,
-                      borderRadius: "50%",
-                      bgcolor:
-                        formData.role === "manager" ? "#64b5f6" : "#ba68c8",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      border: "4px solid white",
-                      boxShadow: 1,
-                    }}
-                  >
-                    {formData.role === "manager" ? (
-                      <AssignmentIndIcon
-                        sx={{ fontSize: 60, color: "white" }}
-                      />
-                    ) : (
-                      <PersonIcon sx={{ fontSize: 60, color: "white" }} />
-                    )}
-                  </Box>
-                )}
-              </Badge>
-            </Box>
-
-            {/* Editable Header for Name & Last Name (Mobile) */}
-            <Box
-              sx={{ mb: 4, display: "flex", flexDirection: "column", gap: 0 }}
+  {/* Editable Header for Name & Last Name (Mobile) */ }
+  < Box
+sx = {{ mb: 4, display: "flex", flexDirection: "column", gap: 0 }}
             >
               <InputBase
                 placeholder="Ime"
@@ -306,390 +141,406 @@ export default function EmployeeCreatePage() {
                   "&.Mui-focused": { borderBottom: "2px solid #1976d2" },
                 }}
               />
-            </Box>
+            </Box >
 
-            {error && (
-              <Alert severity="error" sx={{ mb: 3 }}>
-                {error}
-              </Alert>
-            )}
+  { error && (
+    <Alert severity="error" sx={{ mb: 3 }}>
+      {error}
+    </Alert>
+  )}
 
-            {success && (
-              <Alert severity="success" sx={{ mb: 3 }}>
-                {success}
-              </Alert>
-            )}
+{
+  success && (
+    <Alert severity="success" sx={{ mb: 3 }}>
+      {success}
+    </Alert>
+  )
+}
 
-            <Box component="form" onSubmit={handleSubmit}>
-              <TextField
-                fullWidth
-                label="Korisničko ime"
-                value={formData.username}
-                onChange={(e) =>
-                  setFormData({ ...formData, username: e.target.value })
-                }
-                required
-                sx={{
-                  mb: 3,
-                  bgcolor: "white",
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 2,
-                  },
-                }}
-              />
+<Box component="form" onSubmit={handleSubmit}>
+  <TextField
+    fullWidth
+    label="Korisničko ime"
+    value={formData.username}
+    onChange={(e) =>
+      setFormData({ ...formData, username: e.target.value })
+    }
+    required
+    sx={{
+      mb: 3,
+      bgcolor: "white",
+      "& .MuiOutlinedInput-root": {
+        borderRadius: 2,
+      },
+    }}
+  />
 
-              <TextField
-                fullWidth
-                label="Lozinka"
-                type="password"
-                value={formData.password}
-                onChange={(e) => handlePasswordChange(e.target.value)}
-                required
-                error={!!passwordError && formData.password.length > 0}
-                helperText={
-                  passwordError && formData.password.length > 0
-                    ? passwordError
-                    : "Minimalno 8 znakova"
-                }
-                sx={{
-                  mb: 3,
-                  bgcolor: "white",
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 2,
-                  },
-                }}
-              />
+  <TextField
+    fullWidth
+    label="Lozinka"
+    type="password"
+    value={formData.password}
+    onChange={(e) => handlePasswordChange(e.target.value)}
+    required
+    error={!!passwordError && formData.password.length > 0}
+    helperText={
+      passwordError && formData.password.length > 0
+        ? passwordError
+        : "Minimalno 8 znakova"
+    }
+    sx={{
+      mb: 3,
+      bgcolor: "white",
+      "& .MuiOutlinedInput-root": {
+        borderRadius: 2,
+      },
+    }}
+  />
 
-              <TextField
-                fullWidth
-                label="Potvrdi lozinku"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={(e) => handleConfirmPasswordChange(e.target.value)}
-                required
-                error={
-                  !!confirmPasswordError && formData.confirmPassword.length > 0
-                }
-                helperText={
-                  confirmPasswordError && formData.confirmPassword.length > 0
-                    ? confirmPasswordError
-                    : "Lozinke se moraju podudarati"
-                }
-                sx={{
-                  mb: 3,
-                  bgcolor: "white",
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 2,
-                  },
-                }}
-              />
-            </Box>
-          </Box>
+  <TextField
+    fullWidth
+    label="Potvrdi lozinku"
+    type="password"
+    value={formData.confirmPassword}
+    onChange={(e) => handleConfirmPasswordChange(e.target.value)}
+    required
+    error={
+      !!confirmPasswordError && formData.confirmPassword.length > 0
+    }
+    helperText={
+      confirmPasswordError && formData.confirmPassword.length > 0
+        ? confirmPasswordError
+        : "Lozinke se moraju podudarati"
+    }
+    sx={{
+      mb: 3,
+      bgcolor: "white",
+      "& .MuiOutlinedInput-root": {
+        borderRadius: 2,
+      },
+    }}
+  />
+</Box>
+          </Box >
 
-          {/* Fixed Button Area at Bottom */}
-          <Box
-            onClick={
-              loading ||
-              loadingRestaurants ||
-              !!passwordError ||
-              !!confirmPasswordError
-                ? undefined
-                : handleSubmit
+  {/* Fixed Button Area at Bottom */ }
+  < Box
+onClick = {
+  loading ||
+  loadingRestaurants ||
+  !formData.name ||
+  !formData.lastName ||
+  !!passwordError ||
+  !!confirmPasswordError
+  ? undefined
+  : handleSubmit
             }
-            sx={{
-              position: "fixed",
-              bottom: "64px",
-              left: 0,
-              right: 0,
-              height: "70px",
-              bgcolor:
-                loading ||
-                loadingRestaurants ||
-                !!passwordError ||
-                !!confirmPasswordError
-                  ? "grey.400"
-                  : "#57aaf4",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor:
-                loading ||
-                loadingRestaurants ||
-                !!passwordError ||
-                !!confirmPasswordError
-                  ? "not-allowed"
-                  : "pointer",
-              transition: "all 0.2s ease-in-out",
-              zIndex: 1000,
-              boxShadow: "0 -2px 8px rgba(0,0,0,0.15)",
-              "&:active": {
-                bgcolor:
-                  loading ||
-                  loadingRestaurants ||
-                  !!passwordError ||
-                  !!confirmPasswordError
-                    ? "grey.400"
-                    : "#3d8fd9",
+sx = {{
+  position: "fixed",
+    bottom: "64px",
+      left: 0,
+        right: 0,
+          height: "70px",
+            bgcolor:
+  loading ||
+    loadingRestaurants ||
+    !formData.name ||
+    !formData.lastName ||
+    !!passwordError ||
+    !!confirmPasswordError
+    ? "grey.400"
+    : "#57aaf4",
+    display: "flex",
+      alignItems: "center",
+        justifyContent: "center",
+          cursor:
+  loading ||
+    loadingRestaurants ||
+    !formData.name ||
+    !formData.lastName ||
+    !!passwordError ||
+    !!confirmPasswordError
+    ? "not-allowed"
+    : "pointer",
+    transition: "all 0.2s ease-in-out",
+      zIndex: 1000,
+        boxShadow: "0 -2px 8px rgba(0,0,0,0.15)",
+          "&:active": {
+    bgcolor:
+    loading ||
+      loadingRestaurants ||
+      !formData.name ||
+      !formData.lastName ||
+      !!passwordError ||
+      !!confirmPasswordError
+      ? "grey.400"
+      : "#3d8fd9",
               },
-            }}
+}}
           >
-            <Typography
-              sx={{
-                color: "white",
-                fontSize: "1.1rem",
-                fontWeight: 600,
-                textTransform: "none",
-              }}
-            >
-              {loading ? (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <CircularProgress size={24} color="inherit" />
-                  Kreiranje...
-                </Box>
-              ) : (
-                "Kreiraj račun"
-              )}
-            </Typography>
-          </Box>
-        </Box>
+  <Typography
+    sx={{
+      color: "white",
+      fontSize: "1.1rem",
+      fontWeight: 600,
+      textTransform: "none",
+    }}
+  >
+    {loading ? (
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <CircularProgress size={24} color="inherit" />
+        Kreiranje...
+      </Box>
+    ) : (
+      "Kreiraj račun"
+    )}
+  </Typography>
+          </Box >
+        </Box >
       </>
     );
   }
 
-  // Desktop Layout
-  return (
-    <>
-      <AdminNavbar isMobile={isMobile} />
+// Desktop Layout
+return (
+  <>
+    <AdminNavbar isMobile={isMobile} />
+    <Box
+      sx={{
+        height: `calc(100vh - ${headerHeight}px)`,
+        bgcolor: "#f5f5f5",
+        pt: `${headerHeight}px`,
+        pb: 3,
+        pl: `${navWidth}px`,
+        overflowY: "auto",
+      }}
+    >
       <Box
         sx={{
-          height: `calc(100vh - ${headerHeight}px)`,
-          bgcolor: "#f5f5f5",
-          pt: `${headerHeight}px`,
-          pb: 3,
-          pl: `${navWidth}px`,
-          overflowY: "auto",
+          maxWidth: 500,
+          width: "100%",
+          bgcolor: "white",
+          borderRadius: 3,
+          p: 4,
+          boxShadow: 2,
+          mx: "auto",
         }}
       >
-        <Box
-          sx={{
-            maxWidth: 500,
-            width: "100%",
-            bgcolor: "white",
-            borderRadius: 3,
-            p: 4,
-            boxShadow: 2,
-            mx: "auto",
-          }}
-        >
-          {/* Image Upload (Desktop) */}
-          <Box sx={{ display: "flex", justifyContent: "center", mb: 4 }}>
-            <Badge
-              overlap="circular"
-              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-              badgeContent={
-                <Box
-                  component="label"
-                  sx={{
-                    bgcolor: "primary.main",
-                    color: "white",
-                    width: 32,
-                    height: 32,
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    border: "2px solid white",
-                    "&:hover": { bgcolor: "primary.dark" },
-                  }}
-                >
-                  <EditIcon sx={{ fontSize: 18 }} />
-                  <input
-                    type="file"
-                    hidden
-                    accept="image/*"
-                    onChange={handleImageChange}
-                  />
-                </Box>
-              }
-            >
-              <Avatar
-                src={imagePreview || "/placeholder-user.jpg"}
+        {/* Image Upload (Desktop) */}
+        <Box sx={{ display: "flex", justifyContent: "center", mb: 4 }}>
+          <Badge
+            overlap="circular"
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            badgeContent={
+              <Box
+                component="label"
                 sx={{
-                  width: 120,
-                  height: 120,
-                  border: "4px solid white",
-                  boxShadow: 1,
+                  bgcolor: "primary.main",
+                  color: "white",
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  border: "2px solid white",
+                  "&:hover": { bgcolor: "primary.dark" },
                 }}
-              />
-            </Badge>
-          </Box>
-
-          {/* Editable Header for Name & Last Name */}
-          <Box sx={{ mb: 4, display: "flex", flexDirection: "column", gap: 0 }}>
-            <InputBase
-              placeholder="Ime"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              required
+              >
+                <EditIcon sx={{ fontSize: 18 }} />
+                <input
+                  type="file"
+                  hidden
+                  accept="image/*"
+                  onChange={handleImageChange}
+                />
+              </Box>
+            }
+          >
+            <Avatar
+              src={imagePreview || "/placeholder-user.jpg"}
               sx={{
-                fontSize: "2.5rem",
-                fontWeight: 800,
-                color: "#212222",
-                maxWidth: "fit-content",
-                borderBottom: "2px solid transparent",
-                "&:hover": {
-                  borderBottom: "2px solid #e0e0e0",
-                },
-                "&.Mui-focused": {
-                  borderBottom: "2px solid #1976d2",
-                },
-                "& input": {
-                  p: 0,
-                  "&::placeholder": {
-                    color: "#bdbdbd",
-                    opacity: 1,
-                  },
-                },
+                width: 120,
+                height: 120,
+                border: "4px solid white",
+                boxShadow: 1,
               }}
             />
-            <InputBase
-              placeholder="Prezime"
-              value={formData.lastName}
-              onChange={(e) =>
-                setFormData({ ...formData, lastName: e.target.value })
-              }
-              required
-              sx={{
-                fontSize: "2.5rem",
-                fontWeight: 800,
-                color: "#212222",
-                maxWidth: "fit-content",
-                borderBottom: "2px solid transparent",
-                "&:hover": {
-                  borderBottom: "2px solid #e0e0e0",
-                },
-                "&.Mui-focused": {
-                  borderBottom: "2px solid #1976d2",
-                },
-                "& input": {
-                  p: 0,
-                  "&::placeholder": {
-                    color: "#bdbdbd",
-                    opacity: 1,
-                  },
-                },
-              }}
-            />
-          </Box>
+          </Badge>
+        </Box>
 
-          {error && (
-            <Alert severity="error" sx={{ mb: 3 }}>
-              {error}
-            </Alert>
-          )}
-
-          {success && (
-            <Alert severity="success" sx={{ mb: 3 }}>
-              {success}
-            </Alert>
-          )}
-
-          <Box component="form" onSubmit={handleSubmit}>
-            <TextField
-              fullWidth
-              label="Korisničko ime"
-              value={formData.username}
-              onChange={(e) =>
-                setFormData({ ...formData, username: e.target.value })
-              }
-              required
-              sx={{
-                mb: 3,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
+        {/* Editable Header for Name & Last Name */}
+        <Box sx={{ mb: 4, display: "flex", flexDirection: "column", gap: 0 }}>
+          <InputBase
+            placeholder="Ime"
+            value={formData.name}
+            onChange={(e) =>
+              setFormData({ ...formData, name: e.target.value })
+            }
+            required
+            sx={{
+              fontSize: "2.5rem",
+              fontWeight: 800,
+              color: "#212222",
+              maxWidth: "fit-content",
+              borderBottom: "2px solid transparent",
+              "&:hover": {
+                borderBottom: "2px solid #e0e0e0",
+              },
+              "&.Mui-focused": {
+                borderBottom: "2px solid #1976d2",
+              },
+              "& input": {
+                p: 0,
+                "&::placeholder": {
+                  color: "#bdbdbd",
+                  opacity: 1,
                 },
-              }}
-            />
-
-            <TextField
-              fullWidth
-              label="Lozinka"
-              type="password"
-              value={formData.password}
-              onChange={(e) => handlePasswordChange(e.target.value)}
-              required
-              error={!!passwordError && formData.password.length > 0}
-              helperText={
-                passwordError && formData.password.length > 0
-                  ? passwordError
-                  : "Minimalno 8 znakova"
-              }
-              sx={{
-                mb: 3,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
+              },
+            }}
+          />
+          <InputBase
+            placeholder="Prezime"
+            value={formData.lastName}
+            onChange={(e) =>
+              setFormData({ ...formData, lastName: e.target.value })
+            }
+            required
+            sx={{
+              fontSize: "2.5rem",
+              fontWeight: 800,
+              color: "#212222",
+              maxWidth: "fit-content",
+              borderBottom: "2px solid transparent",
+              "&:hover": {
+                borderBottom: "2px solid #e0e0e0",
+              },
+              "&.Mui-focused": {
+                borderBottom: "2px solid #1976d2",
+              },
+              "& input": {
+                p: 0,
+                "&::placeholder": {
+                  color: "#bdbdbd",
+                  opacity: 1,
                 },
-              }}
-            />
+              },
+            }}
+          />
+        </Box>
 
-            <TextField
-              fullWidth
-              label="Potvrdi lozinku"
-              type="password"
-              value={formData.confirmPassword}
-              onChange={(e) => handleConfirmPasswordChange(e.target.value)}
-              required
-              error={
-                !!confirmPasswordError && formData.confirmPassword.length > 0
-              }
-              helperText={
-                confirmPasswordError && formData.confirmPassword.length > 0
-                  ? confirmPasswordError
-                  : "Lozinke se moraju podudarati"
-              }
-              sx={{
-                mb: 3,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                },
-              }}
-            />
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              size="large"
-              disabled={loading || !!passwordError || !!confirmPasswordError}
-              sx={{
-                py: 1.5,
-                textTransform: "none",
-                fontSize: "1.1rem",
-                fontWeight: 600,
+        {success && (
+          <Alert severity="success" sx={{ mb: 3 }}>
+            {success}
+          </Alert>
+        )}
+
+        <Box component="form" onSubmit={handleSubmit}>
+          <TextField
+            fullWidth
+            label="Korisničko ime"
+            value={formData.username}
+            onChange={(e) =>
+              setFormData({ ...formData, username: e.target.value })
+            }
+            required
+            sx={{
+              mb: 3,
+              "& .MuiOutlinedInput-root": {
                 borderRadius: 2,
-                boxShadow: 2,
-                bgcolor: "#57aaf4",
-                "&:hover": {
-                  bgcolor: "#3d8fd9",
-                  boxShadow: 4,
-                },
-              }}
-            >
-              {loading ? (
-                <>
-                  <CircularProgress size={24} sx={{ mr: 1 }} color="inherit" />
-                  Kreiranje...
-                </>
-              ) : (
-                "Kreiraj račun"
-              )}
-            </Button>
-          </Box>
+              },
+            }}
+          />
+
+          <TextField
+            fullWidth
+            label="Lozinka"
+            type="password"
+            value={formData.password}
+            onChange={(e) => handlePasswordChange(e.target.value)}
+            required
+            error={!!passwordError && formData.password.length > 0}
+            helperText={
+              passwordError && formData.password.length > 0
+                ? passwordError
+                : "Minimalno 8 znakova"
+            }
+            sx={{
+              mb: 3,
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 2,
+              },
+            }}
+          />
+
+          <TextField
+            fullWidth
+            label="Potvrdi lozinku"
+            type="password"
+            value={formData.confirmPassword}
+            onChange={(e) => handleConfirmPasswordChange(e.target.value)}
+            required
+            error={
+              !!confirmPasswordError && formData.confirmPassword.length > 0
+            }
+            helperText={
+              confirmPasswordError && formData.confirmPassword.length > 0
+                ? confirmPasswordError
+                : "Lozinke se moraju podudarati"
+            }
+            sx={{
+              mb: 3,
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 2,
+              },
+            }}
+          />
+
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            size="large"
+            disabled={
+              loading ||
+              !formData.name ||
+              !formData.lastName ||
+              !!passwordError ||
+              !!confirmPasswordError
+            }
+            sx={{
+              py: 1.5,
+              textTransform: "none",
+              fontSize: "1.1rem",
+              fontWeight: 600,
+              borderRadius: 2,
+              boxShadow: 2,
+              bgcolor: "#57aaf4",
+              "&:hover": {
+                bgcolor: "#3d8fd9",
+                boxShadow: 4,
+              },
+            }}
+          >
+            {loading ? (
+              <>
+                <CircularProgress size={24} sx={{ mr: 1 }} color="inherit" />
+                Kreiranje...
+              </>
+            ) : (
+              "Kreiraj račun"
+            )}
+          </Button>
         </Box>
       </Box>
-    </>
-  );
+    </Box>
+  </>
+);
 }
