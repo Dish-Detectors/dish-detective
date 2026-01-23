@@ -278,9 +278,7 @@ export default function DailyMenuPage() {
         {filteredAvailableDishes.length === 0 ? (
           <Box sx={{ bgcolor: "white", p: 3, borderRadius: 3 }}>
             <Typography color="text.secondary">
-              {searchQuery
-                ? t("noSearchResults")
-                : t("allDishesAlreadyInMenu")}
+              {searchQuery ? t("noSearchResults") : t("allDishesAlreadyInMenu")}
             </Typography>
           </Box>
         ) : (

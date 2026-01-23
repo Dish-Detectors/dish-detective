@@ -48,7 +48,8 @@ export default clerkMiddleware(async (auth, req) => {
   const langHeader = req.headers.get("accept-language") || "";
   const detectedLang = langHeader.toLowerCase().startsWith("hr") ? "HR" : "EN";
   const existingLang = req.cookies.get(LANG_COOKIE)?.value;
-  const langToSet = existingLang === "HR" || existingLang === "EN" ? null : detectedLang;
+  const langToSet =
+    existingLang === "HR" || existingLang === "EN" ? null : detectedLang;
 
   const isEmployeeSubdomain = host.startsWith("employee.");
   const url = req.nextUrl.clone();

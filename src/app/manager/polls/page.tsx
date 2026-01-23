@@ -222,8 +222,7 @@ export default function PollsListingPage() {
                         {t("questionsCountLabel", {
                           count: poll.questions.length,
                         })}{" "}
-                        •{" "}
-                        {formatDate(poll.createdAt)}
+                        • {formatDate(poll.createdAt)}
                       </Typography>
                     </Box>
                     <ChevronRightIcon color="action" />

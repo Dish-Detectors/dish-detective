@@ -124,7 +124,9 @@ export default async function RestaurantOfferPage({
   if (!restaurant) {
     return (
       <Box sx={{ p: 4, textAlign: "center" }}>
-        <Typography variant="h5">{await tServer("restaurantNotFound")}</Typography>
+        <Typography variant="h5">
+          {await tServer("restaurantNotFound")}
+        </Typography>
       </Box>
     );
   }
@@ -194,7 +196,14 @@ export default async function RestaurantOfferPage({
         />
         <Box sx={{ p: { xs: 3, md: 4 } }}>
           <Grid container spacing={4} alignItems="stretch">
-            <Grid size={{ xs: 12, md: 7 }} sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+            <Grid
+              size={{ xs: 12, md: 7 }}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}
+            >
               <Box>
                 <Box
                   sx={{
@@ -296,7 +305,9 @@ export default async function RestaurantOfferPage({
                             : "text.primary"
                         }
                       >
-                        {wh.shifts.map((s) => `${s.start} - ${s.end}`).join(", ")}
+                        {wh.shifts
+                          .map((s) => `${s.start} - ${s.end}`)
+                          .join(", ")}
                       </Typography>
                     </Box>
                   ))}
@@ -325,8 +336,8 @@ export default async function RestaurantOfferPage({
             allergens: dish.allergens?.map((a: any) => a.name) || [],
             lastServed: lastServedMap.has(dish._id.toString())
               ? lastServedMap
-                .get(dish._id.toString())!
-                .toLocaleDateString(lang === "HR" ? "hr-HR" : "en-GB")
+                  .get(dish._id.toString())!
+                  .toLocaleDateString(lang === "HR" ? "hr-HR" : "en-GB")
               : neverServedText,
             rating: ratingInfo.avg,
             ratingCount: ratingInfo.count,
@@ -338,6 +349,6 @@ export default async function RestaurantOfferPage({
         restaurantId={id}
         density="compact"
       />
-    </Container >
+    </Container>
   );
 }

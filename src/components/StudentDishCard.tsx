@@ -152,7 +152,10 @@ export default function StudentDishCard({
             mb: 0.5,
           }}
         >
-          <Typography variant={isCompact ? "subtitle1" : "h6"} fontWeight="bold">
+          <Typography
+            variant={isCompact ? "subtitle1" : "h6"}
+            fontWeight="bold"
+          >
             {name}
           </Typography>
           <Box

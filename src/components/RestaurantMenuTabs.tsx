@@ -185,11 +185,7 @@ export default function RestaurantMenuTabs({
       )}
 
       <CustomTabPanel value={value} index={0}>
-        {renderDishGrid(
-          offer,
-          t("noAvailableDishesInRestaurant"),
-          true,
-        )}
+        {renderDishGrid(offer, t("noAvailableDishesInRestaurant"), true)}
       </CustomTabPanel>
 
       <CustomTabPanel value={value} index={1}>

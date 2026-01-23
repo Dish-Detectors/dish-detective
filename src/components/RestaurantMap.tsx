@@ -232,7 +232,11 @@ export default function RestaurantMap({ restaurants }: RestaurantMapProps) {
               }}
               onCloseClick={() => setSelectedRestaurant(null)}
               headerContent={
-                <Typography variant="subtitle1" fontWeight="bold" color="text.primary">
+                <Typography
+                  variant="subtitle1"
+                  fontWeight="bold"
+                  color="text.primary"
+                >
                   {selectedRestaurant.name}
                 </Typography>
               }
@@ -242,10 +246,20 @@ export default function RestaurantMap({ restaurants }: RestaurantMapProps) {
                   <img
                     src={selectedRestaurant.imageUrl}
                     alt={selectedRestaurant.name}
-                    style={{ width: "100%", height: "100px", objectFit: "cover", borderRadius: "8px", marginBottom: "8px" }}
+                    style={{
+                      width: "100%",
+                      height: "100px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                      marginBottom: "8px",
+                    }}
                   />
                 )}
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
+                >
                   {selectedRestaurant.address}
                 </Typography>
                 <Button

@@ -176,9 +176,9 @@ export default function EmployeeCreatePage() {
         }, 2000);
       } else {
         setError(
-          ("errorKey" in result && result.errorKey && t(result.errorKey))
-          || result.error
-          || t("accountCreateError"),
+          ("errorKey" in result && result.errorKey && t(result.errorKey)) ||
+            result.error ||
+            t("accountCreateError"),
         );
       }
     } catch (err) {
