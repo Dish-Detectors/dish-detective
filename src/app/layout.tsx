@@ -51,9 +51,11 @@ export default async function RootLayout({
         <body suppressHydrationWarning={true}>
           <ThemeRegistry>
             <I18nProvider initialLang={lang}>
-              <Header />
-              {children}
-              <Footer />
+              <div className="dd-app-shell">
+                <Header />
+                <main className="dd-app-main">{children}</main>
+                <Footer />
+              </div>
             </I18nProvider>
           </ThemeRegistry>
         </body>

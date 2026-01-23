@@ -248,7 +248,7 @@ export default function Home() {
         sx={{
           position: "relative",
           minHeight: "100vh",
-          width: "100vw",
+          width: "100%",
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
@@ -394,7 +394,7 @@ export default function Home() {
       sx={{
         position: "relative",
         minHeight: "100vh",
-        width: "100vw",
+        width: "100%",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
