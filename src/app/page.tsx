@@ -416,8 +416,8 @@ export default function Home() {
                 sx={{
                   fontWeight: 600,
                   borderRadius: 999,
-                  width: { xs: "100%", sm: "auto", lg: "25%" },
-                  minWidth: { sm: 200 },
+                  width: { xs: "100%", sm: "auto" }, // Removed lg: 25% to let it size naturally
+                  minWidth: { sm: 160 }, // Reduced minWidth from 200
                   px: { sm: 4 },
                   minHeight: 45,
                   color: "white",
@@ -434,8 +434,7 @@ export default function Home() {
               position: "relative",
               width: cardSwapLayout.wrapperWidth,
               height: cardSwapLayout.wrapperHeight,
-              flex: "0 1 auto", // Allow shrinking if absolutely needed
-              display: "block",
+              display: { xs: "none", lg: "block" },
               mx: "auto",
               mt: { xs: 8, lg: 0 }, // Verified gap on mobile
             }}
@@ -691,7 +690,7 @@ export default function Home() {
               sx={{
                 fontWeight: 600,
                 borderRadius: 999,
-                width: "90%",
+                width: "60%",
                 minHeight: 50,
                 color: "white",
                 textTransform: "none",
