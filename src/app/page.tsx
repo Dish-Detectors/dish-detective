@@ -23,6 +23,7 @@ import CardSwap, { Card } from "@/components/CardSwap";
 import Aurora from "@/components/Aurora";
 import { getUserRole } from "./actions";
 import { getTranslation, getCurrentLang } from "@/utils/i18n";
+import { LANDING_IMAGES } from "@/constants/assets";
 
 export default function Home() {
   const router = useRouter();
@@ -314,11 +315,12 @@ export default function Home() {
             display: "flex",
             flexDirection: { xs: "column", lg: "row" },
             alignItems: "center",
-            justifyContent: { xs: "center", lg: "space-between" },
-            gap: { xs: 5, lg: 8 },
+            // On mobile, use space-evenly to distribute available vertical space
+            justifyContent: { xs: "space-evenly", lg: "space-between" },
+            gap: { xs: 2, lg: 8 }, // Smaller gap on mobile
             pr: { xs: 0, lg: "clamp(70px, 2vw, 180px)" },
-            pt: { xs: 10, lg: 0 },
-            pb: { xs: 4, lg: 0 },
+            pt: { xs: 2, lg: 0 }, // Minimal top padding to push text up
+            pb: { xs: 2, lg: 0 }, // Reduced bottom padding (was 4)
           }}
         >
           <Box
@@ -337,11 +339,11 @@ export default function Home() {
               fontWeight={800}
               sx={{
                 color: "white",
-                mb: 2,
-                lineHeight: 1.2,
+                mb: 1, // Reduced margin
+                lineHeight: 1.1, // Tighter line height
                 wordBreak: "break-word",
                 letterSpacing: -1,
-                fontSize: { xs: "3rem", sm: "3.75rem" },
+                fontSize: { xs: "2.5rem", sm: "3.75rem" }, // Smaller font on mobile
               }}
             >
               {t.heroTitle}
@@ -350,11 +352,11 @@ export default function Home() {
             <Typography
               variant="h5"
               sx={{
-                mb: 3,
+                mb: 2, // Reduced margin (was 3)
                 color: "lightgrey",
                 letterSpacing: 1.2,
-                fontSize: { xs: "1.25rem", sm: "1.5rem" },
-                minHeight: { xs: "3rem", sm: "auto" },
+                fontSize: { xs: "1rem", sm: "1.5rem" }, // Smaller subtitle
+                minHeight: { xs: "2rem", sm: "auto" },
               }}
             >
               <span className="ddTypewriterText">{subtitleText}</span>
@@ -477,7 +479,7 @@ export default function Home() {
                       }}
                     >
                       <Image
-                        src="/menuview.png"
+                        src={LANDING_IMAGES.REAL_TIME_MENU}
                         alt="Student view"
                         fill
                         sizes={cardSwapImageSizes}
@@ -549,7 +551,7 @@ export default function Home() {
                       }}
                     >
                       <Image
-                        src="/menzamap.png"
+                        src={LANDING_IMAGES.OVERVIEW}
                         alt="Menza map"
                         fill
                         sizes={cardSwapImageSizes}
@@ -620,7 +622,7 @@ export default function Home() {
                       }}
                     >
                       <Image
-                        src="/notification.png"
+                        src={LANDING_IMAGES.NOTIFICATIONS}
                         alt="Notifications"
                         fill
                         sizes={cardSwapImageSizes}
