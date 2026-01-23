@@ -417,8 +417,8 @@ export default function Home() {
                 sx={{
                   fontWeight: 600,
                   borderRadius: 999,
-                  width: { xs: "100%", sm: "auto", lg: 220 },
-                  minWidth: { sm: 140 },
+                  width: { xs: "100%", sm: "auto" }, // Removed lg: 25% to let it size naturally
+                  minWidth: { sm: 160 }, // Reduced minWidth from 200
                   px: { sm: 4 },
                   minHeight: 45,
                   color: "white",
@@ -430,19 +430,29 @@ export default function Home() {
             </Stack>
           </Box>
 
-          {!isMobile && (
-            <Box
-              sx={{
-                position: "relative",
-                width: cardSwapLayout.wrapperWidth,
-                height: cardSwapLayout.wrapperHeight,
-                flex: "0 1 auto", // Allow shrinking if absolutely needed
-                display: "block",
-                mx: { xs: "auto", lg: 0 },
-                ml: { lg: "auto" },
-                mt: { xs: 8, lg: 0 }, // Verified gap on mobile
-              }}
-              aria-hidden="true"
+          <Box
+            sx={{
+              position: "relative",
+              width: cardSwapLayout.wrapperWidth,
+              height: cardSwapLayout.wrapperHeight,
+              display: { xs: "none", lg: "block" },
+              mx: "auto",
+              mt: { xs: 8, lg: 0 }, // Verified gap on mobile
+            }}
+            aria-hidden="true"
+          >
+            <CardSwap
+              appearDelayMs={250}
+              width={cardSwapLayout.cardWidth}
+              height={cardSwapLayout.cardHeight}
+              cardDistance={cardSwapLayout.cardDistance}
+              verticalDistance={cardSwapLayout.verticalDistance}
+              delay={5200}
+              pauseOnHover
+              staggerFadeIn
+              staggerFadeInDelayMs={60}
+              staggerFadeInEachMs={120}
+              staggerFadeInDurationSec={0.55}
             >
               <CardSwap
                 appearDelayMs={250}
@@ -695,7 +705,7 @@ export default function Home() {
               sx={{
                 fontWeight: 600,
                 borderRadius: 999,
-                width: "75%",
+                width: "60%",
                 minHeight: 50,
                 color: "white",
                 textTransform: "none",

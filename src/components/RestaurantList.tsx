@@ -77,8 +77,11 @@ export default function RestaurantList({ restaurants }: RestaurantListProps) {
                 transition:
                   "transform 0.2s, box-shadow 0.2s, background-color 0.3s ease, color 0.3s ease",
                 "&:hover": {
-                  transform: "translateY(-4px)",
-                  boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+                  transform: { xs: "none", md: "translateY(-4px)" },
+                  boxShadow: {
+                    xs: "0 2px 12px rgba(0,0,0,0.06)", // Keep original shadow on mobile
+                    md: "0 8px 24px rgba(0,0,0,0.12)", // Enhanced shadow on desktop
+                  },
                 },
                 overflow: "hidden",
                 height: "100%",

@@ -107,7 +107,7 @@ export default function PollPage() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          bgcolor: "#f5f5f5",
+          bgcolor: "background.default",
         }}
       >
         <PancakeStackLoader />
@@ -161,7 +161,7 @@ export default function PollPage() {
   }
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#f5f5f5", py: 4 }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "background.default", py: 4 }}>
       <Container maxWidth="md">
         <Typography
           variant="h4"
@@ -215,7 +215,7 @@ export default function PollPage() {
                     onChange={(e) => handleAnswerChange(index, e.target.value)}
                     sx={{
                       justifyContent: "space-between",
-                      bgcolor: "#f9f9f9",
+                      bgcolor: "action.hover",
                       p: 1,
                       borderRadius: 2,
                     }}
