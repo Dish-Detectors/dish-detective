@@ -23,6 +23,7 @@ import {
   getManagerSubscriptionCounts,
 } from "@/app/manager/stats/actions";
 import { BarChart } from "@mui/x-charts/BarChart";
+import { useI18n } from "@/components/I18nProvider";
 
 type SortMode = "alpha" | "subcount";
 
@@ -35,6 +36,7 @@ type ManagerDish = {
 };
 
 export default function ManagerStatsPage() {
+  const { t } = useI18n();
   const [menzaId, setMenzaId] = useState<string | null>(null);
   const [dishes, setDishes] = useState<ManagerDish[]>([]);
   const [loading, setLoading] = useState(true);
@@ -143,11 +145,11 @@ export default function ManagerStatsPage() {
               lineHeight: 1.2,
             }}
           >
-            Statistika
+            {t("statsTitle")}
           </Typography>
 
           <IconButton
-            aria-label="Sortiraj"
+            aria-label={t("sort")}
             aria-controls={sortMenuOpen ? "stats-sort-menu" : undefined}
             aria-haspopup="true"
             aria-expanded={sortMenuOpen ? "true" : undefined}
@@ -169,7 +171,7 @@ export default function ManagerStatsPage() {
         <TextField
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Pretraži jela..."
+          placeholder={t("searchDishesPlaceholder")}
           size="small"
           sx={{
             width: { xs: "100%", sm: 340, md: 440, lg: 520 },
@@ -209,7 +211,7 @@ export default function ManagerStatsPage() {
           }}
         >
           <IconButton
-            aria-label="Sortiraj"
+            aria-label={t("sort")}
             aria-controls={sortMenuOpen ? "stats-sort-menu" : undefined}
             aria-haspopup="true"
             aria-expanded={sortMenuOpen ? "true" : undefined}
@@ -239,7 +241,7 @@ export default function ManagerStatsPage() {
                 setSortAnchorEl(null);
               }}
             >
-              Abecedno
+              {t("sortAlphabetical")}
             </MenuItem>
             <MenuItem
               selected={sortMode === "subcount"}
@@ -248,7 +250,7 @@ export default function ManagerStatsPage() {
                 setSortAnchorEl(null);
               }}
             >
-              Po zainteresiranosti
+              {t("sortByInterest")}
             </MenuItem>
           </Menu>
         </Box>
@@ -273,7 +275,7 @@ export default function ManagerStatsPage() {
               }}
             >
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                Zainteresiranost po jelima
+                {t("interestByDishTitle")}
               </Typography>
               <Box sx={{ width: "100%", height: 280 }}>
                 <BarChart
@@ -292,7 +294,7 @@ export default function ManagerStatsPage() {
                   series={[
                     {
                       dataKey: "count",
-                      label: "Broj zainteresiranih",
+                      label: t("interestedCountLabel"),
                       color: "#1976d2",
                     },
                   ]}
@@ -339,7 +341,7 @@ export default function ManagerStatsPage() {
             }}
           >
             <Typography color="text.secondary">
-              Nije pronađena menza za ovog korisnika.
+              {t("noRestaurantForUser")}
             </Typography>
           </Paper>
         ) : sortedDishes.length === 0 ? (
@@ -353,7 +355,7 @@ export default function ManagerStatsPage() {
             }}
           >
             <Typography color="text.secondary">
-              Trenutno nema jela u jelovniku.
+              {t("noDishesInMenuGeneric")}
             </Typography>
           </Paper>
         ) : (

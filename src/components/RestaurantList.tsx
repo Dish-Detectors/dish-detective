@@ -13,12 +13,15 @@ import {
 import { IRestaurant } from "@/models/Restaurant";
 import Link from "next/link";
 import { getRestaurantStatus, getWorkingHoursString } from "@/utils/time";
+import { useI18n } from "@/components/I18nProvider";
 
 interface RestaurantListProps {
   restaurants: IRestaurant[];
 }
 
 export default function RestaurantList({ restaurants }: RestaurantListProps) {
+  const { lang, t } = useI18n();
+
   return (
     <Box
       sx={{
@@ -36,9 +39,11 @@ export default function RestaurantList({ restaurants }: RestaurantListProps) {
       {restaurants.map((restaurant) => {
         const { status, message, isToday } = getRestaurantStatus(
           restaurant.workingHours || [],
+          lang,
         );
         const workingHoursString = getWorkingHoursString(
           restaurant.workingHours || [],
+          lang,
         );
 
         let statusColor: "success" | "error" | "warning" | "default" =
@@ -147,12 +152,12 @@ export default function RestaurantList({ restaurants }: RestaurantListProps) {
                     <Chip
                       label={
                         status === "open"
-                          ? "Otvoreno"
+                          ? t("statusOpen")
                           : status === "closed"
-                            ? "Zatvoreno"
+                            ? t("statusClosed")
                             : status === "closing_soon"
-                              ? "Zatvara se uskoro"
-                              : "Otvara se uskoro"
+                              ? t("statusClosingSoon")
+                              : t("statusOpeningSoon")
                       }
                       color={statusColor}
                       size="small"
@@ -181,7 +186,7 @@ export default function RestaurantList({ restaurants }: RestaurantListProps) {
                       color="text.secondary"
                       sx={{ ml: 0.5 }}
                     >
-                      Danas: {workingHoursString}
+                      {t("todayPrefix")}: {workingHoursString}
                     </Typography>
                   )}
                 </Box>

@@ -12,6 +12,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import DishCard from "@/components/DishCard";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
+import { useI18n } from "@/components/I18nProvider";
 import {
   getManagerRestaurant,
   getAllDishes,
@@ -35,6 +36,7 @@ interface MenuItem {
 }
 
 export default function DailyMenuPage() {
+  const { t } = useI18n();
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
   const [allDishes, setAllDishes] = useState<Dish[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -162,7 +164,7 @@ export default function DailyMenuPage() {
             justifySelf: "start",
           }}
         >
-          Kreiraj dnevni meni
+          {t("createDailyMenuTitle")}
         </Typography>
 
         <Divider
@@ -176,7 +178,7 @@ export default function DailyMenuPage() {
         <TextField
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Pretraži jela za dodavanje..."
+          placeholder={t("searchDishesToAddPlaceholder")}
           size="small"
           sx={{
             width: { xs: "100%", sm: 340, md: 440, lg: 520 },
@@ -218,12 +220,12 @@ export default function DailyMenuPage() {
       >
         {/* Današnji Meni Section */}
         <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: "#444" }}>
-          Današnji meni ({menuItems.length})
+          {t("todaysMenuWithCount", { count: menuItems.length })}
         </Typography>
         {menuItems.length === 0 ? (
           <Box sx={{ bgcolor: "white", p: 3, borderRadius: 3, mb: 4 }}>
             <Typography color="text.secondary">
-              Nema jela u današnjem meniju.
+              {t("noDishesInTodaysMenu")}
             </Typography>
           </Box>
         ) : (
@@ -258,7 +260,7 @@ export default function DailyMenuPage() {
                       textTransform: "uppercase",
                     }}
                   >
-                    {item.available ? "Dostupno" : "Nedostupno"}
+                    {item.available ? t("available") : t("unavailable")}
                   </Typography>
                 }
               />
@@ -270,15 +272,13 @@ export default function DailyMenuPage() {
 
         {/* Dostupna Jela Section */}
         <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: "#444" }}>
-          Dodaj jela u meni
+          {t("addDishesToMenuTitle")}
         </Typography>
 
         {filteredAvailableDishes.length === 0 ? (
           <Box sx={{ bgcolor: "white", p: 3, borderRadius: 3 }}>
             <Typography color="text.secondary">
-              {searchQuery
-                ? "Nema rezultata pretrage"
-                : "Sva jela su već u meniju"}
+              {searchQuery ? t("noSearchResults") : t("allDishesAlreadyInMenu")}
             </Typography>
           </Box>
         ) : (

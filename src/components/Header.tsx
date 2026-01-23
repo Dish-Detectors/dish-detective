@@ -19,15 +19,19 @@ import {
 import { useColorMode } from "@/components/ThemeRegistry";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function Header() {
   const pathname = usePathname();
   const { user } = useUser();
   const { toggleColorMode, mode } = useColorMode();
+  const { lang, setLang, t } = useI18n();
   const isHomepage = pathname === "/";
   const isLoginRoute = pathname.startsWith("/login");
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const toggleLang = () => setLang(lang === "HR" ? "EN" : "HR");
 
   const [showHomepageHeader, setShowHomepageHeader] = useState(false);
 
@@ -186,6 +190,8 @@ export default function Header() {
                 },
               }}
               disableRipple
+              aria-label={t("language")}
+              onClick={toggleLang}
             >
               <Image
                 src="/translate.png"
@@ -285,7 +291,7 @@ export default function Header() {
 
           <Button
             sx={{
-              display: { xs: "none", sm: "flex" },
+              display: "flex",
               minWidth: 0,
               padding: 0,
               bgcolor: "transparent",
@@ -294,6 +300,8 @@ export default function Header() {
               },
             }}
             disableRipple
+            aria-label={t("language")}
+            onClick={toggleLang}
           >
             <Image
               src="/translate.png"

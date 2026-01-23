@@ -12,12 +12,14 @@ import {
   useTheme,
 } from "@mui/material";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function Page() {
   const { signUp, isLoaded } = useSignUp();
   const router = useRouter();
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
+  const { t: tr } = useI18n();
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -61,7 +63,7 @@ export default function Page() {
         return;
       }
 
-      setError("Greška prilikom prijave s Google računom");
+      setError(tr("googleLoginError"));
       setLoading(false);
     }
   };
@@ -115,7 +117,7 @@ export default function Page() {
             textAlign: "center",
           }}
         >
-          Student login
+          {tr("studentLoginTitle")}
         </Typography>
 
         {error && (
@@ -173,7 +175,7 @@ export default function Page() {
                 }),
           }}
         >
-          {loading ? "Prijava..." : "Prijavi se s Google računom"}
+          {loading ? tr("signingIn") : tr("loginWithGoogle")}
         </Button>
       </Box>
     </Box>

@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { getCurrentUserFirstName } from "@/app/admin/actions";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
 import { navWidth } from "@/components/AdminNavbar";
+import { useI18n } from "@/components/I18nProvider";
 
 interface ActionButtonProps {
   children: ReactNode;
@@ -132,6 +133,7 @@ export default function Page() {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const { t: tr } = useI18n();
   const [name, setName] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -179,7 +181,7 @@ export default function Page() {
           fontWeight={780}
           sx={{ color: "#212222", mb: 3, ml: 1 }}
         >
-          Dobrodošli{name ? `, ${name}` : ""}!
+          {tr("welcomeWithName", { name: name ? `, ${name}` : "" })}
         </Typography>
 
         <Box sx={{ px: 2 }}>
@@ -201,7 +203,7 @@ export default function Page() {
             icon={<TuneIcon sx={{ fontSize: 32, color: "text.primary" }} />}
             animationDelay="0.1s"
           >
-            Restorani
+            {tr("restaurants")}
           </MobileActionCard>
           <MobileActionCard
             onClick={() => router.push("/admin/dishes")}
@@ -210,7 +212,7 @@ export default function Page() {
             }
             animationDelay="0.3s"
           >
-            Jela
+            {tr("dishes")}
           </MobileActionCard>
           <Box sx={{ gridColumn: "span 2" }}>
             <MobileActionCard
@@ -218,7 +220,7 @@ export default function Page() {
               icon={<PeopleIcon sx={{ fontSize: 32, color: "text.primary" }} />}
               animationDelay="0.5s"
             >
-              Računi
+              {tr("accounts")}
             </MobileActionCard>
           </Box>
         </Box>
@@ -239,7 +241,7 @@ export default function Page() {
         fontWeight={780}
         sx={{ color: "#212222", mb: 4, ml: 4 }}
       >
-        Dobrodošli{name ? `, ${name}` : ""}!
+        {tr("welcomeWithName", { name: name ? `, ${name}` : "" })}
       </Typography>
 
       <Box sx={{ px: 4, mt: -3 }}>
@@ -277,7 +279,7 @@ export default function Page() {
                   }}
                 />
               }
-              title="Restorani"
+              title={tr("restaurants")}
               onClick={() => router.push("/admin/restaurants")}
               animationDelay="0.1s"
             />
@@ -293,7 +295,7 @@ export default function Page() {
                   }}
                 />
               }
-              title="Jela"
+              title={tr("dishes")}
               onClick={() => router.push("/admin/dishes")}
               animationDelay="0.3s"
             />
@@ -309,7 +311,7 @@ export default function Page() {
                   }}
                 />
               }
-              title="Računi"
+              title={tr("accounts")}
               onClick={() => router.push("/admin/accounts")}
               animationDelay="0.5s"
             />

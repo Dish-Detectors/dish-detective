@@ -24,12 +24,14 @@ import SuccessScreen from "@/components/SuccessScreen";
 import { getAllDishes, getAllAllergens } from "../../actions";
 import { updateDish } from "../actions";
 import { put } from "@vercel/blob";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function DishEditPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const { t } = useI18n();
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -88,13 +90,13 @@ export default function DishEditPage({
             setCurrentImageUrl(dish.imageUrl);
             setImagePreview(dish.imageUrl);
           } else {
-            setError("Jelo nije pronađeno");
+            setError(t("dishNotFound"));
           }
         } else {
-          setError("Greška pri učitavanju jela");
+          setError(t("dishLoadError"));
         }
       } catch (err) {
-        setError("Greška pri učitavanju jela");
+        setError(t("dishLoadError"));
       } finally {
         setLoadingDish(false);
       }
@@ -128,7 +130,7 @@ export default function DishEditPage({
 
     // Require image (either existing or new upload)
     if (!imagePreview && !imageFile) {
-      setError("Molimo odaberite sliku jela");
+      setError(t("pleaseSelectDishImage"));
       return;
     }
 
@@ -159,22 +161,22 @@ export default function DishEditPage({
       });
 
       if (result.success) {
-        setSuccess("Jelo uspješno ažurirano!");
+        setSuccess(t("dishUpdatedSuccess"));
         setShowSuccessScreen(true);
         setTimeout(() => router.push("/admin/dishes"), 2000);
       } else {
-        setError(result.message || "Došlo je do greške. Pokušajte ponovo.");
+        setError(result.message || t("genericTryAgainError"));
       }
     } catch (err) {
       console.error("Error updating dish:", err);
-      setError("Došlo je do greške. Pokušajte ponovo.");
+      setError(t("genericTryAgainError"));
     } finally {
       setLoading(false);
     }
   };
 
   if (showSuccessScreen) {
-    return <SuccessScreen message="Jelo uspješno ažurirano!" />;
+    return <SuccessScreen message={t("dishUpdatedSuccess")} />;
   }
 
   if (loadingDish) {
@@ -226,7 +228,7 @@ export default function DishEditPage({
                   color: "#212222",
                 }}
               >
-                Uredi jelo
+                {t("editDishTitle")}
               </Typography>
 
               {error && (
@@ -298,7 +300,7 @@ export default function DishEditPage({
                           startIcon={<CloudUploadIcon />}
                           sx={{ textTransform: "none" }}
                         >
-                          Odaberi sliku
+                          {t("chooseImageButton")}
                         </Button>
                       </label>
                       <Typography
@@ -306,7 +308,7 @@ export default function DishEditPage({
                         display="block"
                         sx={{ mt: 1, color: "text.secondary" }}
                       >
-                        PNG, JPG do 5MB
+                        {t("imageFormatsHint")}
                       </Typography>
                     </Box>
                   )}
@@ -314,7 +316,7 @@ export default function DishEditPage({
 
                 <TextField
                   fullWidth
-                  label="Naziv jela"
+                  label={t("dishNameLabel")}
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -331,7 +333,7 @@ export default function DishEditPage({
 
                 <TextField
                   fullWidth
-                  label="Opis"
+                  label={t("dishDescriptionLabel")}
                   value={formData.description}
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
@@ -363,8 +365,8 @@ export default function DishEditPage({
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        label="Dodaj alergen"
-                        placeholder="Odaberi alergene"
+                        label={t("addAllergenLabel")}
+                        placeholder={t("selectAllergensPlaceholder")}
                         sx={{
                           bgcolor: "white",
                           "& .MuiOutlinedInput-root": {
@@ -422,10 +424,10 @@ export default function DishEditPage({
               {loading ? (
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <CircularProgress size={24} color="inherit" />
-                  Ažuriranje...
+                  {t("updating")}
                 </Box>
               ) : (
-                "Spremi promjene"
+                t("saveChanges")
               )}
             </Typography>
           </Box>
@@ -490,7 +492,7 @@ export default function DishEditPage({
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  placeholder="Naziv jela"
+                  placeholder={t("dishNamePlaceholder")}
                   fullWidth
                   required
                   sx={{
@@ -504,11 +506,11 @@ export default function DishEditPage({
                 />
 
                 <Typography variant="h6" fontWeight="bold" gutterBottom>
-                  Opis
+                  {t("dishDescriptionLabel")}
                 </Typography>
                 <TextField
                   fullWidth
-                  placeholder="Unesite opis jela..."
+                  placeholder={t("dishDescriptionPlaceholder")}
                   value={formData.description}
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
@@ -639,10 +641,10 @@ export default function DishEditPage({
                           sx={{ fontSize: 48, color: "text.secondary", mb: 2 }}
                         />
                         <Typography variant="h6" color="text.secondary">
-                          Odaberi sliku
+                          {t("chooseImageButton")}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          PNG, JPG do 5MB
+                          {t("imageFormatsHint")}
                         </Typography>
                       </label>
                     </Box>
@@ -658,7 +660,7 @@ export default function DishEditPage({
               gutterBottom
               sx={{ mt: -2 }}
             >
-              Alergeni
+              {t("allergensLabel")}
             </Typography>
             <Box sx={{ mb: 4 }}>
               <Autocomplete
@@ -675,7 +677,7 @@ export default function DishEditPage({
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    placeholder="Odaberi alergene"
+                    placeholder={t("selectAllergensPlaceholder")}
                     variant="outlined"
                     sx={{
                       "& .MuiOutlinedInput-root": {
@@ -728,7 +730,7 @@ export default function DishEditPage({
                 {loading ? (
                   <CircularProgress size={24} color="inherit" />
                 ) : (
-                  "Spremi promjene"
+                  t("saveChanges")
                 )}
               </Button>
             </Box>

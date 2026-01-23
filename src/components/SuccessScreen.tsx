@@ -3,6 +3,7 @@
 import { Box, Typography } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PancakeStackLoader from "@/components/PancakeStackLoader";
+import { useI18n } from "@/components/I18nProvider";
 
 interface SuccessScreenProps {
   message: string;
@@ -13,6 +14,8 @@ export default function SuccessScreen({
   message,
   showLoader = true,
 }: SuccessScreenProps) {
+  const { t } = useI18n();
+
   return (
     <Box
       sx={{
@@ -92,7 +95,7 @@ export default function SuccessScreen({
             textAlign: "center",
           }}
         >
-          Preusmjeravanje...
+          {t("redirecting")}
         </Typography>
       </Box>
     </Box>

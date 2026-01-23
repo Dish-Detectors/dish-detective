@@ -23,9 +23,11 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useRouter } from "next/navigation";
 import { createPoll, getEligibleStudentCount } from "../actions";
 import SuccessScreen from "@/components/SuccessScreen";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function ManagerPollsPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [title, setTitle] = useState("");
   const [questions, setQuestions] = useState<string[]>([""]);
   const [percentage, setPercentage] = useState<number>(25);
@@ -81,7 +83,7 @@ export default function ManagerPollsPage() {
     if (!title.trim()) {
       setSnackbar({
         open: true,
-        message: "Molimo unesite naslov ankete.",
+        message: t("enterPollTitleError"),
         severity: "error",
       });
       return;
@@ -90,7 +92,7 @@ export default function ManagerPollsPage() {
     if (questions.some((q) => !q.trim())) {
       setSnackbar({
         open: true,
-        message: "Molimo ispunite sva pitanja.",
+        message: t("fillAllQuestionsError"),
         severity: "error",
       });
       return;
@@ -116,7 +118,7 @@ export default function ManagerPollsPage() {
     } catch (error) {
       setSnackbar({
         open: true,
-        message: "Došlo je do greške prilikom slanja.",
+        message: t("pollSendError"),
         severity: "error",
       });
     } finally {
@@ -130,7 +132,7 @@ export default function ManagerPollsPage() {
   };
 
   if (showSuccessScreen) {
-    return <SuccessScreen message="Anketa uspješno poslana!" />;
+    return <SuccessScreen message={t("pollSentSuccess")} />;
   }
 
   return (
@@ -164,7 +166,7 @@ export default function ManagerPollsPage() {
           onClick={() => router.push("/manager/polls")}
           sx={{ mb: 2, mt: 2 }}
         >
-          Povratak na povijest
+          {t("backToPollHistory")}
         </Button>
         <Typography
           variant="h4"
@@ -172,24 +174,24 @@ export default function ManagerPollsPage() {
           gutterBottom
           sx={{ color: "#212222" }}
         >
-          Kreiraj novu anketu
+          {t("createNewPollTitle")}
         </Typography>
         <Typography color="text.secondary" sx={{ mb: 4 }}>
-          Pošaljite anketu studentima koji su pretplaćeni na vaša jela.
+          {t("sendPollSubtitle")}
         </Typography>
 
         <Paper sx={{ p: 4, borderRadius: 3, mb: 2 }}>
           <Stack spacing={4}>
             <Box>
               <Typography variant="h6" gutterBottom fontWeight={600}>
-                Osnovne informacije
+                {t("basicInfoTitle")}
               </Typography>
               <TextField
                 fullWidth
-                label="Naslov ankete"
+                label={t("pollTitleLabel")}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="npr. Anketa o zadovoljstvu hranom - Siječanj"
+                placeholder={t("pollTitlePlaceholder")}
                 sx={{ mb: 2 }}
               />
             </Box>
@@ -198,7 +200,7 @@ export default function ManagerPollsPage() {
 
             <Box>
               <Typography variant="h6" gutterBottom fontWeight={600}>
-                Pitanja
+                {t("questionsTitle")}
               </Typography>
               <Typography
                 variant="caption"
@@ -206,8 +208,7 @@ export default function ManagerPollsPage() {
                 display="block"
                 sx={{ mb: 2 }}
               >
-                Studenti će za svako pitanje moći odabrati ocjenu od "U
-                potpunosti se ne slažem" do "U potpunosti se slažem".
+                {t("questionsScaleHint")}
               </Typography>
 
               <Stack spacing={2}>
@@ -215,12 +216,12 @@ export default function ManagerPollsPage() {
                   <Box key={index} sx={{ display: "flex", gap: 1 }}>
                     <TextField
                       fullWidth
-                      label={`Pitanje ${index + 1}`}
+                      label={t("questionLabel", { number: index + 1 })}
                       value={q}
                       onChange={(e) =>
                         handleQuestionChange(index, e.target.value)
                       }
-                      placeholder="npr. Jeste li zadovoljni veličinom porcije?"
+                      placeholder={t("questionPlaceholder")}
                     />
                     {questions.length > 1 && (
                       <IconButton
@@ -237,7 +238,7 @@ export default function ManagerPollsPage() {
                   onClick={handleAddQuestion}
                   sx={{ alignSelf: "flex-start" }}
                 >
-                  Dodaj pitanje
+                  {t("addQuestion")}
                 </Button>
               </Stack>
             </Box>
@@ -247,32 +248,32 @@ export default function ManagerPollsPage() {
             <Stack direction={{ xs: "column", md: "row" }} spacing={4}>
               <Box sx={{ flex: 1 }}>
                 <Typography variant="h6" gutterBottom fontWeight={600}>
-                  Dostupni studenti
+                  {t("availableStudentsTitle")}
                 </Typography>
                 {loadingCount ? (
                   <CircularProgress size={24} />
                 ) : eligibleCount !== null ? (
                   <Box>
                     <Typography variant="body1">
-                      Ukupno pretplaćenih studenata:{" "}
-                      <strong>{eligibleCount}</strong>
+                      {t("totalSubscribedStudents", { count: eligibleCount })}
                     </Typography>
                     <Alert severity="info" sx={{ mt: 2, borderRadius: 2 }}>
-                      Odabrali ste <strong>{percentage}%</strong> uzorka. Anketa
-                      će biti poslana na približno{" "}
-                      <strong>{calculateTargetCount()}</strong> studenata.
+                      {t("sampleInfo", {
+                        percentage,
+                        count: calculateTargetCount(),
+                      })}
                     </Alert>
                   </Box>
                 ) : (
                   <Alert severity="error" sx={{ borderRadius: 2 }}>
-                    Neuspješno dohvaćanje broja studenata.
+                    {t("failedToFetchStudentCount")}
                   </Alert>
                 )}
               </Box>
 
               <Box sx={{ flex: 1 }}>
                 <Typography variant="h6" gutterBottom fontWeight={600}>
-                  Uzorak studenata
+                  {t("studentSampleTitle")}
                 </Typography>
                 <ToggleButtonGroup
                   value={percentage}
@@ -324,7 +325,7 @@ export default function ManagerPollsPage() {
                   fontWeight: 600,
                 }}
               >
-                Pošalji anketu
+                {t("sendPoll")}
               </Button>
             </Box>
           </Stack>

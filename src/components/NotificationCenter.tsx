@@ -26,6 +26,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import DownloadIcon from "@mui/icons-material/Download";
+import { useI18n } from "@/components/I18nProvider";
 import {
   getAllStudentNotifications,
   getAllWorkerNotifications,
@@ -50,6 +51,7 @@ const SwipeableNotificationItem = ({
   onClick,
   setPreviewImage,
 }: any) => {
+  const { lang, t } = useI18n();
   const [startX, setStartX] = useState<number | null>(null);
   const [offsetX, setOffsetX] = useState(0);
   const [isSwiping, setIsSwiping] = useState(false);
@@ -102,6 +104,16 @@ const SwipeableNotificationItem = ({
   };
 
   if (isDeleted) return null;
+
+  const titleText = notif.titleKey
+    ? t(notif.titleKey, notif.titleParams)
+    : notif.title === "Obavijest"
+      ? t("notificationDefaultTitle")
+      : notif.title || t("notificationDefaultTitle");
+
+  const descriptionText = notif.descriptionKey
+    ? t(notif.descriptionKey, notif.descriptionParams)
+    : notif.description;
 
   return (
     <ListItem
@@ -269,7 +281,7 @@ const SwipeableNotificationItem = ({
                 lineHeight: 1.2,
               }}
             >
-              {notif.title || "Obavijest"}
+              {titleText}
             </Typography>
           </Box>
 
@@ -286,7 +298,7 @@ const SwipeableNotificationItem = ({
               overflow: "hidden",
             }}
           >
-            {notif.description}
+            {descriptionText}
           </Typography>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -294,12 +306,15 @@ const SwipeableNotificationItem = ({
               variant="caption"
               sx={{ color: "text.disabled", fontWeight: 500 }}
             >
-              {new Date(notif.createdAt).toLocaleString("hr-HR", {
-                day: "2-digit",
-                month: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+              {new Date(notif.createdAt).toLocaleString(
+                lang === "HR" ? "hr-HR" : "en-GB",
+                {
+                  day: "2-digit",
+                  month: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                },
+              )}
             </Typography>
           </Box>
         </Box>
@@ -316,6 +331,7 @@ export default function NotificationCenter({
   onRead,
 }: NotificationCenterProps & { onRead?: () => void }) {
   const router = useRouter();
+  const { t } = useI18n();
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -573,11 +589,11 @@ export default function NotificationCenter({
               }}
             >
               <Typography variant="h6" fontWeight="700" fontSize="1.1rem">
-                Obavijesti
+                {t("notificationsTitle")}
               </Typography>
               <Box>
                 {notifications.length > 0 && (
-                  <Tooltip title="Obriši sve">
+                  <Tooltip title={t("deleteAllNotificationsTooltip")}>
                     <IconButton
                       size="small"
                       onClick={() => setConfirmDeleteOpen(true)}
@@ -635,7 +651,7 @@ export default function NotificationCenter({
                       sx={{ fontSize: 48, mb: 1, color: "text.disabled" }}
                     />
                     <Typography variant="body2" color="text.secondary">
-                      Nema novih obavijesti.
+                      {t("noNewNotifications")}
                     </Typography>
                   </Box>
                 ) : (
@@ -664,18 +680,19 @@ export default function NotificationCenter({
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"Obriši sve obavijesti?"}
+          {t("deleteAllNotificationsConfirmTitle")}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Jeste li sigurni da želite obrisati sve obavijesti? Ova radnja se ne
-            može poništiti.
+            {t("deleteAllNotificationsConfirmBody")}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setConfirmDeleteOpen(false)}>Odustani</Button>
+          <Button onClick={() => setConfirmDeleteOpen(false)}>
+            {t("cancel")}
+          </Button>
           <Button onClick={handleDeleteAll} color="error" autoFocus>
-            Obriši sve
+            {t("deleteAll")}
           </Button>
         </DialogActions>
       </Dialog>

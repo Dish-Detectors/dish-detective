@@ -25,6 +25,7 @@ import { createEmployeeAccount } from "./actions";
 import { uploadProfileImage } from "../upload-image";
 import SuccessScreen from "@/components/SuccessScreen";
 import AdminNavbar, { navWidth, headerHeight } from "@/components/AdminNavbar";
+import { useI18n } from "@/components/I18nProvider";
 
 // ... inside component
 
@@ -36,6 +37,7 @@ type Restaurant = {
 };
 
 export default function EmployeeCreatePage() {
+  const { t } = useI18n();
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -74,14 +76,14 @@ export default function EmployeeCreatePage() {
 
   const validatePassword = (password: string): string => {
     if (password.length < 8) {
-      return "Lozinka mora imati minimalno 8 znakova";
+      return t("passwordMinLength");
     }
     return "";
   };
 
   const validateConfirmPassword = (confirm: string, pass: string): string => {
     if (confirm !== pass) {
-      return "Lozinke se moraju podudarati";
+      return t("passwordsMustMatch");
     }
     return "";
   };
@@ -120,10 +122,10 @@ export default function EmployeeCreatePage() {
         if (result.success && result.data) {
           setRestaurants(result.data);
         } else {
-          setError("Failed to load restaurants");
+          setError(t("failedToLoadRestaurants"));
         }
       } catch (err) {
-        setError("Failed to load restaurants");
+        setError(t("failedToLoadRestaurants"));
       } finally {
         setLoadingRestaurants(false);
       }
@@ -138,7 +140,7 @@ export default function EmployeeCreatePage() {
       confirmPasswordError ||
       formData.password !== formData.confirmPassword
     ) {
-      setError("Molimo provjerite lozinke");
+      setError(t("checkPasswords"));
       return;
     }
 
@@ -166,17 +168,21 @@ export default function EmployeeCreatePage() {
           // We don't block success on image upload failure, but we could log it
         }
 
-        setSuccess("Račun uspješno kreiran!");
+        setSuccess(t("accountCreatedSuccess"));
         setShowSuccessScreen(true);
         // Redirect after showing success screen
         setTimeout(() => {
           router.push("/admin/accounts");
         }, 2000);
       } else {
-        setError(result.error || "Neuspješno kreiranje računa");
+        setError(
+          ("errorKey" in result && result.errorKey && t(result.errorKey)) ||
+            result.error ||
+            t("accountCreateError"),
+        );
       }
     } catch (err) {
-      setError("Došlo je do greške prilikom kreiranja računa");
+      setError(t("accountCreateGenericError"));
     } finally {
       setLoading(false);
     }
@@ -184,7 +190,7 @@ export default function EmployeeCreatePage() {
 
   // Show success screen after successful creation
   if (showSuccessScreen) {
-    return <SuccessScreen message="Račun uspješno kreiran!" />;
+    return <SuccessScreen message={t("accountCreatedSuccess")} />;
   }
 
   // Mobile Layout
@@ -275,7 +281,7 @@ export default function EmployeeCreatePage() {
               sx={{ mb: 4, display: "flex", flexDirection: "column", gap: 0 }}
             >
               <InputBase
-                placeholder="Ime"
+                placeholder={t("firstNamePlaceholder")}
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
@@ -291,7 +297,7 @@ export default function EmployeeCreatePage() {
                 }}
               />
               <InputBase
-                placeholder="Prezime"
+                placeholder={t("lastNamePlaceholder")}
                 value={formData.lastName}
                 onChange={(e) =>
                   setFormData({ ...formData, lastName: e.target.value })
@@ -323,7 +329,7 @@ export default function EmployeeCreatePage() {
             <Box component="form" onSubmit={handleSubmit}>
               <TextField
                 fullWidth
-                label="Korisničko ime"
+                label={t("usernameLabel")}
                 value={formData.username}
                 onChange={(e) =>
                   setFormData({ ...formData, username: e.target.value })
@@ -340,7 +346,7 @@ export default function EmployeeCreatePage() {
 
               <TextField
                 fullWidth
-                label="Lozinka"
+                label={t("passwordLabel")}
                 type="password"
                 value={formData.password}
                 onChange={(e) => handlePasswordChange(e.target.value)}
@@ -349,7 +355,7 @@ export default function EmployeeCreatePage() {
                 helperText={
                   passwordError && formData.password.length > 0
                     ? passwordError
-                    : "Minimalno 8 znakova"
+                    : t("min8CharsHint")
                 }
                 sx={{
                   mb: 3,
@@ -362,7 +368,7 @@ export default function EmployeeCreatePage() {
 
               <TextField
                 fullWidth
-                label="Potvrdi lozinku"
+                label={t("confirmPasswordLabel")}
                 type="password"
                 value={formData.confirmPassword}
                 onChange={(e) => handleConfirmPasswordChange(e.target.value)}
@@ -373,7 +379,7 @@ export default function EmployeeCreatePage() {
                 helperText={
                   confirmPasswordError && formData.confirmPassword.length > 0
                     ? confirmPasswordError
-                    : "Lozinke se moraju podudarati"
+                    : t("passwordsMustMatch")
                 }
                 sx={{
                   mb: 3,
@@ -444,10 +450,10 @@ export default function EmployeeCreatePage() {
               {loading ? (
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <CircularProgress size={24} color="inherit" />
-                  Kreiranje...
+                  {t("creating")}
                 </Box>
               ) : (
-                "Kreiraj račun"
+                t("createAccount")
               )}
             </Typography>
           </Box>
@@ -528,7 +534,7 @@ export default function EmployeeCreatePage() {
           {/* Editable Header for Name & Last Name */}
           <Box sx={{ mb: 4, display: "flex", flexDirection: "column", gap: 0 }}>
             <InputBase
-              placeholder="Ime"
+              placeholder={t("firstNamePlaceholder")}
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
@@ -556,7 +562,7 @@ export default function EmployeeCreatePage() {
               }}
             />
             <InputBase
-              placeholder="Prezime"
+              placeholder={t("lastNamePlaceholder")}
               value={formData.lastName}
               onChange={(e) =>
                 setFormData({ ...formData, lastName: e.target.value })
@@ -600,7 +606,7 @@ export default function EmployeeCreatePage() {
           <Box component="form" onSubmit={handleSubmit}>
             <TextField
               fullWidth
-              label="Korisničko ime"
+              label={t("usernameLabel")}
               value={formData.username}
               onChange={(e) =>
                 setFormData({ ...formData, username: e.target.value })
@@ -616,7 +622,7 @@ export default function EmployeeCreatePage() {
 
             <TextField
               fullWidth
-              label="Lozinka"
+              label={t("passwordLabel")}
               type="password"
               value={formData.password}
               onChange={(e) => handlePasswordChange(e.target.value)}
@@ -625,7 +631,7 @@ export default function EmployeeCreatePage() {
               helperText={
                 passwordError && formData.password.length > 0
                   ? passwordError
-                  : "Minimalno 8 znakova"
+                  : t("min8CharsHint")
               }
               sx={{
                 mb: 3,
@@ -637,7 +643,7 @@ export default function EmployeeCreatePage() {
 
             <TextField
               fullWidth
-              label="Potvrdi lozinku"
+              label={t("confirmPasswordLabel")}
               type="password"
               value={formData.confirmPassword}
               onChange={(e) => handleConfirmPasswordChange(e.target.value)}
@@ -648,7 +654,7 @@ export default function EmployeeCreatePage() {
               helperText={
                 confirmPasswordError && formData.confirmPassword.length > 0
                   ? confirmPasswordError
-                  : "Lozinke se moraju podudarati"
+                  : t("passwordsMustMatch")
               }
               sx={{
                 mb: 3,
@@ -681,10 +687,10 @@ export default function EmployeeCreatePage() {
               {loading ? (
                 <>
                   <CircularProgress size={24} sx={{ mr: 1 }} color="inherit" />
-                  Kreiranje...
+                  {t("creating")}
                 </>
               ) : (
-                "Kreiraj račun"
+                t("createAccount")
               )}
             </Button>
           </Box>

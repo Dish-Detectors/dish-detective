@@ -1,6 +1,7 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { Box, Typography, Button } from "@mui/material";
 import { SignOutButton } from "@clerk/nextjs";
+import { tServer } from "@/utils/i18nServer";
 
 export default async function UnassignedPage() {
   const user = await currentUser();
@@ -19,20 +20,19 @@ export default async function UnassignedPage() {
       }}
     >
       <Typography variant="h4" fontWeight="bold" gutterBottom>
-        Niste pridodijeljeni
+        {await tServer("unassignedTitle")}
       </Typography>
       <Typography
         variant="body1"
         color="text.secondary"
         sx={{ mb: 4, maxWidth: 500 }}
       >
-        Bok {user?.firstName}, tvoj račun je kreiran, ali još nisi pridodijeljen
-        niti jednom restoranu. Molimo kontaktiraj administratora.
+        {await tServer("unassignedBody", { firstName: user?.firstName || "" })}
       </Typography>
 
       <SignOutButton>
         <Button variant="outlined" color="primary">
-          Odjavi se
+          {await tServer("signOut")}
         </Button>
       </SignOutButton>
     </Box>

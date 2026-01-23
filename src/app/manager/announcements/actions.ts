@@ -53,7 +53,7 @@ export async function sendAnnouncement(
           topic: "topic_all_students",
           notification: {
             title: notificationTitle,
-            body: text || "Nova datoteka", // Fallback if text is empty (attachment only)
+            body: text || "New file / Nova datoteka", // Fallback if text is empty (attachment only)
           },
           data: {
             type: "announcement",

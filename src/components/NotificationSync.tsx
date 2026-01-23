@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Snackbar, Button, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { useI18n } from "@/components/I18nProvider";
 import {
   checkNotificationPermission,
   requestNotificationPermission,
@@ -13,6 +14,7 @@ import {
 } from "@/actions/notification";
 
 export default function NotificationSync() {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -59,7 +61,7 @@ export default function NotificationSync() {
   return (
     <Snackbar
       open={open}
-      message="Želite li primati obavijesti o novostima i jelima?"
+      message={t("enableNotificationsPrompt")}
       action={
         <React.Fragment>
           <Button
@@ -68,7 +70,7 @@ export default function NotificationSync() {
             onClick={handleSync}
             disabled={loading}
           >
-            OMOGUĆI
+            {t("enable")}
           </Button>
           <IconButton
             size="small"

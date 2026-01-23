@@ -17,17 +17,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { IShift, IWorkingDay } from "@/models/Restaurant";
-
-const DAYS = ["NED", "PON", "UTO", "SRI", "ČET", "PET", "SUB"];
-const DAY_LABELS = [
-  "Nedjelja",
-  "Ponedjeljak",
-  "Utorak",
-  "Srijeda",
-  "Četvrtak",
-  "Petak",
-  "Subota",
-];
+import { useI18n } from "@/components/I18nProvider";
 
 export interface WorkingHoursData {
   [day: number]: IShift[];
@@ -44,8 +34,28 @@ export default function WorkingHoursEditor({
   onChange,
   error,
 }: WorkingHoursEditorProps) {
+  const { t } = useI18n();
   const [selectedDay, setSelectedDay] = useState<number>(1); // Monday default
   const [workingHours, setWorkingHours] = useState<WorkingHoursData>({});
+
+  const DAYS = [
+    t("daySunShort"),
+    t("dayMonShort"),
+    t("dayTueShort"),
+    t("dayWedShort"),
+    t("dayThuShort"),
+    t("dayFriShort"),
+    t("daySatShort"),
+  ];
+  const DAY_LABELS = [
+    t("daySunday"),
+    t("dayMonday"),
+    t("dayTuesday"),
+    t("dayWednesday"),
+    t("dayThursday"),
+    t("dayFriday"),
+    t("daySaturday"),
+  ];
 
   useEffect(() => {
     // Initialize data
@@ -165,7 +175,7 @@ export default function WorkingHoursEditor({
               color="text.secondary"
               sx={{ textAlign: "center", py: 4 }}
             >
-              Nema definiranih smjena za ovaj dan. Restoran je zatvoren.
+              {t("noShiftsDefined")}
             </Typography>
           ) : (
             currentShifts.map((shift, index) => (
@@ -198,7 +208,7 @@ export default function WorkingHoursEditor({
                   }}
                 >
                   <TextField
-                    label="Početak"
+                    label={t("shiftStart")}
                     type="time"
                     size="small"
                     value={shift.start}
@@ -221,10 +231,10 @@ export default function WorkingHoursEditor({
                     color="text.secondary"
                     sx={{ display: { xs: "none", sm: "block" } }}
                   >
-                    do
+                    {t("timeTo")}
                   </Typography>
                   <TextField
-                    label="Kraj"
+                    label={t("shiftEnd")}
                     type="time"
                     size="small"
                     value={shift.end}
@@ -272,7 +282,7 @@ export default function WorkingHoursEditor({
             fontWeight: 600,
           }}
         >
-          Dodaj smjenu
+          {t("addShift")}
         </Button>
       </Paper>
       {error && (

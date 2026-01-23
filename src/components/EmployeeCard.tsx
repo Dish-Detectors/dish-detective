@@ -14,6 +14,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd"; // Manager Icon
 import PersonIcon from "@mui/icons-material/Person"; // Worker Icon
 import RestaurantIcon from "@mui/icons-material/Restaurant";
+import { useI18n } from "@/components/I18nProvider";
 
 interface EmployeeCardProps {
   id: string;
@@ -38,9 +39,14 @@ export default function EmployeeCard({
   onEdit,
   onDelete,
 }: EmployeeCardProps) {
-  let displayRole = "Nije pridodijeljen";
-  if (role === "manager") displayRole = "Voditelj";
-  if (role === "worker") displayRole = "Radnik";
+  const { t } = useI18n();
+
+  const displayRole =
+    role === "manager"
+      ? t("roleManager")
+      : role === "worker"
+        ? t("roleWorker")
+        : t("managerUnassigned");
 
   const buttonStyle = {
     flex: 1,
@@ -137,7 +143,7 @@ export default function EmployeeCard({
         <Box sx={{ display: "flex", alignItems: "center", mb: 1.5, gap: 1 }}>
           <RestaurantIcon sx={{ fontSize: 18, color: "text.secondary" }} />
           <Typography variant="body2" color="text.secondary" noWrap>
-            {restaurantName || "Nije dodijeljen"}
+            {restaurantName || t("managerUnassigned")}
           </Typography>
         </Box>
 
